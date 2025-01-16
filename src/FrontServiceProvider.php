@@ -1,0 +1,235 @@
+<?php
+
+namespace GP247\Front;
+
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\DB;
+use GP247\Front\Middleware\CheckDomain;
+use GP247\Front\Commands\FrontInstall;
+use GP247\Front\Commands\FrontUninstall;
+
+class FrontServiceProvider extends ServiceProvider
+{
+
+    protected function initial()
+    {
+        //Create directory
+        try {
+            if (!is_dir($directory = app_path('GP247/Front/Api'))) {
+                mkdir($directory, 0777, true);
+            }
+            if (!is_dir($directory = app_path('GP247/Front/Controllers'))) {
+                mkdir($directory, 0777, true);
+            }
+            if (!is_dir($directory = app_path('GP247/Front/Controllers/Admin'))) {
+                mkdir($directory, 0777, true);
+            }
+            if (!is_dir($directory = app_path('GP247/Templates'))) {
+                mkdir($directory, 0777, true);
+            }
+        } catch (\Throwable $e) {
+            $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
+            echo $msg;
+            exit;
+        }
+
+                
+        //Load publish
+        try {
+            $this->registerPublishing();
+        } catch (\Throwable $e) {
+            $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
+            echo $msg;
+            exit;
+        }
+
+        try {
+            $this->commands([
+                FrontInstall::class,
+                FrontUninstall::class,
+            ]);
+        } catch (\Throwable $e) {
+            $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
+            gp247_report($msg);
+            echo $msg;
+            exit;
+        }
+    }
+
+    /**
+     * Bootstrap services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+
+        $this->initial();
+
+        if (GP247_ACTIVE == 1 && \Illuminate\Support\Facades\Storage::disk('local')->exists('gp247-installed.txt')) {
+
+            //Load helper
+            try {
+                foreach (glob(__DIR__.'/Library/Helpers/*.php') as $filename) {
+                    require_once $filename;
+                }
+            } catch (\Throwable $e) {
+                $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
+                gp247_report($msg);
+                echo $msg;
+                exit;
+            }
+
+            //Boot process GP247
+            try {
+                $this->bootDefault();
+            } catch (\Throwable $e) {
+                $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
+                gp247_report($msg);
+                echo $msg;
+                exit;
+            }
+
+            //Route
+            try {
+                if (file_exists($routes = __DIR__.'/routes.php')) {
+                    $this->loadRoutesFrom($routes);
+                }
+            } catch (\Throwable $e) {
+                $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
+                gp247_report($msg);
+                echo $msg;
+                exit;
+            }
+
+            $this->loadViewsFrom(app_path().'/GP247/Templates', 'GP247TemplatePath');
+            $this->loadViewsFrom(__DIR__.'/Views', 'gp247-front');
+
+            //Route Api
+            try {
+                if (config('gp247-config.env.GP247_API_MODE')) {
+                    if (file_exists($routes = __DIR__.'/Api/routes.php')) {
+                        $this->loadRoutesFrom($routes);
+                    }
+                }
+            } catch (\Throwable $e) {
+                $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
+                gp247_report($msg);
+                echo $msg;
+                exit;
+            }
+
+
+            try {
+                $this->registerRouteMiddleware();
+            } catch (\Throwable $e) {
+                $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
+                gp247_report($msg);
+                echo $msg;
+                exit;
+            }
+
+            try {
+                $this->validationExtend();
+            } catch (\Throwable $e) {
+                $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
+                gp247_report($msg);
+                echo $msg;
+                exit;
+            }
+
+            $this->eventRegister();
+
+        }
+    }
+
+    /**
+     * Register services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->mergeConfigFrom(__DIR__.'/Config/config.php', 'gp247-config');
+        if (file_exists(__DIR__.'/Library/Const.php')) {
+            require_once(__DIR__.'/Library/Const.php');
+        }
+    }
+
+    public function bootDefault()
+    {
+
+        view()->share('GP247TemplatePath', 'GP247TemplatePath::'.gp247_store_info('template','default'));
+        view()->share('GP247TemplateFile', 'GP247/Templates/'.gp247_store_info('template','default'));
+    }
+
+    /**
+     * The application's route middleware.
+     *
+     * @var array
+     */
+    protected $routeMiddleware = [
+        'check.domain'     => CheckDomain::class,
+    ];
+
+    /**
+     * The application's route middleware groups.
+     *
+     * @var array
+     */
+    protected function middlewareGroups()
+    {
+        return [
+            'front'        => config('gp247-config.front.middleware'),
+        ];
+    }
+
+    /**
+     * Register the route middleware.
+     *
+     * @return void
+     */
+    protected function registerRouteMiddleware()
+    {
+        // register route middleware.
+        foreach ($this->routeMiddleware as $key => $middleware) {
+            app('router')->aliasMiddleware($key, $middleware);
+        }
+
+        // register middleware group.
+        foreach ($this->middlewareGroups() as $key => $middleware) {
+            app('router')->middlewareGroup($key, array_values($middleware));
+        }
+    }
+
+    /**
+     * Validattion extend
+     *
+     * @return  [type]  [return description]
+     */
+    protected function validationExtend()
+    {
+        //
+    }
+
+    /**
+     * Register the package's publishable resources.
+     *
+     * @return void
+     */
+    protected function registerPublishing()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->publishes([__DIR__.'/public/Templates' => public_path('GP247/Templates')], 'gp247:public-templates');
+            $this->publishes([__DIR__.'/Views/templates' => app_path('GP247/Templates')], 'gp247:view-templates');
+            $this->publishes([__DIR__.'/Views/admin' => resource_path('views/vendor/gp247-front')], 'gp247:view-front');
+        }
+    }
+
+    //Event register
+    protected function eventRegister()
+    {
+        //
+    }
+}
