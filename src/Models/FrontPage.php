@@ -127,7 +127,7 @@ class FrontPage extends Model
                 (new \GP247\Core\Admin\Models\AdminCustomFieldDetail)
                 ->join(GP247_DB_PREFIX.'admin_custom_field', GP247_DB_PREFIX.'admin_custom_field.id', GP247_DB_PREFIX.'admin_custom_field_detail.custom_field_id')
                 ->where(GP247_DB_PREFIX.'admin_custom_field_detail.rel_id', $page->id)
-                ->where(GP247_DB_PREFIX.'admin_custom_field.type', 'shop_page')
+                ->where(GP247_DB_PREFIX.'admin_custom_field.type', $page->getTable())
                 ->delete();
             }
         );

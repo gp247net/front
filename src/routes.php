@@ -15,6 +15,11 @@ Route::group(
             $nameSpaceHome = 'GP247\Front\Controllers';
         }
 
+        //Process click banner
+        Route::get('/banner/{id}', $nameSpaceHome.'\HomeController@clickBanner')
+        ->name('front.banner.click');
+
+
         Route::get('/', $nameSpaceHome.'\HomeController@index')->name('front.home');
 
         Route::get('index.html', function(){

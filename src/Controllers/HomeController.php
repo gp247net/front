@@ -3,6 +3,7 @@ namespace GP247\Front\Controllers;
 
 use GP247\Front\Controllers\RootFrontController;
 use GP247\Front\Models\FrontPage;
+use GP247\Front\Models\FrontBanner;
 
 class HomeController extends RootFrontController
 {
@@ -63,5 +64,23 @@ class HomeController extends RootFrontController
         } else {
             return $this->pageNotFound();
         }
+    }
+
+    
+    /**
+     * Process click banner
+     *
+     * @param   [int]  $id
+     *
+     */
+    public function clickBanner($id = 0)
+    {
+        $banner = FrontBanner::find($id);
+        if ($banner) {
+            $banner->click +=1;
+            $banner->save();
+            return redirect(url($banner->url??'/'));
+        }
+        return redirect(url('/'));
     }
 }

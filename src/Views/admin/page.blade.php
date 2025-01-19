@@ -144,7 +144,7 @@
                                         <div class="input-group-append">
                                             <a data-input="image" data-preview="preview_image" data-type="page"
                                                 class="btn btn-primary lfm">
-                                                <i class="fa fa-image"></i> {{gp247_language_render('admin.page.choose_image')}}
+                                                <i class="fa fa-image"></i> {{gp247_language_render('action.choose_image')}}
                                             </a>
                                         </div>
                                 </div>
