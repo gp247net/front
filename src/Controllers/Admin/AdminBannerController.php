@@ -3,19 +3,25 @@ namespace GP247\Front\Controllers\Admin;
 
 use GP247\Core\Admin\Models\AdminLanguage;
 use GP247\Front\Models\FrontBanner;
+use GP247\Front\Models\FrontBannerType;
 use GP247\Front\Controllers\Admin\RootFrontAdminController;
 use Illuminate\Support\Facades\Validator;
 
 class AdminBannerController extends RootFrontAdminController
 {
    
-    public $languages;
     protected $arrTarget;
+    protected $dataType;
     public function __construct()
     {
         parent::__construct();
         $this->arrTarget = ['_blank' => '_blank', '_self' => '_self'];
-        $this->languages = AdminLanguage::getListActive();
+        $this->dataType  = (new FrontBannerType)->pluck('name', 'code')->all();
+        if (gp247_store_check_multi_domain_installed()) {
+            $this->dataType['background-store'] = 'Background store';
+            $this->dataType['breadcrumb-store'] = 'Breadcrumb store';
+        }
+        ksort($this->dataType);
     }
 
     public function index()
@@ -35,6 +41,7 @@ class AdminBannerController extends RootFrontAdminController
             'status' => gp247_language_render('admin.banner.status'),
             'click'  => gp247_language_render('admin.banner.click'),
             'target' => gp247_language_render('admin.banner.target'),
+            'type'   => gp247_language_render('admin.banner.type'),
             'action' => gp247_language_render('action.title'),
         ];
 
@@ -68,6 +75,7 @@ class AdminBannerController extends RootFrontAdminController
                 'status' => $row['status'] ? '<span class="badge badge-success">ON</span>' : '<span class="badge badge-danger">OFF</span>',
                 'click' => number_format($row['click']),
                 'target' => $row['target'],
+                'type' => $this->dataType[$row['type']]??'N/A',
                 'action' => $action,
             ];
         }
@@ -122,9 +130,9 @@ class AdminBannerController extends RootFrontAdminController
             'title'             => gp247_language_render('admin.user.add_new_title'),
             'subTitle'          => '',
             'title_description' => gp247_language_render('admin.user.add_new_des'),
-            'languages'         => $this->languages,
             'banner'              => $banner,
             'arrTarget'         => $this->arrTarget,
+            'dataType'          => $this->dataType,
             'url_action'        => gp247_route_admin('admin_banner.create'),
         ];
         return view('gp247-front::admin.banner')
@@ -202,9 +210,9 @@ class AdminBannerController extends RootFrontAdminController
             'title'             => gp247_language_render('action.edit'),
             'subTitle'          => '',
             'title_description' =>  '',
-            'languages'         => $this->languages,
             'banner'            => $banner,
             'arrTarget'         => $this->arrTarget,
+            'dataType'          => $this->dataType,
             'url_action'        => gp247_route_admin('admin_banner.post_edit', ['id' => $banner['id']]),
         ];
         return view('gp247-front::admin.banner')

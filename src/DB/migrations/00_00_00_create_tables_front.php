@@ -47,7 +47,7 @@ return new class extends Migration
 
 
         $schema->create(
-            GP247_DB_PREFIX.'front_store_block',
+            GP247_DB_PREFIX.'front_layout_block',
             function (Blueprint $table) {
                 $table->uuid('id')->primary();
                 $table->string('name', 255);
@@ -108,6 +108,15 @@ return new class extends Migration
                 $table->string('name', 255);
                 $table->timestamps();
                 
+            }
+        );
+
+        $schema->create(
+            GP247_DB_PREFIX.'front_link_store',
+            function (Blueprint $table) {
+                $table->uuid('link_id');
+                $table->uuid('store_id');
+                $table->primary(['link_id', 'store_id']);
             }
         );
 
@@ -177,14 +186,6 @@ return new class extends Migration
             }
         );
 
-        $schema->create(
-            GP247_DB_PREFIX.'front_link_store',
-            function (Blueprint $table) {
-                $table->uuid('link_id');
-                $table->uuid('store_id');
-                $table->primary(['link_id', 'store_id']);
-            }
-        );
 
     }
 
@@ -199,7 +200,7 @@ return new class extends Migration
         
         $schema->dropIfExists(GP247_DB_PREFIX.'front_banner');
         $schema->dropIfExists(GP247_DB_PREFIX.'front_banner_type');
-        $schema->dropIfExists(GP247_DB_PREFIX.'front_store_block');
+        $schema->dropIfExists(GP247_DB_PREFIX.'front_layout_block');
         $schema->dropIfExists(GP247_DB_PREFIX.'front_layout_page');
         $schema->dropIfExists(GP247_DB_PREFIX.'front_layout_position');
         $schema->dropIfExists(GP247_DB_PREFIX.'front_link');

@@ -17,6 +17,9 @@ class FrontPage extends Model
     protected $connection  = GP247_DB_CONNECTION;
     protected $guarded     = [];
 
+    protected static $getListTitleAdmin = null;
+    protected static $getListPageGroupByParentAdmin = null;
+
     public function stores()
     {
         return $this->belongsToMany(AdminStore::class, FrontPageStore::class, 'page_id', 'store_id');
@@ -249,5 +252,97 @@ class FrontPage extends Model
         }
         $data = $data->first();
         return $data;
+    }
+
+    
+    /**
+     * Get array title page
+     * user for admin
+     *
+     * @return  [type]  [return description]
+     */
+    public static function getListTitleAdmin($storeId = null)
+    {
+        $storeCache = $storeId ? $storeId : session('adminStoreId');
+        $tableDescription = (new FrontPageDescription)->getTable();
+        $table = (new AdminPage)->getTable();
+        if (sc_config_global('cache_status') && sc_config_global('cache_page')) {
+            if (!Cache::has($storeCache.'_cache_page_'.sc_get_locale())) {
+                if (self::$getListTitleAdmin === null) {
+                    $data = self::join($tableDescription, $tableDescription.'.page_id', $table.'.id')
+                    ->where('lang', sc_get_locale());
+                    if ($storeId) {
+                        $tablePageStore = (new FrontPageStore)->getTable();
+                        $data = $data->leftJoin($tablePageStore, $tablePageStore . '.page_id', $table . '.id');
+                        $data = $data->where($tablePageStore . '.store_id', $storeId);
+                    }
+                    $data = $data->pluck('title', 'id')->toArray();
+                    self::$getListTitleAdmin = $data;
+                }
+                sc_set_cache($storeCache.'_cache_page_'.sc_get_locale(), self::$getListTitleAdmin);
+            }
+            return Cache::get($storeCache.'_cache_page_'.sc_get_locale());
+        } else {
+            if (self::$getListTitleAdmin === null) {
+                $data = self::join($tableDescription, $tableDescription.'.page_id', $table.'.id')
+                ->where('lang', sc_get_locale());
+                if ($storeId) {
+                    $tablePageStore = (new FrontPageStore)->getTable();
+                    $data = $data->leftJoin($tablePageStore, $tablePageStore . '.page_id', $table . '.id');
+                    $data = $data->where($tablePageStore . '.store_id', $storeId);
+                }
+                $data = $data->pluck('title', 'id')->toArray();
+                self::$getListTitleAdmin = $data;
+            }
+            return self::$getListTitleAdmin;
+        }
+    }
+
+
+    /**
+     * Create a new page
+     *
+     * @param   array  $dataCreate  [$dataCreate description]
+     *
+     * @return  [type]              [return description]
+     */
+    public static function createPageAdmin(array $dataCreate)
+    {
+        return self::create($dataCreate);
+    }
+
+
+    /**
+     * Insert data description
+     *
+     * @param   array  $dataCreate  [$dataCreate description]
+     *
+     * @return  [type]              [return description]
+     */
+    public static function insertDescriptionAdmin(array $dataCreate)
+    {
+        return FrontPageDescription::create($dataCreate);
+    }
+
+    /**
+     * [getListPageAlias description]
+     *
+     * @param   [type]  $storeId  [$storeId description]
+     *
+     * @return  array             [return description]
+     */
+    public function getListPageAlias($storeId = null):array 
+    {
+        $storeId = $storeId ? $storeId : session('adminStoreId');
+        $arrReturn = [];
+        $tablePage = $this->getTable();
+        $tablePageStore = (new FrontPageStore)->getTable();
+        $data = $this;
+        if ($storeId) {
+            $data = $this->leftJoin($tablePageStore, $tablePageStore . '.page_id', $tablePage . '.id');
+            $data = $data->where($tablePageStore . '.store_id', $storeId);
+        }
+        $arrReturn = $data->pluck('alias')->toArray();
+        return $arrReturn;
     }
 }

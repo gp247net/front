@@ -114,12 +114,11 @@
                                 </div>
                             </div>
                             
-                            @if (!empty($dataType))
                             <div class="form-group row {{ $errors->has('type') ? ' text-red' : '' }}">
                                 <label class="col-sm-2 col-form-label">{{ gp247_language_render('admin.banner.type') }}</label>
                                 <div class="col-sm-8">
                                 <div class="input-group">
-                                <select class="form-control" name="type">
+                                <select class="form-control select2" name="type">
                                     @foreach ($dataType as $key => $name)
                                     <option {{ (old('type', $banner['type']??'') ==  $key)?'selected':'' }} value="{{ $key }}">{{ $name }}</option>
                                     @endforeach
@@ -137,9 +136,7 @@
                                 @endif
                                 </div>
                               </div>
-                            @endif
-
-
+                              
                             <div class="form-group  row {{ $errors->has('sort') ? ' text-red' : '' }}">
                                 <label for="sort" class="col-sm-2 col-form-label">{{ gp247_language_render('admin.banner.sort') }}</label>
                                 <div class="col-sm-8">
