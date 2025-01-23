@@ -10,3 +10,6 @@ if (!defined('GP247_FRONT_MIDDLEWARE')) {
 if (!defined('GP247_SEO_LANG')) {
     define('GP247_SEO_LANG', config('gp247-config.front.route.GP247_SEO_LANG'));
 }
+if (!defined('GP247_TEMPLATE_FRONT_DEFAULT')) {
+    define('GP247_TEMPLATE_FRONT_DEFAULT', config('gp247-config.front.GP247_TEMPLATE_FRONT_DEFAULT'));
+}

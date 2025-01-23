@@ -160,8 +160,8 @@ class FrontServiceProvider extends ServiceProvider
     public function bootDefault()
     {
 
-        view()->share('GP247TemplatePath', 'GP247TemplatePath::'.gp247_store_info('template','default'));
-        view()->share('GP247TemplateFile', 'GP247/Templates/'.gp247_store_info('template','default'));
+        view()->share('GP247TemplatePath', 'GP247TemplatePath::'.gp247_store_info('template',GP247_TEMPLATE_FRONT_DEFAULT));
+        view()->share('GP247TemplateFile', 'GP247/Templates/'.gp247_store_info('template',GP247_TEMPLATE_FRONT_DEFAULT));
     }
 
     /**

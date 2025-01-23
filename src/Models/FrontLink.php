@@ -1,6 +1,6 @@
 <?php
-#S-Cart/Core/Front/Models/FrontLink.php
-namespace SCart\Core\Front\Models;
+#GP247/Front/Models/FrontLink.php
+namespace GP247\Front\Models;
 
 use GP247\Core\Admin\Models\AdminStore;
 use GP247\Front\Models\FrontLinkStore;
@@ -133,4 +133,61 @@ class FrontLink extends Model
             }
         });
     }
+
+    /**
+     * Get link detail in admin
+     *
+     * @param   [type]  $id  [$id description]
+     *
+     * @return  [type]       [return description]
+     */
+    public static function getLinkAdmin($id, $storeId = null)
+    {
+        $data = self::where('id', $id);
+        if ($storeId) {
+            $tableLinkStore = (new FrontLinkStore)->getTable();
+            $tableLink = (new FrontLink)->getTable();
+            $data = $data->leftJoin($tableLinkStore, $tableLinkStore . '.link_id', $tableLink . '.id');
+            $data = $data->where($tableLinkStore . '.store_id', $storeId);
+        }
+        $data = $data->first();
+        return $data;
+    }
+
+    /**
+     * Get list link in admin
+     *
+     * @param   [array]  $dataSearch  [$dataSearch description]
+     *
+     * @return  [type]               [return description]
+     */
+    public static function getLinkListAdmin($storeId = null)
+    {
+        $linkList = (new FrontLink);
+        $tableLink = $linkList->getTable();
+        if ($storeId) {
+            $tableLinkStore = (new FrontLinkStore)->getTable();
+            $linkList = $linkList->leftJoin($tableLinkStore, $tableLinkStore . '.link_id', $tableLink . '.id');
+            $linkList = $linkList->where($tableLinkStore . '.store_id', $storeId);
+        }
+        $linkList = $linkList->orderBy($tableLink.'.created_at', 'desc');
+
+        $linkList = $linkList->paginate(20);
+
+        return $linkList;
+    }
+
+    /**
+     * Create a new link
+     *
+     * @param   array  $dataCreate  [$dataCreate description]
+     *
+     * @return  [type]              [return description]
+     */
+    public static function createLinkAdmin(array $dataCreate)
+    {
+        $dataCreate = gp247_clean($dataCreate);
+        return self::create($dataCreate);
+    }
+
 }

@@ -98,7 +98,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
             }
 
             $storeTmp['action'] = '
-                <a href="' . gp247_route_admin('admin_block.edit', ['id' => $row['id'] ? $row['id'] : 'not-found-id']) . '"><span title="' . gp247_language_render('action.edit') . '" type="button" class="btn btn-flat btn-sm btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
+                <a href="' . gp247_route_admin('admin_layout_block.edit', ['id' => $row['id'] ? $row['id'] : 'not-found-id']) . '"><span title="' . gp247_language_render('action.edit') . '" type="button" class="btn btn-flat btn-sm btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
             <span onclick="deleteItem(\'' . $row['id'] . '\');"  title="' . gp247_language_render('action.delete') . '" class="btn btn-flat btn-sm btn-danger"><i class="fas fa-trash-alt"></i></span>
             ';
             $dataTr[$row['id']] = $storeTmp;
@@ -179,14 +179,14 @@ class AdminLayoutBlockController extends RootFrontAdminController
             'text'     => $data['text'],
             'type'     => $data['type'],
             'sort'     => (int) $data['sort'],
-            'template' => $store->template,
+            'template' => $store->template ?? GP247_TEMPLATE_FRONT_DEFAULT,
             'status'   => (empty($data['status']) ? 0 : 1),
             'store_id' => $storeId,
         ];
         $dataCreate = gp247_clean($dataCreate, ['text'], true);
         FrontLayoutBlock::createStoreBlockContentAdmin($dataCreate);
         
-        return redirect()->route('admin_block.index')->with('success', gp247_language_render('action.create_success'));
+        return redirect()->route('admin_layout_block.index')->with('success', gp247_language_render('action.create_success'));
     }
 
     /**
@@ -214,7 +214,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
             'listViewPage' => $listViewPage,
             'layout' => $layout,
             'storeId' => $layout->store_id,
-            'url_action' => gp247_route_admin('admin_block.edit', ['id' => $layout['id']]),
+            'url_action' => gp247_route_admin('admin_layout_block.edit', ['id' => $layout['id']]),
         ];
         return view('gp247-front::admin.layout_block')
             ->with($data);
@@ -254,14 +254,14 @@ class AdminLayoutBlockController extends RootFrontAdminController
             'text' => $data['text'],
             'type' => $data['type'],
             'sort' => (int) $data['sort'],
-            'template' => $store->template,
+            'template' => $store->template ?? GP247_TEMPLATE_FRONT_DEFAULT,
             'status' => (empty($data['status']) ? 0 : 1),
             'store_id' => $storeId,
         ];
         $dataUpdate = gp247_clean($dataUpdate, ['text'], true);
         $layout->update($dataUpdate);
         
-        return redirect()->route('admin_block.index')->with('success', gp247_language_render('action.edit_success'));
+        return redirect()->route('admin_layout_block.index')->with('success', gp247_language_render('action.edit_success'));
     }
 
     /*

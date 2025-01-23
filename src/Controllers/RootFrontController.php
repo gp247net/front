@@ -9,7 +9,7 @@ class RootFrontController extends Controller
     public $GP247TemplatePath;
     public function __construct()
     {
-        $this->GP247TemplatePath = 'GP247TemplatePath::' . gp247_store_info('template','default');
+        $this->GP247TemplatePath = 'GP247TemplatePath::' . gp247_store_info('template',GP247_TEMPLATE_FRONT_DEFAULT);
         $this->gp247_templatePathFront = config('gp247-config.front.path_view').'::';
     }
     /**
