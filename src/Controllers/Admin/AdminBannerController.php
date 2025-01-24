@@ -204,7 +204,7 @@ class AdminBannerController extends RootFrontAdminController
 
         $banner = $banner->getBannerAdmin($id);
         if (!$banner) {
-            return gp247_language_render('admin.data_not_found_detail');
+            return redirect(gp247_route_admin('admin_banner.index'))->with('error', gp247_language_render('admin.data_not_found'));
         }
         $data = [
             'title'             => gp247_language_render('action.edit'),

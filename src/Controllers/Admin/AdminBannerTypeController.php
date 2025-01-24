@@ -103,7 +103,7 @@ class AdminBannerTypeController extends RootFrontAdminController
     {
         $banner_type = FrontBannerType::find($id);
         if (!$banner_type) {
-            return 'No data';
+            return redirect(gp247_route_admin('admin_banner_type.index'))->with('error', gp247_language_render('admin.data_not_found'));
         }
         $data = [
         'title' => gp247_language_render('admin.banner_type.list'),

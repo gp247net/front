@@ -18,49 +18,12 @@ class AdminLinkGroupController extends RootFrontAdminController
      */
     public function index()
     {
-        $data = [
-            'title' => gp247_language_render('admin.link_group.list'),
-            'title_action' => '<i class="fa fa-plus" aria-hidden="true"></i> ' . gp247_language_render('admin.link_group.add_new_title'),
-            'subTitle' => '',
-            'icon' => 'fa fa-indent',
-            'urlDeleteItem' => gp247_route_admin('admin_link_group.delete'),
-            'removeList' => 0, // 1 - Enable function delete list item
-            'buttonRefresh' => 0, // 1 - Enable button refresh
-            'css' => '',
-            'js' => '',
-            'url_action' => gp247_route_admin('admin_link_group.create'),
-        ];
-
-        $listTh = [
-            'code' => gp247_language_render('admin.link_group.code'),
-            'name' => gp247_language_render('admin.link_group.name'),
-            'action' => gp247_language_render('action.title'),
-        ];
-        $obj = new FrontLinkGroup;
-        $obj = $obj->orderBy('id', 'desc');
-        $dataTmp = $obj->paginate(20);
-
-        $dataTr = [];
-        foreach ($dataTmp as $key => $row) {
-            $dataTr[$row['id']] = [
-                'code' => $row['code'] ?? 'N/A',
-                'name' => $row['name'] ?? 'N/A',
-                'action' => '
-                    <a href="' . gp247_route_admin('admin_link_group.edit', ['id' => $row['id'] ? $row['id'] : 'not-found-id']) . '"><span title="' . gp247_language_render('action.edit') . '" type="button" class="btn btn-flat btn-sm btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-
-                  <span onclick="deleteItem(\'' . $row['id'] . '\');"  title="' . gp247_language_render('action.delete') . '" class="btn btn-flat btn-sm btn-danger"><i class="fas fa-trash-alt"></i></span>
-                  ',
-            ];
-        }
-
-        $data['listTh'] = $listTh;
-        $data['dataTr'] = $dataTr;
-        $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links('gp247-core::component.pagination');
-        $data['resultItems'] = gp247_language_render('admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'total' =>  $dataTmp->total()]);
-
+        $data = $this->processDataScreen();
+        $data['title_action'] = '<i class="fa fa-plus" aria-hidden="true"></i> ' . gp247_language_render('admin.link_group.add_new_title');
+        $data['url_action'] = gp247_route_admin('admin_link_group.create');
         $data['layout'] = 'index';
-        return view('gp247-core::screen.list')
-            ->with($data);
+        return view('gp247-front::admin.link_group')
+        ->with($data);
     }
 
     /**
@@ -103,51 +66,12 @@ class AdminLinkGroupController extends RootFrontAdminController
     {
         $banner_type = FrontLinkGroup::find($id);
         if (!$banner_type) {
-            return 'No data';
+            return redirect(gp247_route_admin('admin_link_group.index'))->with('error', gp247_language_render('admin.data_not_found'));
         }
-        $data = [
-        'title' => gp247_language_render('admin.link_group.list'),
-        'title_action' => '<i class="fa fa-edit" aria-hidden="true"></i> ' . gp247_language_render('action.edit'),
-        'subTitle' => '',
-        'icon' => 'fa fa-indent',
-        'urlDeleteItem' => gp247_route_admin('admin_link_group.delete'),
-        'removeList' => 0, // 1 - Enable function delete list item
-        'buttonRefresh' => 0, // 1 - Enable button refresh
-        'buttonSort' => 0, // 1 - Enable button sort
-        'css' => '',
-        'js' => '',
-        'url_action' => gp247_route_admin('admin_link_group.edit', ['id' => $banner_type['id']]),
-        'banner_type' => $banner_type,
-        'id' => $id,
-    ];
-
-        $listTh = [
-        'code' => gp247_language_render('admin.link_group.code'),
-        'name' => gp247_language_render('admin.link_group.name'),
-        'action' => gp247_language_render('action.title'),
-    ];
-        $obj = new FrontLinkGroup;
-        $obj = $obj->orderBy('id', 'desc');
-        $dataTmp = $obj->paginate(20);
-
-        $dataTr = [];
-        foreach ($dataTmp as $key => $row) {
-            $dataTr[$row['id']] = [
-            'code' => $row['code'] ?? 'N/A',
-            'name' => $row['name'] ?? 'N/A',
-            'action' => '
-                <a href="' . gp247_route_admin('admin_link_group.edit', ['id' => $row['id'] ? $row['id'] : 'not-found-id']) . '"><span title="' . gp247_language_render('action.edit') . '" type="button" class="btn btn-flat btn-sm btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-
-              <span onclick="deleteItem(\'' . $row['id'] . '\');"  title="' . gp247_language_render('action.delete') . '" class="btn btn-flat btn-sm btn-danger"><i class="fas fa-trash-alt"></i></span>
-              ',
-        ];
-        }
-
-        $data['listTh'] = $listTh;
-        $data['dataTr'] = $dataTr;
-        $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links('gp247-core::component.pagination');
-        $data['resultItems'] = gp247_language_render('admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'total' =>  $dataTmp->total()]);
-
+        $data = $this->processDataScreen($id);
+        $data['title_action'] = '<i class="fa fa-edit" aria-hidden="true"></i> ' . gp247_language_render('action.edit');
+        $data['url_action'] = gp247_route_admin('admin_link_group.edit', ['id' => $banner_type['id']]);
+        $data['banner_type'] = $banner_type;
         $data['layout'] = 'edit';
         return view('gp247-front::admin.link_group')
         ->with($data);
@@ -185,6 +109,48 @@ class AdminLinkGroupController extends RootFrontAdminController
         $obj->update($dataUpdate);
 
         return redirect()->back()->with('success', gp247_language_render('action.edit_success'));
+    }
+
+    private function processDataScreen(string $id = null) {
+        $data = [
+            'subTitle' => '',
+            'icon' => 'fa fa-indent',
+            'urlDeleteItem' => gp247_route_admin('admin_link_group.delete'),
+            'removeList' => 0, // 1 - Enable function delete list item
+            'buttonRefresh' => 0, // 1 - Enable button refresh
+            'buttonSort' => 0, // 1 - Enable button sort
+            'css' => '',
+            'js' => '',
+            'id' => $id,
+        ];
+    
+        $listTh = [
+            'code' => gp247_language_render('admin.link_group.code'),
+            'name' => gp247_language_render('admin.link_group.name'),
+            'action' => gp247_language_render('action.title'),
+        ];
+            $obj = new FrontLinkGroup;
+            $obj = $obj->orderBy('id', 'desc');
+            $dataTmp = $obj->paginate(20);
+    
+            $dataTr = [];
+            foreach ($dataTmp as $key => $row) {
+                $dataTr[$row['id']] = [
+                'code' => $row['code'] ?? 'N/A',
+                'name' => $row['name'] ?? 'N/A',
+                'action' => '
+                    <a href="' . gp247_route_admin('admin_link_group.edit', ['id' => $row['id'] ? $row['id'] : 'not-found-id']) . '"><span title="' . gp247_language_render('action.edit') . '" type="button" class="btn btn-flat btn-sm btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
+    
+                  <span onclick="deleteItem(\'' . $row['id'] . '\');"  title="' . gp247_language_render('action.delete') . '" class="btn btn-flat btn-sm btn-danger"><i class="fas fa-trash-alt"></i></span>
+                  ',
+            ];
+            }
+    
+            $data['listTh'] = $listTh;
+            $data['dataTr'] = $dataTr;
+            $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links('gp247-core::component.pagination');
+            $data['resultItems'] = gp247_language_render('admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'total' =>  $dataTmp->total()]);
+            return $data;
     }
 
     /*
