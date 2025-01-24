@@ -115,7 +115,7 @@
                                                 <option value="{!! $view !!}" {{ (old('text',$layout['text']??'') == $view)?'selected':'' }} >{{ $view }}</option>
                                             @endforeach
                                         </select>
-                                        <span class="form-text"><i class="fa fa-info-circle"></i> {{ gp247_language_render('admin.layout_block.helper_view',['template' => gp247_store_info('template', $storeId)]) }}</span>
+                                        <span class="form-text"><i class="fa fa-info-circle"></i> {{ gp247_language_render('admin.layout_block.helper_view',['template' => gp247_store_info(key:'template', storeId:$storeId)]) }}</span>
                                     @else
                                         <textarea name="text" class="form-control text" rows="5" placeholder="Layout text">{{ old('text',$layout['text']??'') }}</textarea>
                                         <span class="form-text"><i class="fa fa-info-circle"></i> {{ gp247_language_render('admin.layout_block.helper_html') }}</span>

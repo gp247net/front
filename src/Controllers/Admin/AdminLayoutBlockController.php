@@ -30,7 +30,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
             'icon'          => 'fa fa-indent',
             'urlDeleteItem' => gp247_route_admin('admin_layout_block.delete'),
             'removeList'    => 0, // 1 - Enable function delete list item
-            'buttonRefresh' => 0, // 1 - Enable button refresh
+            'buttonRefresh' => 1, // 1 - Enable button refresh
             'css'           => '',
             'js'            => '',
         ];
@@ -96,11 +96,11 @@ class AdminLayoutBlockController extends RootFrontAdminController
                 // Only show store info if store is root
                 $storeTmp['shop_store'] = '<i class="nav-icon fab fa-shopify"></i><a target=_new href="'.gp247_store_get_domain_from_code($storeCode).'">'.$storeCode.'</a>';
             }
+            $arrAction[] =  '<a href="' . gp247_route_admin('admin_layout_block.edit', ['id' => $row['id'] ? $row['id'] : 'not-found-id']) . '" class="dropdown-item"><span title="' . gp247_language_render('action.edit') . '"><i class="fa fa-edit"></i> '.gp247_language_render('action.edit').'</span></a>';
+            $arrAction[] =  '<a href="#" onclick="deleteItem(\'' . $row['id'] . '\');"  title="' . gp247_language_render('action.delete') . '" class="dropdown-item"><i class="fas fa-trash-alt"></i> '.gp247_language_render('action.delete').'</a>';
+            $action = $this->procesListAction($arrAction);
 
-            $storeTmp['action'] = '
-                <a href="' . gp247_route_admin('admin_layout_block.edit', ['id' => $row['id'] ? $row['id'] : 'not-found-id']) . '"><span title="' . gp247_language_render('action.edit') . '" type="button" class="btn btn-flat btn-sm btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-            <span onclick="deleteItem(\'' . $row['id'] . '\');"  title="' . gp247_language_render('action.delete') . '" class="btn btn-flat btn-sm btn-danger"><i class="fas fa-trash-alt"></i></span>
-            ';
+            $storeTmp['action'] = $action;
             $dataTr[$row['id']] = $storeTmp;
 
         }
@@ -297,7 +297,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
     public function getListViewBlock($storeId = null)
     {
         $arrView = [];
-        foreach (glob(app_path() . "/GP247/Templates/".gp247_store_info('template', $storeId)."/block/*.blade.php") as $file) {
+        foreach (glob(app_path() . "/GP247/Templates/".gp247_store_info(key:'template', storeId: $storeId)."/block/*.blade.php") as $file) {
             if (file_exists($file)) {
                 $arr = explode('/', $file);
                 $arrView[substr(end($arr), 0, -10)] = substr(end($arr), 0, -10);
@@ -338,7 +338,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
             $html = '<select name="text" class="form-control text">';
             $storeId = request('store_id');
             $arrView = [];
-            foreach (glob(app_path() . "/GP247/Templates/".gp247_store_info('template', $storeId)."/block/*.blade.php") as $file) {
+            foreach (glob(app_path() . "/GP247/Templates/".gp247_store_info(key:'template', storeId:$storeId)."/block/*.blade.php") as $file) {
                 if (file_exists($file)) {
                     $arr = explode('/', $file);
                     $arrView[substr(end($arr), 0, -10)] = substr(end($arr), 0, -10);
@@ -348,7 +348,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
             }
             $html .='</select>';
             $html .='<span class="form-text"><i class="fa fa-info-circle"></i>';
-            $html .= gp247_language_render('admin.layout_block.helper_view', ['template' => gp247_store_info('template', $storeId)]);
+            $html .= gp247_language_render('admin.layout_block.helper_view', ['template' => gp247_store_info(key:'template', storeId:$storeId)]);
             $html .='</span>';
         }
         return $html;

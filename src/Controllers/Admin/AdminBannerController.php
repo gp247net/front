@@ -61,7 +61,7 @@ class AdminBannerController extends RootFrontAdminController
         $dataTr = [];
         foreach ($dataTmp as $key => $row) {
             $arrAction = [
-            '<a href="' . gp247_route_admin('admin_banner.edit', ['id' => $row['id'], 'banner' => request('banner')]) . '"  class="dropdown-item"><i class="fa fa-edit"></i> '.gp247_language_render('action.edit').'</a>',
+            '<a href="' . gp247_route_admin('admin_banner.edit', ['id' => $row['id'], 'banner' => request('banner')]) . '"  class="dropdown-item"><span title="' . gp247_language_render('action.edit') . '"><i class="fa fa-edit"></i> '.gp247_language_render('action.edit').'</span></a>',
             ];
             $arrAction[] = '<a href="#" onclick="deleteItem(\'' . $row['id'] . '\');"  title="' . gp247_language_render('action.delete') . '" class="dropdown-item"><i class="fas fa-trash-alt"></i> '.gp247_language_render('action.remove').'</a>';
             $action = $this->procesListAction($arrAction);
