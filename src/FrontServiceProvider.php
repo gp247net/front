@@ -240,7 +240,7 @@ class FrontServiceProvider extends ServiceProvider
     protected function registerPublishing()
     {
         if ($this->app->runningInConsole()) {
-            $this->publishes([__DIR__.'/public/Templates' => public_path('GP247/Templates')], 'gp247:public-templates');
+            $this->publishes([__DIR__.'/Views/Templates/Default/public' => public_path('GP247/Templates/Default')], 'gp247:public-templates');
             $this->publishes([__DIR__.'/Views/Templates' => app_path('GP247/Templates')], 'gp247:view-templates');
             $this->publishes([__DIR__.'/Views/Admin' => resource_path('views/vendor/gp247-front')], 'gp247:view-front');
         }
