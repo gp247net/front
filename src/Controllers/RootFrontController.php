@@ -5,12 +5,10 @@ use App\Http\Controllers\Controller;
 
 class RootFrontController extends Controller
 {
-    public $gp247_templatePathFront;
     public $GP247TemplatePath;
     public function __construct()
     {
         $this->GP247TemplatePath = 'GP247TemplatePath::' . gp247_store_info('template');
-        $this->gp247_templatePathFront = config('gp247-config.front.path_view').'::';
     }
     /**
      * Default page not found

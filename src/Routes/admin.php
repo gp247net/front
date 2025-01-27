@@ -97,3 +97,30 @@ Route::group(['prefix' => 'layout_block'], function () use ($nameSpaceAdminLayou
     Route::get('/listblock_page', $nameSpaceAdminLayoutBlock.'\AdminLayoutBlockController@getListPageBlockHtml')->name('admin_layout_block.listblock_page');
     Route::post('/delete', $nameSpaceAdminLayoutBlock.'\AdminLayoutBlockController@deleteList')->name('admin_layout_block.delete');
 });
+
+// Template
+if (file_exists(app_path('GP247/Front/Controllers/Admin/AdminTemplateController.php'))) {
+    $nameSpaceAdminTemplate = 'App\GP247\Front\Controllers\Admin';
+} else {
+    $nameSpaceAdminTemplate = 'GP247\Front\Controllers\Admin';
+}
+Route::group(['prefix' => 'template'], function () use ($nameSpaceAdminTemplate) {
+    //Process import
+    Route::get('/import', $nameSpaceAdminTemplate.'\AdminTemplateController@importExtension')
+        ->name('admin_template.import');
+    Route::post('/import', $nameSpaceAdminTemplate.'\AdminTemplateController@processImport')
+        ->name('admin_template.process_import');
+    //End process
+
+    Route::get('/', $nameSpaceAdminTemplate.'\AdminTemplateController@index')->name('admin_template.index');
+    Route::post('install', $nameSpaceAdminTemplate.'\AdminTemplateController@install')->name('admin_template.install');
+    Route::post('uninstall', $nameSpaceAdminTemplate.'\AdminTemplateController@uninstall')->name('admin_template.uninstall');
+    Route::post('enable', $nameSpaceAdminTemplate.'\AdminTemplateController@enable')->name('admin_template.enable');
+    Route::post('disable', $nameSpaceAdminTemplate.'\AdminTemplateController@disable')->name('admin_template.disable');
+
+    if (config('gp247-config.admin.api_template')) {
+        Route::get('/online', $nameSpaceAdminTemplate.'\AdminTemplateOnlineController@index')->name('admin_template_online.index');
+        Route::post('/online/install', $nameSpaceAdminTemplate.'\AdminTemplateOnlineController@install')
+        ->name('admin_template_online.install');
+    }
+});

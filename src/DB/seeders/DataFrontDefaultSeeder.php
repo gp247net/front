@@ -27,6 +27,7 @@ class DataFrontDefaultSeeder extends Seeder
         $checkIdBlock = AdminMenu::where('key', 'ADMIN_CONTENT')->first();
         if ($checkIdBlock) {
             AdminMenu::where('key', 'ADMIN_CONTENT')->delete();
+            AdminMenu::where('key', 'TEMPLATE')->delete();
             AdminMenu::where('parent_id', $checkIdBlock->id)->delete();
         }
 
@@ -49,7 +50,9 @@ class DataFrontDefaultSeeder extends Seeder
                 ['parent_id' => $idBlockAdmin,'sort' => 3,'title' => 'admin.menu_titles.layout','icon' => 'far fa-object-group','uri' => '','key' => null,'type' => 0],
                 ['parent_id' => $idBlockAdmin,'sort' => 4,'title' => 'admin.menu_titles.layout_block','icon' => 'far fa-newspaper','uri' => 'admin::layout_block','key' => null,'type' => 0],
                 ['parent_id' => $idBlockAdmin,'sort' => 5,'title' => 'admin.menu_titles.link_block','icon' => 'fab fa-chrome','uri' => 'admin::link','key' => null,'type' => 0],
-                
+                // Template manager
+                ['parent_id' => 3,'sort' => 1,'title' => 'admin.menu_titles.template_layout','icon' => 'fab fa-windows','uri' => 'admin::template','key' => 'TEMPLATE','type' => 0],
+
             ]
         );
 

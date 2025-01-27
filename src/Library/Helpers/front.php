@@ -39,3 +39,19 @@ if (!function_exists('gp247_route_front') && !in_array('gp247_route_front', conf
         }
     }
 }
+
+if (!function_exists('gp247_front_get_all_template_installed') && !in_array('gp247_front_get_all_template_installed', config('gp247_functions_except', []))) {
+    function gp247_front_get_all_template_installed()
+    {
+        $allTemplate = \GP247\Core\Admin\Models\AdminConfig::where('group', 'Templates')->where('value', 1)->get();
+        $arrTemplate = [
+            GP247_TEMPLATE_FRONT_DEFAULT => GP247_TEMPLATE_FRONT_DEFAULT,
+        ];
+        if ($allTemplate) {
+            foreach ($allTemplate as $template) {
+                $arrTemplate[$template->key] = $template->key;
+            }
+        }
+        return $arrTemplate;
+    }
+}

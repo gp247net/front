@@ -14,6 +14,6 @@ return [
             //If value is empty, it will not be displayed, as dommain.com/abc.html
             'GP247_SEO_LANG' => env('GP247_SEO_LANG', 0),
         ],
-        'GP247_TEMPLATE_FRONT_DEFAULT' => env('GP247_TEMPLATE_FRONT_DEFAULT', 'default'),
+        'GP247_TEMPLATE_FRONT_DEFAULT' => env('GP247_TEMPLATE_FRONT_DEFAULT', 'Default'),
     ],
 ];

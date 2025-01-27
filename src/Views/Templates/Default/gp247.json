@@ -1,0 +1,11 @@
+{
+    "name": "Default module",
+    "image": "images/logo.jpg",
+    "auth": "GP247",
+    "email": "support@gp247.net",
+    "link": "https://GP247.net",
+    "configGroup": "Templates",
+    "configKey": "Default",
+    "version": "1.0",
+    "gp247Version": "1.0"
+}

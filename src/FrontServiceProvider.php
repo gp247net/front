@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use GP247\Front\Middleware\CheckDomain;
 use GP247\Front\Commands\FrontInstall;
 use GP247\Front\Commands\FrontUninstall;
+use GP247\Front\Commands\MakeTemplate;
 
 class FrontServiceProvider extends ServiceProvider
 {
@@ -48,6 +49,7 @@ class FrontServiceProvider extends ServiceProvider
             $this->commands([
                 FrontInstall::class,
                 FrontUninstall::class,
+                MakeTemplate::class,
             ]);
         } catch (\Throwable $e) {
             $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
@@ -139,6 +141,23 @@ class FrontServiceProvider extends ServiceProvider
                 exit;
             }
 
+            //Load Template
+            try {
+                foreach (glob(app_path().'/GP247/Templates/*/Provider.php') as $filename) {
+                    require_once $filename;
+                }
+                foreach (glob(app_path().'/GP247/Templates/*/Route.php') as $filename) {
+                    $this->loadRoutesFrom($filename);
+                }
+            } catch (\Throwable $e) {
+                $msg = '#GP247-FRONT::template_load:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
+                gp247_report($msg);
+                echo $msg;
+                exit;
+            }
+
+
+
             $this->eventRegister();
 
         }
@@ -222,8 +241,8 @@ class FrontServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([__DIR__.'/public/Templates' => public_path('GP247/Templates')], 'gp247:public-templates');
-            $this->publishes([__DIR__.'/Views/templates' => app_path('GP247/Templates')], 'gp247:view-templates');
-            $this->publishes([__DIR__.'/Views/admin' => resource_path('views/vendor/gp247-front')], 'gp247:view-front');
+            $this->publishes([__DIR__.'/Views/Templates' => app_path('GP247/Templates')], 'gp247:view-templates');
+            $this->publishes([__DIR__.'/Views/Admin' => resource_path('views/vendor/gp247-front')], 'gp247:view-front');
         }
     }
 
