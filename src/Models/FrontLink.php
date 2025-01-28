@@ -59,7 +59,7 @@ class FrontLink extends Model
             $links = self::selectRaw($dataSelect)
                 ->where($tableLink.'.status', 1);
             $storeId = config('app.storeId');
-            if (gp247_check_multi_shop_installed()) {
+            if (gp247_store_check_multi_domain_installed()) {
                 $tableLinkStore = (new FrontLinkStore)->getTable();
                 $tableStore = (new AdminStore)->getTable();
                 $links = $links->join($tableLinkStore, $tableLinkStore.'.link_id', $tableLink . '.id');

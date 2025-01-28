@@ -266,11 +266,11 @@ class FrontPage extends Model
         $storeCache = $storeId ? $storeId : session('adminStoreId');
         $tableDescription = (new FrontPageDescription)->getTable();
         $table = (new AdminPage)->getTable();
-        if (sc_config_global('cache_status') && sc_config_global('cache_page')) {
-            if (!Cache::has($storeCache.'_cache_page_'.sc_get_locale())) {
+        if (gp247_config_global('cache_status') && gp247_config_global('cache_page')) {
+            if (!Cache::has($storeCache.'_cache_page_'.gp247_get_locale())) {
                 if (self::$getListTitleAdmin === null) {
                     $data = self::join($tableDescription, $tableDescription.'.page_id', $table.'.id')
-                    ->where('lang', sc_get_locale());
+                    ->where('lang', gp247_get_locale());
                     if ($storeId) {
                         $tablePageStore = (new FrontPageStore)->getTable();
                         $data = $data->leftJoin($tablePageStore, $tablePageStore . '.page_id', $table . '.id');
@@ -279,13 +279,13 @@ class FrontPage extends Model
                     $data = $data->pluck('title', 'id')->toArray();
                     self::$getListTitleAdmin = $data;
                 }
-                sc_set_cache($storeCache.'_cache_page_'.sc_get_locale(), self::$getListTitleAdmin);
+                gp247_cache_set($storeCache.'_cache_page_'.gp247_get_locale(), self::$getListTitleAdmin);
             }
-            return Cache::get($storeCache.'_cache_page_'.sc_get_locale());
+            return Cache::get($storeCache.'_cache_page_'.gp247_get_locale());
         } else {
             if (self::$getListTitleAdmin === null) {
                 $data = self::join($tableDescription, $tableDescription.'.page_id', $table.'.id')
-                ->where('lang', sc_get_locale());
+                ->where('lang', gp247_get_locale());
                 if ($storeId) {
                     $tablePageStore = (new FrontPageStore)->getTable();
                     $data = $data->leftJoin($tablePageStore, $tablePageStore . '.page_id', $table . '.id');
