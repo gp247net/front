@@ -207,7 +207,7 @@ class FrontPage extends Model
     public static function getPageListAdmin(array $dataSearch, $storeId = null)
     {
         $keyword          = $dataSearch['keyword'] ?? '';
-        $sort_order       = $dataSearch['sort_order'] ?? '';
+        $sort       = $dataSearch['sort'] ?? '';
         $arrSort          = $dataSearch['arrSort'] ?? '';
         $tableDescription = (new FrontPageDescription)->getTable();
         $tablePage     = (new FrontPage)->getTable();
@@ -229,9 +229,12 @@ class FrontPage extends Model
             });
         }
 
-        if ($sort_order && array_key_exists($sort_order, $arrSort)) {
-            $field = explode('__', $sort_order)[0];
-            $sort_field = explode('__', $sort_order)[1];
+        if ($sort && array_key_exists($sort, $arrSort)) {
+            $field = explode('__', $sort)[0];
+            $sort_field = explode('__', $sort)[1];
+            if ($field == 'id') {
+                $field = 'created_at';
+            }
             $pageList = $pageList->orderBy($field, $sort_field);
         } else {
             $pageList = $pageList->orderBy($tablePage.'.created_at', 'desc');

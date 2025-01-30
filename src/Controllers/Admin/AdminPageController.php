@@ -34,7 +34,7 @@ class AdminPageController extends RootFrontAdminController
         ];
         $listTh['action'] = gp247_language_render('action.title');
 
-        $sort_order = gp247_clean(request('sort_order') ?? 'id_desc');
+        $sort = gp247_clean(request('sort') ?? 'id_desc');
         $keyword    = gp247_clean(request('keyword') ?? '');
         $arrSort = [
             'id__desc'       => gp247_language_render('filter_sort.id_desc'),
@@ -44,7 +44,7 @@ class AdminPageController extends RootFrontAdminController
         ];
         $dataSearch = [
             'keyword'    => $keyword,
-            'sort_order' => $sort_order,
+            'sort' => $sort,
             'arrSort'    => $arrSort,
         ];
         $dataTmp = FrontPage::getPageListAdmin($dataSearch);
@@ -80,8 +80,8 @@ class AdminPageController extends RootFrontAdminController
 
         //menuSort
         $optionSort = '';
-        foreach ($arrSort as $key => $status) {
-            $optionSort .= '<option  ' . (($sort_order == $key) ? "selected" : "") . ' value="' . $key . '">' . $status . '</option>';
+        foreach ($arrSort as $kSort => $vSort) {
+            $optionSort .= '<option  ' . (($sort == $kSort) ? "selected" : "") . ' value="' . $kSort . '">' . $vSort . '</option>';
         }
         //=menuSort
 
@@ -89,7 +89,7 @@ class AdminPageController extends RootFrontAdminController
         $data['topMenuRight'][] = '
                 <form action="' . gp247_route_admin('admin_page.index') . '" id="button_search">
                 <div class="input-group input-group" style="width: 350px;">
-                    <select class="form-control form-control-sm rounded-0 select2" name="sort_order" id="sort_order">
+                    <select class="form-control form-control-sm rounded-0 select2" name="sort" id="sort">
                     '.$optionSort.'
                     </select> &nbsp;
                     <input type="text" name="keyword" class="form-control form-control-sm rounded-0 float-right" placeholder="' . gp247_language_render('admin.user.search_place') . '" value="' . $keyword . '">

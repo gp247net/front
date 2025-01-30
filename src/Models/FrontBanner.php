@@ -198,7 +198,6 @@ class FrontBanner extends Model
         $storeId = config('app.storeId');
 
         if (gp247_store_check_multi_domain_installed()) {
-            //Get product active for store
             if (!empty($this->gp247_store)) {
                 //If sepcify store id
                 $storeId = $this->gp247_store;
@@ -271,7 +270,7 @@ class FrontBanner extends Model
      */
     public static function getBannerListAdmin(array $dataSearch, $storeId = null)
     {
-        $sort_order       = $dataSearch['sort_order'] ?? '';
+        $sort       = $dataSearch['sort'] ?? '';
         $arrSort          = $dataSearch['arrSort'] ?? '';
         $keyword          = $dataSearch['keyword'] ?? '';
         $bannerList = (new FrontBanner);
@@ -284,9 +283,12 @@ class FrontBanner extends Model
         if ($keyword) {
             $bannerList->where($tableBanner.'.title', 'like', '%'.$keyword.'%');
         }
-        if ($sort_order && array_key_exists($sort_order, $arrSort)) {
-            $field = explode('__', $sort_order)[0];
-            $sort_field = explode('__', $sort_order)[1];
+        if ($sort && array_key_exists($sort, $arrSort)) {
+            $field = explode('__', $sort)[0];
+            $sort_field = explode('__', $sort)[1];
+            if ($field == 'id') {
+                $field = 'created_at';
+            }
             $bannerList = $bannerList->sort($field, $sort_field);
         } else {
             $bannerList = $bannerList->sort($tableBanner.'.created_at', 'desc');
