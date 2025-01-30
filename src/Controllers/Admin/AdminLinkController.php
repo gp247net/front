@@ -13,8 +13,7 @@ class AdminLinkController extends RootFrontAdminController
     public function __construct()
     {
         parent::__construct();
-        $this->
-         = ['_blank' => '_blank', '_self' => '_self'];
+        $this->arrTarget = ['_blank' => '_blank', '_self' => '_self'];
     }
 
     public function arrGroup()
