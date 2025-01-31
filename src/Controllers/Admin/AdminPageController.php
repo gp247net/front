@@ -39,8 +39,6 @@ class AdminPageController extends RootFrontAdminController
         $arrSort = [
             'id__desc'       => gp247_language_render('filter_sort.id_desc'),
             'id__asc'        => gp247_language_render('filter_sort.id_asc'),
-            'name__desc'     => gp247_language_render('filter_sort.name_desc'),
-            'name__asc'      => gp247_language_render('filter_sort.name_asc'),
         ];
         $dataSearch = [
             'keyword'    => $keyword,
@@ -88,11 +86,11 @@ class AdminPageController extends RootFrontAdminController
         //menuSearch
         $data['topMenuRight'][] = '
                 <form action="' . gp247_route_admin('admin_page.index') . '" id="button_search">
-                <div class="input-group input-group" style="width: 350px;">
+                <div class="input-group input-group">
                     <select class="form-control form-control-sm rounded-0 select2" name="sort" id="sort">
                     '.$optionSort.'
                     </select> &nbsp;
-                    <input type="text" name="keyword" class="form-control form-control-sm rounded-0 float-right" placeholder="' . gp247_language_render('admin.user.search_place') . '" value="' . $keyword . '">
+                    <input type="text" name="keyword" class="form-control form-control-sm rounded-0 float-right" placeholder="' . gp247_language_render('search.placeholder') . '" value="' . $keyword . '">
                     <div class="input-group-append">
                         <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-search"></i></button>
                     </div>
@@ -137,7 +135,7 @@ class AdminPageController extends RootFrontAdminController
         $data['alias'] = gp247_word_format_url($data['alias']);
         $data['alias'] = gp247_word_limit($data['alias'], 100);
         $arrValidation = [
-            'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:100',
+            'alias' => 'required|string|max:100',
             'descriptions.*.title' => 'required|string|max:200',
             'descriptions.*.keyword' => 'nullable|string|max:200',
             'descriptions.*.description' => 'nullable|string|max:500',
@@ -239,7 +237,7 @@ class AdminPageController extends RootFrontAdminController
             'descriptions.*.keyword' => 'nullable|string|max:200',
             'descriptions.*.description' => 'nullable|string|max:500',
             'descriptions.*.content' => 'nullable|string',
-            'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:100',
+            'alias' => 'required|string|max:100',
         ];
         
         // Get custom field validation rules
