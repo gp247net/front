@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 $langUrl = GP247_SEO_LANG ?'{lang?}/' : '';
-$suffix = gp247_config('SUFFIX_URL')??'.html';
+$suffix = GP247_SUFFIX_URL;
 Route::group(
     [
         'middleware' => GP247_FRONT_MIDDLEWARE,

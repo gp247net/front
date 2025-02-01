@@ -66,7 +66,7 @@ class AdminLinkGroupController extends RootFrontAdminController
     {
         $banner_type = FrontLinkGroup::find($id);
         if (!$banner_type) {
-            return redirect(gp247_route_admin('admin_link_group.index'))->with('error', gp247_language_render('admin.data_not_found'));
+            return redirect(gp247_route_admin('admin_link_group.index'))->with('error', gp247_language_render('display.data_not_found'));
         }
         $data = $this->processDataScreen($id);
         $data['title_action'] = '<i class="fa fa-edit" aria-hidden="true"></i> ' . gp247_language_render('action.edit');

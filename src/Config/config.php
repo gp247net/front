@@ -15,5 +15,6 @@ return [
             'GP247_SEO_LANG' => env('GP247_SEO_LANG', 0),
         ],
         'GP247_TEMPLATE_FRONT_DEFAULT' => env('GP247_TEMPLATE_FRONT_DEFAULT', 'Default'),
+        'GP247_SUFFIX_URL'    => env('GP247_SUFFIX_URL', '.html'), //Suffix url, ex: domain.com/news/1.html 
     ],
 ];

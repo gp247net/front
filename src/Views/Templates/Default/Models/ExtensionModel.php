@@ -6,12 +6,12 @@ class ExtensionModel
 {
     public function uninstallExtension()
     {
-        return ['error' => 0, 'msg' => 'uninstall success'];
+        return ['error' => 0, 'msg' => gp247_language_render('admin.extension.uninstall_success')];
     }
 
     public function installExtension()
     {
-        return ['error' => 0, 'msg' => 'install success'];
+        return ['error' => 0, 'msg' => gp247_language_render('admin.extension.install_success')];
     }
     
 }

@@ -51,7 +51,7 @@ class DataFrontDefaultSeeder extends Seeder
                 ['parent_id' => $idBlockAdmin,'sort' => 4,'title' => 'admin.menu_titles.layout_block','icon' => 'far fa-newspaper','uri' => 'admin::layout_block','key' => null,'type' => 0],
                 ['parent_id' => $idBlockAdmin,'sort' => 5,'title' => 'admin.menu_titles.link_block','icon' => 'fab fa-chrome','uri' => 'admin::link','key' => null,'type' => 0],
                 // Template manager
-                ['parent_id' => 3,'sort' => 1,'title' => 'admin.menu_titles.template_layout','icon' => 'fab fa-windows','uri' => 'admin::template','key' => 'TEMPLATE','type' => 0],
+                ['parent_id' => 3,'sort' => 1,'title' => 'admin.menu_titles.template','icon' => 'fab fa-windows','uri' => 'admin::template','key' => 'TEMPLATE','type' => 0],
 
             ]
         );
@@ -117,8 +117,8 @@ class DataFrontDefaultSeeder extends Seeder
 
         Languages::insertOrIgnore(
             [
-                ['code' => 'admin.menu_titles.ADMIN_CONTENT','text' => 'Nội dung','position' => 'admin.menu_titles','location' => 'vi'],
-                ['code' => 'admin.menu_titles.ADMIN_CONTENT','text' => 'Content','position' => 'admin.menu_titles','location' => 'en'],
+                ['code' => 'admin.menu_titles.ADMIN_CONTENT','text' => 'CMS','position' => 'admin.menu_titles','location' => 'vi'],
+                ['code' => 'admin.menu_titles.ADMIN_CONTENT','text' => 'CMS','position' => 'admin.menu_titles','location' => 'en'],
                 ['code' => 'admin.menu_titles.layout_block','text' => 'Khối bố cục','position' => 'admin.menu_titles','location' => 'vi'],
                 ['code' => 'admin.menu_titles.layout_block','text' => 'Layout block','position' => 'admin.menu_titles','location' => 'en'],
                 ['code' => 'admin.menu_titles.link_block','text' => 'Quản lý liên kết','position' => 'admin.menu_titles','location' => 'vi'],
@@ -333,6 +333,8 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'front.404_detail','text' => 'Trang bạn đang truy cập không tồn tại','position' => 'front','location' => 'vi'],
                 ['code' => 'front.404_detail','text' => 'The page you are accessing does not exist','position' => 'front','location' => 'en'],
                 ['code' => 'front.404','text' => 'Page not exist','position' => 'front','location' => 'en'],
+                ['code' => 'front.no_item','text' => 'Chưa có mục nào','position' => 'front','location' => 'vi'],
+                ['code' => 'front.no_item','text' => 'No items yet','position' => 'front','location' => 'en'],
                 ['code' => 'front.notfound','text' => 'Không tìm thấy dữ liệu','position' => 'front','location' => 'vi'], 
                 ['code' => 'front.notfound_detail','text' => 'Dữ liệu bạn đang truy cập không tìm thấy','position' => 'front','location' => 'vi'], 
                 ['code' => 'front.notfound','text' => 'Data not found','position' => 'front','location' => 'en'], 

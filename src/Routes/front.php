@@ -4,5 +4,5 @@ if (file_exists(app_path('GP247/Front/Controllers/HomeController.php'))) {
 } else {
     $nameSpaceHome = 'GP247\Front\Controllers';
 }
-$suffix = gp247_config('SUFFIX_URL')??'.html';
+$suffix = GP247_SUFFIX_URL;
 $langUrl = GP247_SEO_LANG ?'{lang?}/' : '';

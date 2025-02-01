@@ -203,7 +203,7 @@ class AdminPageController extends RootFrontAdminController
 
         $page = $page->getPageAdmin($id);
         if (!$page) {
-            return redirect(gp247_route_admin('admin_page.index'))->with('error', gp247_language_render('admin.data_not_found'));
+            return redirect(gp247_route_admin('admin_page.index'))->with('error', gp247_language_render('display.data_not_found'));
         }
         $data = [
             'title'             => gp247_language_render('action.edit'),

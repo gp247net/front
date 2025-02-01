@@ -41,8 +41,8 @@ class FrontInstall extends Command
         $this->call('db:seed', ['--class' => '\GP247\Front\DB\seeders\DataFrontDefaultSeeder', '--force' => true]);
         $this->info('---------------> Seeding database Front default done!');
 
-        $this->call('vendor:publish', ['--tag' => 'gp247:public-templates']);
-        $this->call('vendor:publish', ['--tag' => 'gp247:view-templates']);
+        $this->call('vendor:publish', ['--tag' => 'gp247:template-public']);
+        $this->call('vendor:publish', ['--tag' => 'gp247:template-view']);
 
         $this->welcome();
     }

@@ -35,7 +35,6 @@ class AppConfig extends ExtensionConfigDefault
 
     public function install()
     {
-        $return = ['error' => 0, 'msg' => ''];
         $check = AdminConfig::where('key', $this->configKey)
             ->where('group', $this->configGroup)->first();
         if ($check) {
@@ -104,8 +103,9 @@ class AppConfig extends ExtensionConfigDefault
         AdminHome::where('extension', $this->appPath)->update(['status' => 1]);
 
         if (!$process) {
-            $return = ['error' => 1, 'msg' => 'Error enable'];
+            $return = ['error' => 1, 'msg' => gp247_language_render('admin.extension.action_error', ['action' => 'Enable'])];
         }
+        $return = ['error' => 0, 'msg' => gp247_language_render('admin.extension.enable_success')];
         return $return;
     }
 
@@ -117,7 +117,7 @@ class AppConfig extends ExtensionConfigDefault
             ->where('key', $this->configKey)
             ->update(['value' => self::OFF]);
         if (!$process) {
-            $return = ['error' => 1, 'msg' => 'Error disable'];
+            $return = ['error' => 1, 'msg' => gp247_language_render('admin.extension.action_error', ['action' => 'Disable'])];
         }
 
         //Admin config home
