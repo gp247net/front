@@ -5,7 +5,6 @@
 #App\GP247\Templates\Default\AppConfig.php
 namespace App\GP247\Templates\Default;
 
-use App\GP247\Templates\Default\Models\ExtensionModel;
 use GP247\Core\Admin\Models\AdminConfig;
 use GP247\Core\Admin\Models\AdminHome;
 use GP247\Core\ExtensionConfigDefault;
@@ -34,7 +33,6 @@ class AppConfig extends ExtensionConfigDefault
 
     public function install()
     {
-        $return = ['error' => 0, 'msg' => ''];
         $check = AdminConfig::where('key', $this->configKey)
             ->where('group', $this->configGroup)->first();
         if ($check) {
@@ -59,7 +57,7 @@ class AppConfig extends ExtensionConfigDefault
             if (!$process) {
                 $return = ['error' => 1, 'msg' => gp247_language_render('admin.extension.install_faild')];
             } else {
-                $return = (new ExtensionModel)->installExtension();
+                $return = ['error' => 0, 'msg' => gp247_language_render('admin.extension.install_success')];
             }
         }
 
@@ -68,7 +66,6 @@ class AppConfig extends ExtensionConfigDefault
 
     public function uninstall()
     {
-        $return = ['error' => 0, 'msg' => ''];
         //Please delete all values inserted in the installation step
         $process = (new AdminConfig)
             ->where('key', $this->configKey)
@@ -77,41 +74,40 @@ class AppConfig extends ExtensionConfigDefault
         if (!$process) {
             $return = ['error' => 1, 'msg' => gp247_language_render('admin.extension.action_error', ['action' => 'Uninstall'])];
         } else {
-            (new ExtensionModel)->uninstallExtension();
+            //Admin config home
+            AdminHome::where('extension', $this->appPath)->delete();
+            $return = ['error' => 0, 'msg' => gp247_language_render('admin.extension.uninstall_success')];
         }
-        
-        //Admin config home
-        AdminHome::where('extension', $this->appPath)->delete();
 
         return $return;
     }
     
     public function enable()
     {
-        $return = ['error' => 0, 'msg' => ''];
         $process = (new AdminConfig)
             ->where('group', $this->configGroup)
             ->where('key', $this->configKey)
             ->update(['value' => self::ON]);
         if (!$process) {
-            $return = ['error' => 1, 'msg' => 'Error enable'];
+            $return = ['error' => 1, 'msg' => gp247_language_render('admin.extension.action_error', ['action' => 'Enable'])];
         }
+        $return = ['error' => 0, 'msg' => gp247_language_render('admin.extension.enable_success')];
         return $return;
     }
 
     public function disable()
     {
-        $return = ['error' => 0, 'msg' => ''];
         $process = (new AdminConfig)
             ->where('group', $this->configGroup)
             ->where('key', $this->configKey)
             ->update(['value' => self::OFF]);
         if (!$process) {
-            $return = ['error' => 1, 'msg' => 'Error disable'];
+            $return = ['error' => 1, 'msg' => gp247_language_render('admin.extension.action_error', ['action' => 'Disable'])];
+        } else {
+            //Admin config home
+            AdminHome::where('extension', $this->appPath)->update(['status' => 0]);
+            $return = ['error' => 0, 'msg' => gp247_language_render('admin.extension.disable_success')];
         }
-
-        //Admin config home
-        AdminHome::where('extension', $this->appPath)->update(['status' => 0]);
 
         return $return;
     }

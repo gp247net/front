@@ -5,7 +5,6 @@
 #App\GP247\Templates\Extension_Key\AppConfig.php
 namespace App\GP247\Templates\Extension_Key;
 
-use App\GP247\Templates\Extension_Key\Models\ExtensionModel;
 use GP247\Core\Admin\Models\AdminConfig;
 use GP247\Core\Admin\Models\AdminHome;
 use GP247\Core\ExtensionConfigDefault;
@@ -58,7 +57,6 @@ class AppConfig extends ExtensionConfigDefault
                 AdminConfig::insert(
                     $dataInsert
                 );
-                (new ExtensionModel)->installExtension();
                 $return = ['error' => 0, 'msg' => gp247_language_render('admin.extension.install_success')];
             } catch (\Throwable $e) {
                 $return = ['error' => 1, 'msg' => $e->getMessage()];
@@ -80,8 +78,6 @@ class AppConfig extends ExtensionConfigDefault
 
             //Admin config home
             AdminHome::where('extension', $this->appPath)->delete();
-
-            (new ExtensionModel)->uninstallExtension();
 
             $return = ['error' => 0, 'msg' => gp247_language_render('admin.extension.uninstall_success')];
         } catch (\Throwable $e) {

@@ -63,12 +63,6 @@ class MakeTemplate extends Command
             File::copyDirectory(base_path('vendor/gp247/front/src/'.$source), storage_path($tmp));
             File::copyDirectory(base_path('vendor/gp247/front/src/'.$sourcePublic), storage_path($tmpPublic));
 
-            $model = file_get_contents(storage_path($tmp.'/Models/ExtensionModel.php'));
-            $model      = str_replace('Extension_Key', $extensionKey, $model);
-            $model      = str_replace('ExtensionUrlKey', $extensionUrlKey, $model);
-            file_put_contents(storage_path($tmp.'/Models/ExtensionModel.php'), $model);
-
-
             $appConfigJson = file_get_contents(storage_path($tmp.'/gp247.json'));
             $appConfigJson      = str_replace('Extension_Key', $extensionKey, $appConfigJson);
             $appConfigJson          = str_replace('ExtensionUrlKey', $extensionUrlKey, $appConfigJson);
