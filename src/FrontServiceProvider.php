@@ -181,6 +181,9 @@ class FrontServiceProvider extends ServiceProvider
 
         view()->share('GP247TemplatePath', 'GP247TemplatePath::'.gp247_store_info('template'));
         view()->share('GP247TemplateFile', 'GP247/Templates/'.gp247_store_info('template'));
+        view()->share('modelBanner', (new \GP247\Front\Models\FrontBanner));
+        view()->share('modelPage', (new \GP247\Front\Models\FrontPage));
+        view()->share('modelLink', (new \GP247\Front\Models\FrontLink));
     }
 
     /**
