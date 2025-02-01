@@ -53,13 +53,12 @@ class AdminPageController extends RootFrontAdminController
             '<a href="' . gp247_route_admin('admin_page.edit', ['id' => $row['id'], 'page' => request('page')]) . '"  class="dropdown-item"><i class="fa fa-edit"></i> '.gp247_language_render('action.edit').'</a>',
             ];
             $arrAction[] = '<a href="#" onclick="deleteItem(\'' . $row['id'] . '\');"  title="' . gp247_language_render('action.delete') . '" class="dropdown-item"><i class="fas fa-trash-alt"></i> '.gp247_language_render('action.remove').'</a>';
+            $arrAction[] = '<a target=_new href="' . gp247_route_front('front.page.detail', ['alias' => $row['alias']]) . '" class="dropdown-item"><i class="fas fa-external-link-alt"></i> '.gp247_language_render('action.link').'</a>';
             $action = $this->procesListAction($arrAction);
-
-
             $dataTr[] = [
                 'title' => $row['title'],
                 'image' => gp247_image_render($row['image'], '50px', '', $row['title']),
-                'alias' => '<a href="'.gp247_route_front('front.page.detail', ['alias' => $row['alias']]).'" target="_blank">'.$row['alias'].' <i class="fas fa-link"></i></a>',
+                'alias' => $row['alias'],
                 'status' => $row['status'] ? '<span class="badge badge-success">ON</span>' : '<span class="badge badge-danger">OFF</span>',
                 'action' => $action,
             ];
