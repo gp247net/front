@@ -9,3 +9,7 @@
 <a href="https://packagist.org/packages/gp247/front"><img src="https://poser.pugx.org/gp247/front/v/stable.svg" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/gp247/front"><img src="https://poser.pugx.org/gp247/front/license.svg" alt="License"></a>
 </p>
+
+**How to use?**
+
+> Ensure that the content in the `routes/web.php` file has been removed
