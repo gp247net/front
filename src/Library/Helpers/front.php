@@ -40,6 +40,11 @@ if (!function_exists('gp247_route_front') && !in_array('gp247_route_front', conf
     }
 }
 
+/**
+ * Get all template installed
+ *
+ * @return  [type]  [return description]
+ */
 if (!function_exists('gp247_front_get_all_template_installed') && !in_array('gp247_front_get_all_template_installed', config('gp247_functions_except', []))) {
     function gp247_front_get_all_template_installed()
     {
@@ -53,5 +58,40 @@ if (!function_exists('gp247_front_get_all_template_installed') && !in_array('gp2
             }
         }
         return $arrTemplate;
+    }
+}
+
+if (!function_exists('gp247_link') && !in_array('gp247_link', config('gp247_functions_except', []))) {
+    /**
+     * Get all link
+     *
+     * @return  [type]  [return description]
+     */
+    function gp247_link()
+    {
+        return \GP247\Front\Models\FrontLink::getGroup();
+    }
+}
+
+
+if (!function_exists('gp247_link_collection') && !in_array('gp247_link_collection', config('gp247_functions_except', []))) {
+    /**
+     * Get all link collection
+     *
+     * @return  [type]  [return description]
+     */
+    function gp247_link_collection()
+    {
+        return \GP247\Front\Models\FrontLink::getLinksCollection();
+    }
+}
+
+/*
+Get all layouts
+ */
+if (!function_exists('gp247_front_layout_block') && !in_array('gp247_front_layout_block', config('gp247_functions_except', []))) {
+    function gp247_front_layout_block()
+    {
+        return \GP247\Front\Models\FrontLayoutBlock::getLayout();
     }
 }

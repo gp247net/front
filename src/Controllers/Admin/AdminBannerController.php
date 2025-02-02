@@ -260,6 +260,7 @@ class AdminBannerController extends RootFrontAdminController
         $dataUpdate = [
             'image' => $data['image'],
             'status' => empty($data['status']) ? 0 : 1,
+            'sort' => (int) $data['sort'],
         ];
         $banner->update($dataUpdate);
 

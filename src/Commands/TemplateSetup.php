@@ -31,13 +31,14 @@ class TemplateSetup extends Command
      */
     public function handle()
     {
-        // Check class template Default
-        $classTemplate = gp247_extension_get_class_config(type:'Templates', key:GP247_TEMPLATE_FRONT_DEFAULT);
-        if (!$classTemplate) {
-            throw new Exception('Class template Default not found');
+        $classTemplate = '\App\GP247\Templates\\' . GP247_TEMPLATE_FRONT_DEFAULT . '\AppConfig';
+
+        if (!class_exists($classTemplate)) {
+            $this->info('Class template Default not found');
+        } else {
+            $classTemplate = new $classTemplate();
+            $classTemplate->install();
+            $this->info('---------------> Setup template default done!');
         }
-        $classTemplate = new $classTemplate();
-        $classTemplate->install();
-        $this->info('---------------> Setup template default done!');
     }
 } 

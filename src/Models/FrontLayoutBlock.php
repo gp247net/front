@@ -26,7 +26,7 @@ class FrontLayoutBlock extends Model
             self::$getLayout = self::where('status', 1)
                 ->where('store_id', config('app.storeId'))
                 ->where('template', $template)
-                ->orderBy('sort', 'asc')
+                ->orderBy('sort', 'desc')
                 ->get()
                 ->groupBy('position');
         }

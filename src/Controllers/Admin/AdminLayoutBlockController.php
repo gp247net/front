@@ -296,7 +296,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
     public function getListViewBlock($storeId = null)
     {
         $arrView = [];
-        foreach (glob(app_path() . "/GP247/Templates/".gp247_store_info(key:'template', storeId: $storeId)."/block/*.blade.php") as $file) {
+        foreach (glob(app_path() . "/GP247/Templates/".gp247_store_info(key:'template', storeId: $storeId)."/blocks/*.blade.php") as $file) {
             if (file_exists($file)) {
                 $arr = explode('/', $file);
                 $arrView[substr(end($arr), 0, -10)] = substr(end($arr), 0, -10);

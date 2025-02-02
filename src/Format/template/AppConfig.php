@@ -8,6 +8,7 @@ namespace App\GP247\Templates\Extension_Key;
 use GP247\Core\Admin\Models\AdminConfig;
 use GP247\Core\Admin\Models\AdminHome;
 use GP247\Core\ExtensionConfigDefault;
+use GP247\Core\Admin\Models\AdminStore;
 use Illuminate\Support\Facades\DB;
 class AppConfig extends ExtensionConfigDefault
 {
@@ -162,6 +163,11 @@ class AppConfig extends ExtensionConfigDefault
 
     public function setupStore($storeId = null)
     {
-       // code here
+        // Change template for store
+        AdminStore::where('id', $storeId)
+            ->update(['template' => $this->configKey]);
+
+        // Insert layout block for store
+
     }
 }
