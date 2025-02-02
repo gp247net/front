@@ -6,7 +6,11 @@
 namespace App\GP247\Templates\Default;
 
 use GP247\Core\Admin\Models\AdminConfig;
+use GP247\Core\Admin\Models\AdminStore;
 use GP247\Core\Admin\Models\AdminHome;
+use GP247\Front\Models\FrontLayoutBlock;
+use GP247\Front\Models\FrontBanner;
+use GP247\Front\Models\FrontBannerStore;
 use GP247\Core\ExtensionConfigDefault;
 class AppConfig extends ExtensionConfigDefault
 {
@@ -56,11 +60,21 @@ class AppConfig extends ExtensionConfigDefault
             $process = AdminConfig::insert(
                 $dataInsert
             );
-            if (!$process) {
-                $return = ['error' => 1, 'msg' => gp247_language_render('admin.extension.install_faild')];
+            if (app()->runningInConsole()) {
+                // While install template from command, cannot load helper gp247
+                if (!$process) {
+                    $return = ['error' => 1, 'msg' => 'Error installing template'];
+                } else {
+                    $return = ['error' => 0, 'msg' => 'Install template success'];
+                }
             } else {
-                $return = ['error' => 0, 'msg' => gp247_language_render('admin.extension.install_success')];
+                if (!$process) {
+                    $return = ['error' => 1, 'msg' => gp247_language_render('admin.extension.install_faild')];
+                } else {
+                    $return = ['error' => 0, 'msg' => gp247_language_render('admin.extension.install_success')];
+                }
             }
+
         }
 
         //Setup store for Root store
@@ -120,6 +134,7 @@ class AppConfig extends ExtensionConfigDefault
         return $return;
     }
 
+
     /**
      * Get info template
      *
@@ -145,13 +160,95 @@ class AppConfig extends ExtensionConfigDefault
 
     public function removeStore($storeId = null)
     {
-        // code here
+        if ($storeId) {
+            FrontLayoutBlock::where('template', $this->configKey)
+                ->where('store_id', $storeId)
+                ->delete();
+            $tableBanner = (new FrontBanner)->getTable();
+            $tableBannerStore = (new FrontBannerStore)->getTable();
+            $idBanners = (new FrontBanner)
+                ->join($tableBannerStore, $tableBannerStore.'.banner_id', $tableBanner.'.id')
+                ->where($tableBanner.'.title', 'like', '%('.$this->configKey.')%')
+                ->where($tableBannerStore.'.store_id', $storeId)
+                ->pluck('id');
+    
+            if ($idBanners) {
+                FrontBannerStore::whereIn('banner_id', $idBanners)
+                ->delete();
+                FrontBanner::whereIn('id', $idBanners)
+                ->delete();
+            }
+        } else {
+            // Remove from all stories
+            FrontLayoutBlock::where('template', $this->configKey)
+                ->delete();
+            $idBanners = FrontBanner::where('title', 'like', '%('.$this->configKey.')%')
+                ->pluck('id');
+            if ($idBanners) {
+                FrontBannerStore::whereIn('banner_id', $idBanners)
+                ->delete();
+                FrontBanner::whereIn('id', $idBanners)
+                ->delete();
+            }
+        }
     }
 
     // Setup for store
 
     public function setupStore($storeId = null)
     {
-       // code here
+        // Change template for store
+        AdminStore::where('id', $storeId)
+            ->update(['template' => $this->configKey]);
+
+        // Insert layout block for store
+        $dataInsert[] = [
+            'id'       => $this->uuid(),
+            'name'     => 'Banner top ('.$this->configKey.')',
+            'position' => 'banner_top',
+            'page'     => 'front_home',
+            'text'     => 'banner_image',
+            'type'     => 'view',
+            'sort'     => 10,
+            'status'   => 1,
+            'template' => $this->configKey,
+            'store_id' => $storeId,
+        ];
+
+        $dataInsert[] = [
+            'id'       => $this->uuid(),
+            'name'     => 'Top news ('.$this->configKey.')',
+            'position' => 'bottom',
+            'page'     => 'front_home',
+            'text'     => 'top_news',
+            'type'     => 'view',
+            'sort'     => 10,
+            'status'   => 1,
+            'template' => $this->configKey,
+            'store_id' => $storeId,
+        ];
+
+        FrontLayoutBlock::insert($dataInsert);
+    
+        $modelBanner = new FrontBanner;
+        $modelBannerStore = new FrontBannerStore; 
+    
+        $idBanner1 = $modelBanner->create(['id' => $this->uuid(), 'title' => 'Banner home 1 ('.$this->configKey.')', 'image' => 'https://picsum.photos/800/400?random=1', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner']);
+        $modelBannerStore->create(['banner_id' => $idBanner1->id, 'store_id' => $storeId]);
+        $idBanner2 = $modelBanner->create(['id' => $this->uuid(), 'title' => 'Banner home 2 ('.$this->configKey.')', 'image' => 'https://picsum.photos/800/400?random=2', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner']);
+        $modelBannerStore->create(['banner_id' => $idBanner2->id, 'store_id' => $storeId]);
+        $idBanner3 = $modelBanner->create(['id' => $this->uuid(), 'title' => 'Banner breadcrumb ('.$this->configKey.')', 'image' => 'https://picsum.photos/800/400?random=3', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'breadcrumb']);
+        $modelBannerStore->create(['banner_id' => $idBanner3->id, 'store_id' => $storeId]);
+        $idBanner4 = $modelBanner->create(['id' => $this->uuid(), 'title' => 'Banner store ('.$this->configKey.')', 'image' => 'https://picsum.photos/800/400?random=4', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner-store']);
+        $modelBannerStore->create(['banner_id' => $idBanner4->id, 'store_id' => $storeId]);
+    
+    }
+    private function uuid() {
+        // While install template from command, cannot load helper gp247
+        if(app()->runningInConsole( )) {
+            return (string)\Illuminate\Support\Str::orderedUuid();
+        } else {
+            return gp247_uuid();
+        }
     }
 }

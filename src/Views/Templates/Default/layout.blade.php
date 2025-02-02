@@ -1,19 +1,9 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    
-    <title>@yield('title', config('app.name', 'GP247'))</title>
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-        @section('block_main')
-        
-        @show
-</body>
-</html>
-
+@if (gp247_store_info('active') == '1'  || (gp247_store_info('active') == '0' && auth()->guard('admin')->user()))
+    {{-- Admin logged can view the website content under maintenance --}}
+    @if (gp247_store_info('active') == '0' && auth()->guard('admin')->user())
+        @includeIf($GP247TemplatePath . '.maintenance_note')
+    @endif
+    @include($GP247TemplatePath . '.main')
+@else
+    @include($GP247TemplatePath . '.maintenance')
+@endif

@@ -1,0 +1,1 @@
+@includeIf($GP247TemplatePath.'.common.render_block', ['positionBlock' => 'right'])
