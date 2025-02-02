@@ -7,5 +7,7 @@
     "configGroup": "Templates",
     "configKey": "Default",
     "version": "1.0",
-    "gp247Version": "1.0"
+    "requireCore": ["1.0"],
+    "requirePackages": ["gp247/front"],
+    "requireExtensions": []
 }
