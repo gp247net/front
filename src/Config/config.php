@@ -16,5 +16,22 @@ return [
         ],
         'GP247_TEMPLATE_FRONT_DEFAULT' => env('GP247_TEMPLATE_FRONT_DEFAULT', 'Default'),
         'GP247_SUFFIX_URL'    => env('GP247_SUFFIX_URL', '.html'), //Suffix url, ex: domain.com/news/1.html 
+
+        'layout_page' => [
+            'front_home' => 'admin.layout_block_page.home',
+            'front_contact' => 'admin.layout_block_page.contact',
+            'front_list' => 'admin.layout_block_page.list',
+            'front_page_detail' => 'admin.layout_block_page.page_detail',
+            'front_news_detail' => 'admin.layout_block_page.news_detail',
+            'front_search' => 'admin.layout_block_page.search',       
+        ],
+        'layout_position' => [
+            'header' => 'admin.layout_block_position.header',
+            'banner_top' => 'admin.layout_block_position.banner_top',
+            'top' => 'admin.layout_block_position.top',
+            'left' => 'admin.layout_block_position.left',
+            'right' => 'admin.layout_block_position.right',
+            'bottom' => 'admin.layout_block_position.bottom',
+        ],
     ],
 ];

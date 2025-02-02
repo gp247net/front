@@ -5,8 +5,6 @@ use GP247\Front\Controllers\Admin\RootFrontAdminController;
 use GP247\Front\Models\FrontLayoutBlock;
 use GP247\Core\Admin\Models\AdminStore;
 use GP247\Front\Models\FrontPage;
-use GP247\Front\Models\FrontLayoutPage;
-use GP247\Front\Models\FrontLayoutPosition;
 use Illuminate\Support\Facades\Validator;
 
 class AdminLayoutBlockController extends RootFrontAdminController
@@ -17,9 +15,9 @@ class AdminLayoutBlockController extends RootFrontAdminController
     public function __construct()
     {
         parent::__construct();
-        $this->layoutPage = FrontLayoutPage::getPages();
+        $this->layoutPage = config('gp247-config.front.layout_page');
+        $this->layoutPosition = config('gp247-config.front.layout_position');
         $this->layoutType = ['html'=>'Html', 'view' => 'View', 'page' => 'Page'];
-        $this->layoutPosition = FrontLayoutPosition::getPositions();
     }
 
     public function index()
@@ -96,6 +94,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
                 // Only show store info if store is root
                 $storeTmp['shop_store'] = '<i class="nav-icon fab fa-shopify"></i><a target=_new href="'.gp247_store_get_domain_from_code($storeCode).'">'.$storeCode.'</a>';
             }
+            $arrAction = [];
             $arrAction[] =  '<a href="' . gp247_route_admin('admin_layout_block.edit', ['id' => $row['id'] ? $row['id'] : 'not-found-id']) . '" class="dropdown-item"><span title="' . gp247_language_render('action.edit') . '"><i class="fa fa-edit"></i> '.gp247_language_render('action.edit').'</span></a>';
             $arrAction[] =  '<a href="#" onclick="deleteItem(\'' . $row['id'] . '\');"  title="' . gp247_language_render('action.delete') . '" class="dropdown-item"><i class="fas fa-trash-alt"></i> '.gp247_language_render('action.delete').'</a>';
             $action = $this->procesListAction($arrAction);

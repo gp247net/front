@@ -7,8 +7,6 @@ use Illuminate\Support\Facades\DB;
 use GP247\Core\Admin\Models\AdminMenu;
 use GP247\Core\Admin\Models\Languages;
 use GP247\Front\Models\FrontBannerType;
-use GP247\Front\Models\FrontLayoutPosition;
-use GP247\Front\Models\FrontLayoutPage;
 use GP247\Front\Models\FrontLinkGroup;
 class DataFrontDefaultSeeder extends Seeder
 {
@@ -67,41 +65,6 @@ class DataFrontDefaultSeeder extends Seeder
                 ['id' => 7,'code' => 'other', 'name' => 'Other'],
             ]
         );
-
-        FrontLayoutPosition::insertOrIgnore(
-            [
-                ['id' => 1,'key' => 'header','name' => 'admin.layout_block_position.header'],
-                ['id' => 2,'key' => 'banner_top','name' => 'admin.layout_block_position.banner_top'],
-                ['id' => 3,'key' => 'top','name' => 'admin.layout_block_position.top'],
-                ['id' => 4,'key' => 'left','name' => 'admin.layout_block_position.left'],
-                ['id' => 5,'key' => 'right','name' => 'admin.layout_block_position.right'],
-                ['id' => 6,'key' => 'bottom','name' => 'admin.layout_block_position.bottom'],
-            ]
-        );
-
-        FrontLayoutPage::insertOrIgnore(
-            [
-                ['id' => 1,'key' => 'home','name' => 'admin.layout_block_page.home'],
-                ['id' => 2,'key' => 'shop_home','name' => 'admin.layout_block_page.shop_home'],
-                ['id' => 3,'key' => 'shop_search','name' => 'admin.layout_block_page.shop_search'],
-                ['id' => 4,'key' => 'shop_product_list','name' => 'admin.layout_block_page.product_list'],
-                ['id' => 5,'key' => 'product_detail','name' => 'admin.layout_block_page.product_detail'],
-                ['id' => 6,'key' => 'shop_cart','name' => 'admin.layout_block_page.shop_cart'],
-                ['id' => 7,'key' => 'shop_item_list','name' => 'admin.layout_block_page.item_list'],
-                ['id' => 8,'key' => 'shop_item_detail','name' => 'admin.layout_block_page.item_detail'],
-                ['id' => 9,'key' => 'shop_news','name' => 'admin.layout_block_page.news_list'],
-                ['id' => 10,'key' => 'shop_news_detail','name' => 'admin.layout_block_page.news_detail'],
-                ['id' => 11,'key' => 'shop_auth','name' => 'admin.layout_block_page.shop_auth'],
-                ['id' => 12,'key' => 'shop_profile','name' => 'admin.layout_block_page.shop_profile'],
-                ['id' => 13,'key' => 'shop_page','name' => 'admin.layout_block_page.shop_page'],
-                ['id' => 14,'key' => 'shop_contact','name' => 'admin.layout_block_page.shop_contact'],
-                ['id' => 15,'key' => 'content_list','name' => 'admin.layout_block_page.content_list'],
-                ['id' => 16,'key' => 'content_detail','name' => 'admin.layout_block_page.content_detail'],
-                ['id' => 17,'key' => 'vendor_home','name' => 'admin.layout_block_page.vendor_home'],
-                ['id' => 18,'key' => 'store_product_list','name' => 'admin.layout_block_page.store_product_list'],
-            ]
-        );
-
         FrontLinkGroup::insertOrIgnore(
             [
                 ['id' => '1','code' => 'menu','name' => 'Menu main'],
@@ -191,42 +154,16 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'admin.link_group.name','text' => 'Name','position' => 'admin.link_group','location' => 'en'],
                 ['code' => 'admin.layout_block_page.all','text' => 'All Page','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block_page.home','text' => 'Home page','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.shop_home','text' => 'Home shop','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.shop_search','text' => 'Search page','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.vendor_home','text' => 'Store: home','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.store_product_list','text' => 'Store: product list','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.product_list','text' => 'List: product','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.product_detail','text' => 'Detail: product','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.shop_cart','text' => 'Cart: cart, wishlist, compare, checkout','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.shop_auth','text' => 'Auth: login, forgot, register','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.shop_profile','text' => 'Customer profile','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.item_list','text' => 'List: category, brand, supplier','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.item_detail','text' => 'Detail: item','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.news_list','text' => 'List:  Blog/news','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.news_detail','text' => 'Detail: entry Blog','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.content_list','text' => 'List: content CMS','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.content_detail','text' => 'Detail: entry CMS','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.shop_contact','text' => 'Page contact','position' => 'admin.layout_block','location' => 'en'],
-                ['code' => 'admin.layout_block_page.shop_page','text' => 'Other page: about...','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block_page.all','text' => 'Tất cả trang','position' => 'admin.layout_block','location' => 'vi'],
+                ['code' => 'admin.layout_block_page.page_detail','text' => 'Trang chi tiết','position' => 'admin.layout_block','location' => 'vi'],
+                ['code' => 'admin.layout_block_page.page_detail','text' => 'Page detail','position' => 'admin.layout_block','location' => 'en'],
+                ['code' => 'admin.layout_block_page.list','text' => 'Trang danh sách','position' => 'admin.layout_block','location' => 'vi'],
+                ['code' => 'admin.layout_block_page.list','text' => 'Page list','position' => 'admin.layout_block','location' => 'en'],
+                ['code' => 'admin.layout_block_page.contact','text' => 'Trang liên hệ','position' => 'admin.layout_block','location' => 'vi'],
+                ['code' => 'admin.layout_block_page.contact','text' => 'Contact page','position' => 'admin.layout_block','location' => 'en'],
+                ['code' => 'admin.layout_block_page.search','text' => 'Trang tìm kiếm','position' => 'admin.layout_block','location' => 'vi'],
+                ['code' => 'admin.layout_block_page.search','text' => 'Search page','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block_page.home','text' => 'Trang chủ','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.shop_home','text' => 'Trang chủ Shop','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.shop_search','text' => 'Trang tìm kiếm','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.vendor_home','text' => 'Cửa hàng: trang chủ','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.store_product_list','text' => 'Cửa hàng: danh sách sản phẩm','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.product_list','text' => 'Danh sách: sản phẩm','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.product_detail','text' => 'Chi tiết: sản phẩm','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.shop_cart','text' => 'Giỏ hàng: giỏ hàng, wishlist, compare, checkout','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.shop_auth','text' => 'Chứng thực: đăng nhập, đăng ký, quên mật khẩu','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.shop_profile','text' => 'Tài khoản khách hàng','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.item_list','text' => 'Danh sách item: danh mục, thương hiệu, nhà cung cấp','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.item_detail','text' => 'Chi tiết: item','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.news_list','text' => 'Danh sách: bài viết Blog','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.news_detail','text' => 'Chi tiết: bài viết Blog','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.content_list','text' => 'Danh sách: bài viết CMS','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.content_detail','text' => 'Chi tiết: bài viết CMS','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.shop_contact','text' => 'Trang liên hệ','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_page.shop_page','text' => 'Các trang viết: giới thiệu...','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block_position.header','text' => 'Head code :meta, css, javascript,...','position' => 'admin.layout_page_block','location' => 'vi'],
                 ['code' => 'admin.layout_block_position.top','text' => 'Block Top','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block_position.bottom','text' => 'Block Bottom','position' => 'admin.layout_block','location' => 'vi'],

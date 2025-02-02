@@ -97,6 +97,7 @@ class AdminLinkController extends RootFrontAdminController
                     $dataMap['shop_store'] = '';
                 }
             }
+            $arrAction = [];
             $arrAction[] = '<a href="' . gp247_route_admin('admin_link.edit', ['id' => $row['id'] ? $row['id'] : 'not-found-id']) . '" class="dropdown-item"><span title="' . gp247_language_render('action.edit') . '"><i class="fa fa-edit"></i> '.gp247_language_render('action.edit').'</span></a>';
             $arrAction[] = '<a href="#" onclick="deleteItem(\'' . $row['id'] . '\');"  title="' . gp247_language_render('action.delete') . '" class="dropdown-item"><i class="fas fa-trash-alt"></i> '.gp247_language_render('action.delete').'</a>';
             $action = $this->procesListAction($arrAction);
