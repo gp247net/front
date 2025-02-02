@@ -8,6 +8,9 @@ use GP247\Core\Admin\Models\AdminMenu;
 use GP247\Core\Admin\Models\Languages;
 use GP247\Front\Models\FrontBannerType;
 use GP247\Front\Models\FrontLinkGroup;
+use GP247\Front\Models\FrontPage;
+use GP247\Front\Models\FrontPageDescription;
+
 class DataFrontDefaultSeeder extends Seeder
 {
 
@@ -340,6 +343,39 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'front.welcome_back','text' => 'Welcome back!','position' => 'front','location' => 'en'],
             ]
         );
+
+        $page = FrontPage::create([
+            'alias' => 'home',
+            'image' => '',
+            'status' => 1,
+        ]);
+
+        $descriptions = [
+            'vi' => [
+                'title' => 'Trang chủ',
+                'keyword' => 'trang chu, home',
+                'description' => 'Trang chủ website',
+                'content' => '<h3>Chào mừng đến với CMS được tạo bởi hệ thống GP247</h3>'
+            ],
+            'en' => [
+                'title' => 'Home page',
+                'keyword' => 'home page',
+                'description' => 'Website homepage',
+                'content' => '<h3>Welcome to CMS created by GP247 system</h3>'
+            ]
+        ];
+
+        foreach ($descriptions as $lang => $description) {
+            FrontPageDescription::create([
+                'page_id' => $page->id,
+                'lang' => $lang,
+                'title' => $description['title'],
+                'keyword' => $description['keyword'],
+                'description' => $description['description'],
+                'content' => $description['content']
+            ]);
+        }
+        $page->stores()->attach(GP247_STORE_ID_ROOT);
 
     }
 
