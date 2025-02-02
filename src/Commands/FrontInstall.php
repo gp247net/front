@@ -41,8 +41,17 @@ class FrontInstall extends Command
         $this->call('db:seed', ['--class' => '\GP247\Front\DB\seeders\DataFrontDefaultSeeder', '--force' => true]);
         $this->info('---------------> Seeding database Front default done!');
 
+        //== Begin setup template default
+        // Copy template default
         $this->call('vendor:publish', ['--tag' => 'gp247:template-public']);
         $this->call('vendor:publish', ['--tag' => 'gp247:template-view']);
+
+        //Setup template default for Root store
+        // This command can only be run after the above default template copy command is successful.
+        // If copying the above pattern fails, do it manually. Then run this command again.
+        $this->call('gp247:template-setup');
+
+        //== End setup template default
 
         $this->welcome();
     }

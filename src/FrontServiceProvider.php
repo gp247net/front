@@ -9,6 +9,7 @@ use GP247\Front\Middleware\CheckDomain;
 use GP247\Front\Commands\FrontInstall;
 use GP247\Front\Commands\FrontUninstall;
 use GP247\Front\Commands\MakeTemplate;
+use GP247\Front\Commands\TemplateSetup;
 
 class FrontServiceProvider extends ServiceProvider
 {
@@ -50,6 +51,7 @@ class FrontServiceProvider extends ServiceProvider
                 FrontInstall::class,
                 FrontUninstall::class,
                 MakeTemplate::class,
+                TemplateSetup::class,
             ]);
         } catch (\Throwable $e) {
             $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
