@@ -15,6 +15,9 @@ Route::group(
             $nameSpaceHome = 'GP247\Front\Controllers';
         }
 
+        Route::get($langUrl.'search'.$suffix, $nameSpaceHome.'\HomeController@searchProcessFront')
+        ->name('front.search');
+
         //Process click banner
         Route::get('/banner/{id}', $nameSpaceHome.'\HomeController@clickBanner')
         ->name('front.banner.click');
