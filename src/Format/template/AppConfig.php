@@ -65,6 +65,9 @@ class AppConfig extends ExtensionConfigDefault
             }
         }
 
+        //Setup store for Root store
+        $this->setupStore(GP247_STORE_ID_ROOT);
+
         return $return;
     }
 
@@ -85,6 +88,9 @@ class AppConfig extends ExtensionConfigDefault
         } catch (\Throwable $e) {
             $return = ['error' => 1, 'msg' => $e->getMessage()];
         }
+
+        //Remove setup for all stores
+        $this->removeStore();
 
         return $return;
     }
@@ -146,15 +152,15 @@ class AppConfig extends ExtensionConfigDefault
     }
 
     // Remove setup for store
-    // Use when change template
-    public function removeStore($storeId)
+
+    public function removeStore($storeId = null)
     {
         // code here
     }
 
     // Setup for store
-    // Use when change template
-    public function setupStore($storeId)
+
+    public function setupStore($storeId = null)
     {
        // code here
     }
