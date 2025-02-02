@@ -20,8 +20,9 @@ return [
         'layout_page' => [
             'front_home' => 'admin.layout_block_page.home',
             'front_contact' => 'admin.layout_block_page.contact',
-            'front_list' => 'admin.layout_block_page.list',
+            'front_page_list' => 'admin.layout_block_page.page_list',
             'front_page_detail' => 'admin.layout_block_page.page_detail',
+            'front_news_list' => 'admin.layout_block_page.news_list',
             'front_news_detail' => 'admin.layout_block_page.news_detail',
             'front_search' => 'admin.layout_block_page.search',       
         ],
