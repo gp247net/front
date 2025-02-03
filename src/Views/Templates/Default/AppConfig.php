@@ -217,11 +217,11 @@ class AppConfig extends ExtensionConfigDefault
 
         $dataInsert[] = [
             'id'       => $this->uuid(),
-            'name'     => 'Top news ('.$this->configKey.')',
+            'name'     => 'Page home ('.$this->configKey.')',
             'position' => 'bottom',
             'page'     => 'front_home',
-            'text'     => 'top_news',
-            'type'     => 'view',
+            'text'     => 'home',
+            'type'     => 'page',
             'sort'     => 10,
             'status'   => 1,
             'template' => $this->configKey,

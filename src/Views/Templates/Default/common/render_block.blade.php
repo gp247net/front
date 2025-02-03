@@ -11,7 +11,7 @@
             @if ($layout->type =='html')
                 {!! $layout->text !!}
             @elseif($layout->type =='view')
-                @includeIf($GP247TemplatePath.'.block.'.$layout->text)
+                @includeIf($GP247TemplatePath.'.blocks.'.$layout->text)
             @elseif($layout->type =='page')
             <section class="section section-xxl bg-default">
                 <div class="container">
