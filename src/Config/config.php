@@ -27,12 +27,12 @@ return [
             'front_search' => 'admin.layout_block_page.search',       
         ],
         'layout_position' => [
-            'header' => 'admin.layout_block_position.header',
-            'banner_top' => 'admin.layout_block_position.banner_top',
+            'top_site' => 'admin.layout_block_position.top_site',
             'top' => 'admin.layout_block_position.top',
             'left' => 'admin.layout_block_position.left',
             'right' => 'admin.layout_block_position.right',
             'bottom' => 'admin.layout_block_position.bottom',
+            'footer' => 'admin.layout_block_position.footer',
         ],
     ],
 ];

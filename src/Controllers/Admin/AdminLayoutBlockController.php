@@ -81,7 +81,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
             $storeTmp = [
                 'name' => $row['name'],
                 'type' => $type_name,
-                'position' => htmlspecialchars(gp247_language_render($this->layoutPosition[$row['position']]) ?? ''),
+                'position' => htmlspecialchars(gp247_language_render($this->layoutPosition[$row['position']] ?? $row['position']) ?? ''),
                 'page' => $htmlPage,
                 'text' => htmlspecialchars($row['text']),
                 'sort' => $row['sort'],
