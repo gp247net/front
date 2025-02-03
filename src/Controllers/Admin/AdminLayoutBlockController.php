@@ -126,8 +126,9 @@ class AdminLayoutBlockController extends RootFrontAdminController
      */
     public function create()
     {
-        $listViewBlock = $this->getListViewBlock();
-        $listViewPage = $this->getListPageBlock();
+        $storeId = session('adminStoreId');
+        $listViewBlock = $this->getListViewBlock($storeId);
+        $listViewPage = $this->getListPageBlock($storeId);
         $data = [
             'title'             => gp247_language_render('admin.layout_block.add_new_title'),
             'subTitle'          => '',
@@ -138,6 +139,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
             'layoutType'        => $this->layoutType,
             'listViewBlock'     => $listViewBlock,
             'listViewPage'     => $listViewPage,
+            'storeId'           => $storeId,
             'layout'            => [],
             'url_action'        => gp247_route_admin('admin_layout_block.post_create'),
         ];
@@ -151,9 +153,9 @@ class AdminLayoutBlockController extends RootFrontAdminController
      */
     public function postCreate()
     {
+        $data = request()->all();
         $storeId = $data['store_id'] ?? session('adminStoreId');
         $store = AdminStore::find($storeId);
-        $data = request()->all();
         $dataOrigin = request()->all();
         $validator = Validator::make($dataOrigin, [
             'name' => 'required',
@@ -224,15 +226,15 @@ class AdminLayoutBlockController extends RootFrontAdminController
      */
     public function postEdit($id)
     {
+        $data = request()->all();
+        $dataOrigin = request()->all();
         $storeId = $data['store_id'] ?? session('adminStoreId');
         $store = AdminStore::find($storeId);
 
-        $layout = (new FrontLayoutBlock)->getStoreBlockContentAdmin($id);
+        $layout = (new FrontLayoutBlock)->getStoreBlockContentAdmin($id, $storeId);
         if (!$layout) {
             return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
         }
-        $data = request()->all();
-        $dataOrigin = request()->all();
         $validator = Validator::make($dataOrigin, [
             'name' => 'required',
         ], [
@@ -337,7 +339,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
             $html = '<select name="text" class="form-control text">';
             $storeId = request('store_id');
             $arrView = [];
-            foreach (glob(app_path() . "/GP247/Templates/".gp247_store_info(key:'template', storeId:$storeId)."/block/*.blade.php") as $file) {
+            foreach (glob(app_path() . "/GP247/Templates/".gp247_store_info(key:'template', storeId:$storeId)."/blocks/*.blade.php") as $file) {
                 if (file_exists($file)) {
                     $arr = explode('/', $file);
                     $arrView[substr(end($arr), 0, -10)] = substr(end($arr), 0, -10);
