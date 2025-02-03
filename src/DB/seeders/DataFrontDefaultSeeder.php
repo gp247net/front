@@ -343,8 +343,10 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'front.welcome_back','text' => 'Welcome back!','position' => 'front','location' => 'en'],
             ]
         );
-
+        // Cannot use gp247 helper during installation, as it may not be fully loaded.
+        $pageId = (string)\Illuminate\Support\Str::orderedUuid();
         $page = FrontPage::create([
+            'id' => $pageId,
             'alias' => 'home',
             'image' => '',
             'status' => 1,
@@ -367,7 +369,7 @@ class DataFrontDefaultSeeder extends Seeder
 
         foreach ($descriptions as $lang => $description) {
             FrontPageDescription::create([
-                'page_id' => $page->id,
+                'page_id' => $pageId,
                 'lang' => $lang,
                 'title' => $description['title'],
                 'keyword' => $description['keyword'],
@@ -376,7 +378,7 @@ class DataFrontDefaultSeeder extends Seeder
             ]);
         }
         $page->stores()->attach(GP247_STORE_ID_ROOT);
-
+        $page->save();
     }
 
     public function updateDataVersion() {
