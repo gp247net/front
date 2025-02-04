@@ -32,12 +32,6 @@ class AdminLayoutBlockController extends RootFrontAdminController
             'css'           => '',
             'js'            => '',
         ];
-        //Process add content
-        $data['menuRight'] = gp247_config_group('menuRight', \Request::route()->getName());
-        $data['menuLeft'] = gp247_config_group('menuLeft', \Request::route()->getName());
-        $data['topMenuRight'] = gp247_config_group('topMenuRight', \Request::route()->getName());
-        $data['topMenuLeft'] = gp247_config_group('topMenuLeft', \Request::route()->getName());
-        $data['blockBottom'] = gp247_config_group('blockBottom', \Request::route()->getName());
 
         $listTh = [
             'name'     => gp247_language_render('admin.layout_block.name'),

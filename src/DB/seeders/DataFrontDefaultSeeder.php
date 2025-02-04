@@ -10,6 +10,8 @@ use GP247\Front\Models\FrontBannerType;
 use GP247\Front\Models\FrontLinkGroup;
 use GP247\Front\Models\FrontPage;
 use GP247\Front\Models\FrontPageDescription;
+use GP247\Front\Models\FrontLink;
+use GP247\Front\Models\FrontLinkDescription;
 
 class DataFrontDefaultSeeder extends Seeder
 {
@@ -168,19 +170,23 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'admin.layout_block_page.news_detail','text' => 'Trang chi tiết tin tức','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block_page.contact','text' => 'Trang liên hệ','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block_page.contact','text' => 'Contact page','position' => 'admin.layout_block','location' => 'en'],
+                ['code' => 'admin.layout_block_page.about','text' => 'Trang giới thiệu','position' => 'admin.layout_block','location' => 'vi'],
+                ['code' => 'admin.layout_block_page.about','text' => 'About page','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block_page.search','text' => 'Trang tìm kiếm','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block_page.search','text' => 'Search page','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block_page.home','text' => 'Trang chủ','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_position.top_stite','text' => 'Vị trí Head code :meta, css, javascript,...','position' => 'admin.layout_page_block','location' => 'vi'],
+                ['code' => 'admin.layout_block_position.top_site','text' => 'Vị trí Head code :meta, css, javascript,...','position' => 'admin.layout_page_block','location' => 'vi'],
                 ['code' => 'admin.layout_block_position.top','text' => 'Vị trí Top (Banner/Header)','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block_position.bottom','text' => 'Vị trí Bottom','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block_position.footer','text' => 'Vị trí Footer','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block_position.left','text' => 'Vị trí Left - Cột trái','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block_position.right','text' => 'Vị trí Right - Cột phải','position' => 'admin.layout_block','location' => 'vi'],
-                ['code' => 'admin.layout_block_position.top_stite','text' => 'Position Head code: meta, css, javascript, ...','position' => 'admin.layout_block','location' => 'en'],
+                ['code' => 'admin.layout_block_position.center','text' => 'Vị trí Center - Cột giữa','position' => 'admin.layout_block','location' => 'vi'],
+                ['code' => 'admin.layout_block_position.top_site','text' => 'Position Head code: meta, css, javascript, ...','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block_position.top','text' => 'Position Top (Banner/Header)','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block_position.bottom','text' => 'Position Bottom','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block_position.footer','text' => 'Position Footer','position' => 'admin.layout_block','location' => 'en'],
+                ['code' => 'admin.layout_block_position.center','text' => 'Position Center','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block_position.left','text' => 'Position Left','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block_position.right','text' => 'Position Right','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block.list','text' => 'Danh sách block','position' => 'admin.layout_block','location' => 'vi'],
@@ -303,14 +309,6 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'front.about','text' => 'Giới thiệu','position' => 'front','location' => 'vi'],
                 ['code' => 'front.contact','text' => 'Contact us','position' => 'front','location' => 'en'],
                 ['code' => 'front.contact','text' => 'Liên hệ','position' => 'front','location' => 'vi'],
-                ['code' => 'front.my_profile','text' => 'Tài khoản','position' => 'front','location' => 'vi'],
-                ['code' => 'front.my_profile','text' => 'My profile','position' => 'front','location' => 'en'],
-                ['code' => 'front.my_account','text' => 'Tài khoản','position' => 'front','location' => 'vi'],
-                ['code' => 'front.my_account','text' => 'My account','position' => 'front','location' => 'en'],
-                ['code' => 'front.account','text' => 'Tài khoản','position' => 'front','location' => 'vi'],
-                ['code' => 'front.account','text' => 'customer','position' => 'front','location' => 'en'],
-                ['code' => 'front.currency','text' => 'Tiền tệ','position' => 'front','location' => 'vi'],
-                ['code' => 'front.currency','text' => 'Currency','position' => 'front','location' => 'en'],
                 ['code' => 'front.language','text' => 'Ngôn ngữ','position' => 'front','location' => 'vi'],
                 ['code' => 'front.language','text' => 'Language','position' => 'front','location' => 'en'],
                 ['code' => 'front.login','text' => 'Đăng nhập','position' => 'front','location' => 'vi'],
@@ -341,15 +339,18 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'front.view_not_exist','text' => 'View not found :view','position' => 'front','location' => 'en'],
                 ['code' => 'front.welcome_back','text' => 'Chào mừng trở lại','position' => 'front','location' => 'vi'],
                 ['code' => 'front.welcome_back','text' => 'Welcome back!','position' => 'front','location' => 'en'],
+                ['code' => 'front.email','text' => 'Email','position' => 'front','location' => 'vi'],
+                ['code' => 'front.email','text' => 'Email','position' => 'front','location' => 'en'],
             ]
         );
+
         // Cannot use gp247 helper during installation, as it may not be fully loaded.
         $pageId = (string)\Illuminate\Support\Str::orderedUuid();
         $page = FrontPage::create([
             'id' => $pageId,
             'alias' => 'home',
             'image' => '',
-            'status' => 1,
+            'status' => 0,
         ]);
 
         $descriptions = [
@@ -379,6 +380,137 @@ class DataFrontDefaultSeeder extends Seeder
         }
         $page->stores()->attach(GP247_STORE_ID_ROOT);
         $page->save();
+
+        $pageAboutId = (string)\Illuminate\Support\Str::orderedUuid();
+        $pageAbout = FrontPage::create([
+            'id' => $pageAboutId,
+            'alias' => 'about',
+            'image' => '',
+            'status' => 1,
+        ]);
+
+        $descriptionsAbout = [
+            'vi' => [
+                'title' => 'Giới thiệu về GP247',
+                'keyword' => 'giới thiệu GP247, giải pháp website miễn phí, doanh nghiệp',
+                'description' => 'GP247 - Giải pháp website miễn phí dành cho doanh nghiệp',
+                'content' => '<h2>Về GP247</h2>
+                <p>GP247 là giải pháp website miễn phí dành cho doanh nghiệp, được phát triển với mục tiêu hỗ trợ cộng đồng doanh nghiệp trong việc số hóa và phát triển kinh doanh trực tuyến.</p>
+
+                <h3>Sản Phẩm Của Chúng Tôi</h3>
+                <ul>
+                    <li>GP247/core - Hệ thống core cơ bản</li>
+                    <li>GP247/front - Quản lý giao diện và nội dung</li>
+                    <li>GP247/cms - Hệ thống quản lý nội dung</li>
+                </ul>
+
+                <h3>Hỗ Trợ & Cộng Đồng</h3>
+                <p>Chúng tôi luôn sẵn sàng hỗ trợ và lắng nghe phản hồi từ cộng đồng để cùng nhau xây dựng một cộng đồng vững mạnh và phát triển. Bạn có thể tham gia cộng đồng GP247 trên các nền tảng mạng xã hội để nhận được sự hỗ trợ nhanh chóng từ đội ngũ phát triển và các thành viên khác.</p>
+
+                <h3>Liên Hệ</h3>
+                <ul>
+                    <li>Email hỗ trợ kỹ thuật: support@gp247.net</li>
+                    <li>Email hợp tác và phát triển: dev@gp247.net</li>
+                </ul>'
+            ],
+            'en' => [
+                'title' => 'About GP247',
+                'keyword' => 'about GP247, free website solutions, business',
+                'description' => 'GP247 - Free website solutions for businesses',
+                'content' => '<h2>About GP247</h2>
+                <p>GP247 is a free website solution for businesses, developed with the goal of supporting the business community in digitalization and online business development.</p>
+
+                <h3>Our Products</h3>
+                <ul>
+                    <li>GP247/core - Basic core system</li>
+                    <li>GP247/front - Interface and content management</li>
+                    <li>GP247/cms - Content management system</li>
+                </ul>
+
+                <h3>Support & Community</h3>
+                <p>We are always ready to assist and listen to feedback from the community to build a strong and thriving community together. You can join the GP247 community on social media platforms to receive prompt assistance from the development team and other members.</p>
+
+                <h3>Contact</h3>
+                <ul>
+                    <li>Technical support email: support@gp247.net</li>
+                    <li>Development and cooperation email: dev@gp247.net</li>
+                </ul>'
+            ]
+        ];
+
+        foreach ($descriptionsAbout as $lang => $description) {
+            FrontPageDescription::create([
+                'page_id' => $pageAboutId,
+                'lang' => $lang,
+                'title' => $description['title'],
+                'keyword' => $description['keyword'],
+                'description' => $description['description'],
+                'content' => $description['content']
+            ]);
+        }
+        $pageAbout->stores()->attach(GP247_STORE_ID_ROOT);
+        $pageAbout->save();
+
+        $links = [
+            // Menu links
+            [
+                'name' => 'Contact',
+                'url' => '#',
+                'target' => '_self',
+                'group' => 'menu', // menu main
+                'sort' => 1,
+                'status' => 1,
+            ],
+            [
+                'name' => 'GP247',
+                'url' => 'https://gp247.net',
+                'target' => '_self',
+                'group' => 'menu', // menu main
+                'sort' => 1,
+                'status' => 1,
+            ],
+            [
+                'name' => 'About',
+                'url' => 'route::front.page.detail:alias__about',
+                'target' => '_self', 
+                'group' => 'menu', // menu main
+                'sort' => 2,
+                'status' => 1,
+            ],
+            // Footer links
+            [
+                'name' => 'Privacy Policy',
+                'url' => '#',
+                'target' => '_self',
+                'group' => 'footer', // footer main
+                'sort' => 1,
+                'status' => 1,
+            ],
+            [
+                'name' => 'Terms of Use',
+                'url' => '#',
+                'target' => '_self',
+                'group' => 'footer', // footer main
+                'sort' => 2,
+                'status' => 1,
+            ],
+        ];
+
+        foreach ($links as $link) {
+            $frontLink = FrontLink::create([
+                'id' => (string)\Illuminate\Support\Str::orderedUuid(),
+                'name' => $link['name'],
+                'url' => $link['url'],
+                'target' => $link['target'],
+                'group' => $link['group'],
+                'sort' => $link['sort'],
+                'status' => $link['status'],
+            ]);
+
+            // Attach to store using model relationship
+            $frontLink->stores()->attach(GP247_STORE_ID_ROOT);
+        }
+
     }
 
     public function updateDataVersion() {

@@ -58,7 +58,7 @@ class HomeController extends RootFrontController
     {
         $page = (new FrontPage)->getDetail($alias, $type = 'alias');
         if ($page) {
-            $view = $this->GP247TemplatePath . '.screen.page';
+            $view = $this->GP247TemplatePath . '.screen.page_detail';
             gp247_check_view($view);
             return view(
                 $view,
@@ -104,12 +104,12 @@ class HomeController extends RootFrontController
         $keyword = gp247_request('keyword','','string');
 
         $itemsList = (new FrontPage)
-        ->setLimit(gp247_config('news_list'))
+        ->setLimit(gp247_config('page_list'))
         ->setKeyword($keyword)
         ->setPaginate()
         ->getData();
 
-        $view = $this->GP247TemplatePath . '.screen.item_list';
+        $view = $this->GP247TemplatePath . '.screen.page_list';
         gp247_check_view($view);
 
         return view(

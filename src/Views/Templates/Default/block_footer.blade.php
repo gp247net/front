@@ -57,7 +57,7 @@
                         @csrf
                           <div class="form-wrap">
                             <input class="form-input" id="subscribe-form-2-email" type="email" name="subscribe_email" required/>
-                            <label class="form-label" for="subscribe-form-2-email">{{ gp247_language_render('subscribe.email') }}</label>
+                            <label class="form-label" for="subscribe-form-2-email">{{ gp247_language_render('front.email') }}</label>
                           </div>
                           <div class="form-button">
                             <button class="button button-icon-2 button-zakaria button-primary" type="submit" title="{{ gp247_language_render('subscribe.title') }}">
@@ -69,7 +69,7 @@
                 </ul>
               </div>
               <div class="col-lg-4 wow fadeInRight" data-wow-delay=".2s">
-                <h4 class="footer-classic-title"> {{ gp247_language_render('front.my_profile') }}</h4>
+                <h4 class="footer-classic-title"> {{ gp247_language_render('front.link_useful') }}</h4>
                 <!-- RD Mailform-->
                 <ul class="contacts-creative">
                   @if (!empty(gp247_link_collection()['footer']))

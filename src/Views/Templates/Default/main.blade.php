@@ -29,21 +29,26 @@
     <link rel="stylesheet" href="{{ gp247_file($GP247TemplateFile.'/css/fonts.css')}}">
     <link rel="stylesheet" href="{{ gp247_file($GP247TemplateFile.'/css/style.css')}}">
 
-    <style>.ie-panel{display: none;background: #212121;padding: 10px 0;box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3);clear: both;text-align:center;position: relative;z-index: 1;} html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {display: block;}</style>
     @stack('styles')
   </head>
 <body>
 
     <div class="page">
         {{-- Block header --}}
-        @section('block_header')
-            @include($GP247TemplatePath.'.block_header')
+        @section('block_menu')
+            @include($GP247TemplatePath.'.block_menu')
         @show
         {{--// Block header --}}
 
         {{-- Block top --}}
         @section('block_top')
-            @include($GP247TemplatePath.'.block_top')
+            <!--Notice -->
+            @include($GP247TemplatePath.'.common.notice')
+            <!--//Notice -->
+
+            {{-- Module top --}}
+            @includeIf($GP247TemplatePath.'.common.render_block', ['positionBlock' => 'top'])
+            {{-- //Module top --}}
 
             <!--Breadcrumb -->
             @section('breadcrumb')
@@ -51,9 +56,6 @@
             @show
             <!--//Breadcrumb -->
 
-            <!--Notice -->
-            @include($GP247TemplatePath.'.common.notice')
-            <!--//Notice -->
         @show
         {{-- //Block top --}}
 
@@ -64,37 +66,31 @@
                     <div class="row row-50">
                         @section('block_main_content')
 
-                        @if (empty($hiddenBlockLeft))
                             <!--Block left-->
+                            @section('block_main_content_left')
                             <div class="col-lg-4 col-xl-3">
-                                @section('block_main_content_left')
-                                    @include($GP247TemplatePath.'.block_main_content_left')
-                                @show
+                                <div class="aside row row-30 row-md-50 justify-content-md-between">
+                                    <!--Module left -->
+                                    @includeIf($GP247TemplatePath.'.common.render_block', ['positionBlock' => 'left'])
+                                    <!--//Module left -->
+                                </div>
                             </div>
+                            @show
                             <!--//Block left-->
 
                             <!--Block center-->
-                            <div class="col-lg-9 col-xl-9">
-                                @section('block_main_content_center')
-                                    @include($GP247TemplatePath.'.block_main_content_center')
-                                @show
-                            </div>
-                            <!--//Block center-->
-                        @else
-                            <!--Block center-->
                             @section('block_main_content_center')
-                                @include($GP247TemplatePath.'.block_main_content_center')
+                            <div class="col-lg-9 col-xl-9">
+                                @includeIf($GP247TemplatePath.'.common.render_block', ['positionBlock' => 'center'])
+                            </div>
                             @show
                             <!--//Block center-->
-                        @endif
 
-                        @if (empty($hiddenBlockRight))
                             <!--Block right -->
                             @section('block_main_content_right')
-                                @include($GP247TemplatePath.'.block_main_content_right')
+                                @includeIf($GP247TemplatePath.'.common.render_block', ['positionBlock' => 'right'])
                             @show
                             <!--//Block right -->
-                        @endif
 
                         @show
                     </div>
@@ -116,6 +112,9 @@
 
         {{-- Block footer --}}
         @section('block_footer')
+            <!--Module bottom -->
+            @includeIf($GP247TemplatePath.'.common.render_block', ['positionBlock' => 'footer'])
+            <!--//Module bottom -->
             @include($GP247TemplatePath.'.block_footer')
         @show
         {{-- //Block footer --}}

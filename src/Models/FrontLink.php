@@ -70,8 +70,8 @@ class FrontLink extends Model
 
             // Link not in collection
             $links = $links
-            ->orderBy($tableLink.'.sort', 'asc')
-            ->orderBy($tableLink.'.id', 'desc')
+            ->orderBy($tableLink.'.sort', 'desc')
+            ->orderBy($tableLink.'.created_at', 'desc')
             ->get();
 
             $finalData = [];

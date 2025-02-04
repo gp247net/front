@@ -20,6 +20,7 @@ return [
         'layout_page' => [
             'front_home' => 'admin.layout_block_page.home',
             'front_contact' => 'admin.layout_block_page.contact',
+            'front_about' => 'admin.layout_block_page.about',
             'front_page_list' => 'admin.layout_block_page.page_list',
             'front_page_detail' => 'admin.layout_block_page.page_detail',
             'front_news_list' => 'admin.layout_block_page.news_list',
@@ -30,6 +31,7 @@ return [
             'top_site' => 'admin.layout_block_position.top_site',
             'top' => 'admin.layout_block_position.top',
             'left' => 'admin.layout_block_position.left',
+            'center' => 'admin.layout_block_position.center',
             'right' => 'admin.layout_block_position.right',
             'bottom' => 'admin.layout_block_position.bottom',
             'footer' => 'admin.layout_block_position.footer',
