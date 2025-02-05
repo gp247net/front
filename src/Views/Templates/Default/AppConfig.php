@@ -205,7 +205,7 @@ class AppConfig extends ExtensionConfigDefault
         $dataInsert[] = [
             'id'       => $this->uuid(),
             'name'     => 'Banner top ('.$this->configKey.')',
-            'position' => 'banner_top',
+            'position' => 'top',
             'page'     => 'front_home',
             'text'     => 'banner_image',
             'type'     => 'view',
