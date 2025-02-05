@@ -394,47 +394,13 @@ class DataFrontDefaultSeeder extends Seeder
                 'title' => 'Giới thiệu về GP247',
                 'keyword' => 'giới thiệu GP247, giải pháp website miễn phí, doanh nghiệp',
                 'description' => 'GP247 - Giải pháp website miễn phí dành cho doanh nghiệp',
-                'content' => '<h2>Về GP247</h2>
-                <p>GP247 là giải pháp website miễn phí dành cho doanh nghiệp, được phát triển với mục tiêu hỗ trợ cộng đồng doanh nghiệp trong việc số hóa và phát triển kinh doanh trực tuyến.</p>
-
-                <h3>Sản Phẩm Của Chúng Tôi</h3>
-                <ul>
-                    <li>GP247/core - Hệ thống core cơ bản</li>
-                    <li>GP247/front - Quản lý giao diện và nội dung</li>
-                    <li>GP247/cms - Hệ thống quản lý nội dung</li>
-                </ul>
-
-                <h3>Hỗ Trợ & Cộng Đồng</h3>
-                <p>Chúng tôi luôn sẵn sàng hỗ trợ và lắng nghe phản hồi từ cộng đồng để cùng nhau xây dựng một cộng đồng vững mạnh và phát triển. Bạn có thể tham gia cộng đồng GP247 trên các nền tảng mạng xã hội để nhận được sự hỗ trợ nhanh chóng từ đội ngũ phát triển và các thành viên khác.</p>
-
-                <h3>Liên Hệ</h3>
-                <ul>
-                    <li>Email hỗ trợ kỹ thuật: support@gp247.net</li>
-                    <li>Email hợp tác và phát triển: dev@gp247.net</li>
-                </ul>'
+                'content' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
             ],
             'en' => [
                 'title' => 'About GP247',
                 'keyword' => 'about GP247, free website solutions, business',
                 'description' => 'GP247 - Free website solutions for businesses',
-                'content' => '<h2>About GP247</h2>
-                <p>GP247 is a free website solution for businesses, developed with the goal of supporting the business community in digitalization and online business development.</p>
-
-                <h3>Our Products</h3>
-                <ul>
-                    <li>GP247/core - Basic core system</li>
-                    <li>GP247/front - Interface and content management</li>
-                    <li>GP247/cms - Content management system</li>
-                </ul>
-
-                <h3>Support & Community</h3>
-                <p>We are always ready to assist and listen to feedback from the community to build a strong and thriving community together. You can join the GP247 community on social media platforms to receive prompt assistance from the development team and other members.</p>
-
-                <h3>Contact</h3>
-                <ul>
-                    <li>Technical support email: support@gp247.net</li>
-                    <li>Development and cooperation email: dev@gp247.net</li>
-                </ul>'
+                'content' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
             ]
         ];
 
@@ -454,8 +420,8 @@ class DataFrontDefaultSeeder extends Seeder
         $links = [
             // Menu links
             [
-                'name' => 'Contact',
-                'url' => '#',
+                'name' => 'Plugin',
+                'url' => 'admin::plugin',
                 'target' => '_self',
                 'group' => 'menu', // menu main
                 'sort' => 1,
