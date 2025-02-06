@@ -18,7 +18,14 @@ Use paginate: $news->appends(request()->except(['page','_token']))->links()
             @foreach ($news as $newsDetail)
             <div class="col-sm-6 col-lg-4">
               {{-- Render product single --}}
-              @include($GP247TemplatePath.'.common.blog_single', ['blog' => $newsDetail])
+              @php
+                $item['thumb'] = $newsDetail->getThumb();
+                $item['url'] = $newsDetail->getUrl();
+                $item['title'] = $newsDetail->title;
+                $item['description'] = $newsDetail->description;
+                $item['created_at'] = $newsDetail->created_at;
+              @endphp
+              @include($GP247TemplatePath.'.common.item_single_long', ['item' => $newsDetail])
               {{-- //Render product single --}}
             </div>
             @endforeach

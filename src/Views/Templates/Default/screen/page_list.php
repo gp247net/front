@@ -18,6 +18,11 @@ Use paginate: $itemsList->appends(request()->except(['page','_token']))->links()
             @foreach ($itemsList as $item)
             <div class="col-sm-6 col-lg-4 text-center">
                 {{-- Render item single --}}
+                @php
+                    $item['thumb'] = $item->getThumb();
+                    $item['url'] = $item->getUrl();
+                    $item['title'] = $item->title;
+                @endphp
                 @include($GP247TemplatePath.'.common.item_single', ['item' => $item])               
                 {{-- //Render item single --}}
               </div>
