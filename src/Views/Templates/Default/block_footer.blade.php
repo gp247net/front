@@ -53,7 +53,7 @@
                   </li>
                   <li>
 
-                    <form class="rd-form-inline rd-form-inline-2"  method="post" action="{{ gp247_route_front('subscribe') }}">
+                    <form class="rd-form-inline rd-form-inline-2"  method="post" action="{{ gp247_route_front('front.subscribe') }}">
                         @csrf
                           <div class="form-wrap">
                             <input class="form-input" id="subscribe-form-2-email" type="email" name="subscribe_email" required/>

@@ -72,7 +72,7 @@ class FrontPage extends Model
 
     public function getUrl($lang = null)
     {
-        return gp247_route_front('page.detail', ['alias' => $this->alias, 'lang' => $lang ?? app()->getLocale()]);
+        return gp247_route_front('front.page.detail', ['alias' => $this->alias, 'lang' => $lang ?? app()->getLocale()]);
     }
 
     /**

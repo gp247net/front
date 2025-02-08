@@ -25,7 +25,7 @@ Use paginate: $itemsList->appends(request()->except(['page','_token']))->links()
                 @endphp
                 @include($GP247TemplatePath.'.common.item_single', ['item' => $item])               
                 {{-- //Render item single --}}
-              </div>
+            </div>
             @endforeach
 
         {{-- Render pagination --}}

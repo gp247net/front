@@ -23,6 +23,11 @@ Route::group(
         ->name('front.banner.click');
 
 
+        //Subscribe
+        Route::post('/subscribe', $nameSpaceHome.'\HomeController@emailSubscribe')
+            ->name('front.subscribe');
+
+
         Route::get('/', $nameSpaceHome.'\HomeController@index')->name('front.home');
 
         Route::get('index.html', function(){

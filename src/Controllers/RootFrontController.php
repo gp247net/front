@@ -2,7 +2,8 @@
 namespace GP247\Front\Controllers;
 
 use App\Http\Controllers\Controller;
-
+use Illuminate\Http\Request;
+use GP247\Front\Models\FrontSubscribe;
 class RootFrontController extends Controller
 {
     public $GP247TemplatePath;
@@ -48,6 +49,30 @@ class RootFrontController extends Controller
                 'keyword' => '',
             ]
         );
+    }
+
+    /**
+     * email subscribe
+     * @param  Request $request
+     * @return json
+     */
+    public function emailSubscribe(Request $request)
+    {
+        $validator = $request->validate([
+            'subscribe_email' => 'required|email',
+            ], [
+            'subscribe_email.required' => gp247_language_render('validation.required'),
+            'subscribe_email.email'    => gp247_language_render('validation.email'),
+        ]);
+        $data       = $request->all();
+        $checkEmail = FrontSubscribe::where('email', $data['subscribe_email'])
+            ->where('store_id', config('app.storeId'))
+            ->first();
+        if (!$checkEmail) {
+            FrontSubscribe::create(['email' => $data['subscribe_email'], 'store_id' => config('app.storeId')]);
+        }
+        return redirect()->back()
+            ->with(['success' => gp247_language_render('subscribe.subscribe_success')]);
     }
 
 }
