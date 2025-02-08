@@ -101,7 +101,8 @@ class HomeController extends RootFrontController
      */
     private function _search()
     {
-        $keyword = gp247_request('keyword','','string');
+        $keyword = request('keyword');
+        $keyword = gp247_clean(data:$keyword, hight:true);
 
         $itemsList = (new FrontPage)
         ->setLimit(gp247_config('page_list'))
@@ -116,7 +117,7 @@ class HomeController extends RootFrontController
             $view,
             array(
                 'title'       => gp247_language_render('action.search') . ': ' . $keyword,
-                'itemsList'       => $itemsList,
+                'itemsList'   => $itemsList,
                 'layout_page' => 'front_search',
                 'breadcrumbs' => [
                     ['url'    => '', 'title' => gp247_language_render('action.search')],
