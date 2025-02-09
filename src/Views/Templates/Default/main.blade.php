@@ -34,11 +34,11 @@
 <body>
 
     <div class="page">
-        {{-- Block header --}}
+        {{-- Block block_menu --}}
         @section('block_menu')
             @include($GP247TemplatePath.'.block_menu')
         @show
-        {{--// Block header --}}
+        {{--// Block block_menu --}}
 
         {{-- Block top --}}
         @section('block_top')

@@ -10,7 +10,6 @@
 <a href="https://packagist.org/packages/gp247/front"><img src="https://poser.pugx.org/gp247/front/license.svg" alt="License"></a>
 </p>
 
-[<img src="https://gp247.net/GP247/Core/language/flag_vn.png" width="24"> Tiếng Việt](readme_vi.md)
 
 ## Introduction
 
