@@ -118,7 +118,7 @@ Route::group(['prefix' => 'template'], function () use ($nameSpaceAdminTemplate)
     Route::post('enable', $nameSpaceAdminTemplate.'\AdminTemplateController@enable')->name('admin_template.enable');
     Route::post('disable', $nameSpaceAdminTemplate.'\AdminTemplateController@disable')->name('admin_template.disable');
 
-    if (config('gp247-config.admin.api_template')) {
+    if (config('gp247-config.admin.api_templates')) {
         Route::get('/online', $nameSpaceAdminTemplate.'\AdminTemplateOnlineController@index')->name('admin_template_online.index');
         Route::post('/online/install', $nameSpaceAdminTemplate.'\AdminTemplateOnlineController@install')
         ->name('admin_template_online.install');
