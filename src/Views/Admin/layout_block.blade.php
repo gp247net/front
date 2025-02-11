@@ -139,7 +139,7 @@
                                 <div class="col-sm-8">
                                     <select class="form-control store_id select2" style="width: 100%;" name="store_id" >
                                         <option value=""></option>
-                                        @foreach (gp247_get_list_code_store() as $k => $v)
+                                        @foreach (gp247_store_get_list_code() as $k => $v)
                                             <option value="{{ $k }}" {{ (old('store_id', $layout['store_id']??'') ==$k) ? 'selected':'' }}>{{ gp247_language_render($v) }}</option>
                                         @endforeach
                                     </select>

@@ -159,13 +159,13 @@
                                     class="col-sm-2 col-form-label">{{ gp247_language_render('admin.select_store') }}</label>
                                 <div class="col-sm-8">
                                     <select class="form-control shop_store select2" 
-                                    @if (gp247_check_multi_store_installed())
+                                    @if (gp247_store_check_multi_domain_installed())
                                         multiple="multiple"
                                     @endif
                                     data-placeholder="{{ gp247_language_render('admin.select_store') }}" style="width: 100%;"
                                     name="shop_store[]">
                                         <option value=""></option>
-                                        @foreach (gp247_get_list_code_store() as $k => $v)
+                                        @foreach (gp247_store_get_list_code() as $k => $v)
                                         <option value="{{ $k }}"
                                             {{ (count($listStore) && in_array($k, $listStore))?'selected':'' }}>{{ $v }}
                                         </option>
