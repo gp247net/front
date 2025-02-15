@@ -121,7 +121,7 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'admin.link.select_group','text' => 'Chọn nhóm','position' => 'admin.link','location' => 'vi'],
                 ['code' => 'admin.link.select_target','text' => 'Chọn target','position' => 'admin.link','location' => 'vi'],
                 ['code' => 'admin.link.select_collection','text' => 'Chọn bộ sưu tập','position' => 'admin.link','location' => 'vi'],
-                ['code' => 'admin.link.helper_url','text' => 'Ví dụ: url, path, hoặc route::name','position' => 'admin.link','location' => 'vi'],
+                ['code' => 'admin.link.helper_url','text' => 'Ví dụ: url, path, hoặc route_front::name','position' => 'admin.link','location' => 'vi'],
                 ['code' => 'admin.link.name','text' => 'Name','position' => 'admin.link','location' => 'en'],
                 ['code' => 'admin.link.url','text' => 'Url','position' => 'admin.link','location' => 'en'],
                 ['code' => 'admin.link.target','text' => 'Target','position' => 'admin.link','location' => 'en'],
@@ -134,7 +134,7 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'admin.link.select_group','text' => 'Select group','position' => 'admin.link','location' => 'en'],
                 ['code' => 'admin.link.select_target','text' => 'Select target','position' => 'admin.link','location' => 'en'],
                 ['code' => 'admin.link.select_collection','text' => 'Select collection','position' => 'admin.link','location' => 'en'],
-                ['code' => 'admin.link.helper_url','text' => 'Ex: url, path, or route::name','position' => 'admin.link','location' => 'en'],
+                ['code' => 'admin.link.helper_url','text' => 'Ex: url, path, or route_front::name','position' => 'admin.link','location' => 'en'],
                 ['code' => 'admin.link_position.menu','text' => 'Menu','position' => 'admin.link','location' => 'vi'],
                 ['code' => 'admin.link_position.menu_left','text' => 'Menu trái','position' => 'admin.link','location' => 'vi'],
                 ['code' => 'admin.link_position.menu_right','text' => 'Menu phải','position' => 'admin.link','location' => 'vi'],
@@ -437,7 +437,7 @@ class DataFrontDefaultSeeder extends Seeder
             ],
             [
                 'name' => 'About',
-                'url' => 'route::front.page.detail:alias__about',
+                'url' => 'route_front::front.page.detail:alias__about',
                 'target' => '_self', 
                 'group' => 'menu', // menu main
                 'sort' => 2,
