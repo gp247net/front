@@ -1,6 +1,7 @@
 <!--Render block-->
 @php
     $positionBlock = $positionBlock ?? '';
+    $GP247LayoutBlock = gp247_front_layout_block();
 @endphp
 @isset ($GP247LayoutBlock[$positionBlock])
     @foreach ( $GP247LayoutBlock[$positionBlock] as $layout)
