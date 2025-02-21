@@ -4,14 +4,14 @@ namespace GP247\Front\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Cache;
-use GP247\Core\Admin\Models\AdminStore;
+use GP247\Core\Models\AdminStore;
 use GP247\Front\Models\FrontPageStore;
 
 class FrontPage extends Model
 {
     
-    use \GP247\Core\Admin\Models\ModelTrait;
-    use \GP247\Core\Admin\Models\UuidTrait;
+    use \GP247\Core\Models\ModelTrait;
+    use \GP247\Core\Models\UuidTrait;
 
     public $table          = GP247_DB_PREFIX.'front_page';
     protected $connection  = GP247_DB_CONNECTION;
@@ -127,7 +127,7 @@ class FrontPage extends Model
                 $page->stores()->detach();
 
                 //Delete custom field
-                (new \GP247\Core\Admin\Models\AdminCustomFieldDetail)
+                (new \GP247\Core\Models\AdminCustomFieldDetail)
                 ->join(GP247_DB_PREFIX.'admin_custom_field', GP247_DB_PREFIX.'admin_custom_field.id', GP247_DB_PREFIX.'admin_custom_field_detail.custom_field_id')
                 ->where(GP247_DB_PREFIX.'admin_custom_field_detail.rel_id', $page->id)
                 ->where(GP247_DB_PREFIX.'admin_custom_field.type', $page->getTable())

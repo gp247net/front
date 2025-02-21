@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class FrontPageDescription extends Model
 {
-    use \GP247\Core\Admin\Models\UuidTrait;
+    use \GP247\Core\Models\UuidTrait;
     
     protected $primaryKey = ['lang', 'page_id'];
     public $incrementing  = false;

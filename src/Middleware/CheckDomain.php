@@ -3,7 +3,7 @@
 namespace GP247\Front\Middleware;
 
 use Closure;
-use GP247\Core\Admin\Models\AdminStore;
+use GP247\Core\Models\AdminStore;
 
 class CheckDomain
 {

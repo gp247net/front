@@ -2,7 +2,7 @@
 namespace GP247\Front\Controllers\Admin;
 
 use GP247\Front\Controllers\Admin\RootFrontAdminController;
-use GP247\Core\Admin\Controllers\ExtensionOnlineController;
+use GP247\Core\Controllers\ExtensionOnlineController;
 class AdminTemplateOnlineController extends RootFrontAdminController
 {
     use ExtensionOnlineController;

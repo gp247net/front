@@ -2,14 +2,14 @@
 #GP247/Front/Models/FrontLink.php
 namespace GP247\Front\Models;
 
-use GP247\Core\Admin\Models\AdminStore;
+use GP247\Core\Models\AdminStore;
 use GP247\Front\Models\FrontLinkStore;
 use Illuminate\Database\Eloquent\Model;
 
 class FrontLink extends Model
 {
-    use \GP247\Core\Admin\Models\ModelTrait;
-    use \GP247\Core\Admin\Models\UuidTrait;
+    use \GP247\Core\Models\ModelTrait;
+    use \GP247\Core\Models\UuidTrait;
 
     public $table = GP247_DB_PREFIX.'front_link';
     protected $guarded = [];

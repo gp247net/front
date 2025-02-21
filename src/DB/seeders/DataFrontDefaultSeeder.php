@@ -4,8 +4,8 @@ namespace GP247\Front\DB\seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use GP247\Core\Admin\Models\AdminMenu;
-use GP247\Core\Admin\Models\Languages;
+use GP247\Core\Models\AdminMenu;
+use GP247\Core\Models\Languages;
 use GP247\Front\Models\FrontBannerType;
 use GP247\Front\Models\FrontLinkGroup;
 use GP247\Front\Models\FrontPage;

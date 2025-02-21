@@ -2,8 +2,8 @@
 namespace GP247\Front\Controllers\Admin;
 
 use GP247\Front\Controllers\Admin\RootFrontAdminController;
-use GP247\Core\Admin\Controllers\ExtensionController;
-use GP247\Core\Admin\Models\AdminStore;
+use GP247\Core\Controllers\ExtensionController;
+use GP247\Core\Models\AdminStore;
 
 
 class AdminTemplateController extends RootFrontAdminController

@@ -1,7 +1,7 @@
 <?php
 namespace GP247\Front\Controllers\Admin;
 
-use GP247\Core\Admin\Controllers\RootAdminController;
+use GP247\Core\Controllers\RootAdminController;
 
 class RootFrontAdminController extends RootAdminController
 {

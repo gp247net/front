@@ -5,9 +5,9 @@
 #App\GP247\Templates\Default\AppConfig.php
 namespace App\GP247\Templates\Default;
 
-use GP247\Core\Admin\Models\AdminConfig;
-use GP247\Core\Admin\Models\AdminStore;
-use GP247\Core\Admin\Models\AdminHome;
+use GP247\Core\Models\AdminConfig;
+use GP247\Core\Models\AdminStore;
+use GP247\Core\Models\AdminHome;
 use GP247\Front\Models\FrontLayoutBlock;
 use GP247\Front\Models\FrontBanner;
 use GP247\Front\Models\FrontBannerStore;

@@ -1,7 +1,7 @@
 <?php
 namespace GP247\Front\Controllers\Admin;
 
-use GP247\Core\Admin\Models\AdminLanguage;
+use GP247\Core\Models\AdminLanguage;
 use GP247\Front\Models\FrontBanner;
 use GP247\Front\Models\FrontBannerType;
 use GP247\Front\Controllers\Admin\RootFrontAdminController;

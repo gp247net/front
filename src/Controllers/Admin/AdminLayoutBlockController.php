@@ -3,7 +3,7 @@ namespace GP247\Front\Controllers\Admin;
 
 use GP247\Front\Controllers\Admin\RootFrontAdminController;
 use GP247\Front\Models\FrontLayoutBlock;
-use GP247\Core\Admin\Models\AdminStore;
+use GP247\Core\Models\AdminStore;
 use GP247\Front\Models\FrontPage;
 use Illuminate\Support\Facades\Validator;
 

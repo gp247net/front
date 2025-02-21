@@ -5,10 +5,10 @@
 #App\GP247\Templates\Extension_Key\AppConfig.php
 namespace App\GP247\Templates\Extension_Key;
 
-use GP247\Core\Admin\Models\AdminConfig;
-use GP247\Core\Admin\Models\AdminHome;
+use GP247\Core\Models\AdminConfig;
+use GP247\Core\Models\AdminHome;
 use GP247\Core\ExtensionConfigDefault;
-use GP247\Core\Admin\Models\AdminStore;
+use GP247\Core\Models\AdminStore;
 use Illuminate\Support\Facades\DB;
 class AppConfig extends ExtensionConfigDefault
 {

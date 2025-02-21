@@ -5,7 +5,7 @@ namespace GP247\Front\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Exception;
-use GP247\Core\Admin\Models\AdminConfig;
+use GP247\Core\Models\AdminConfig;
 use Illuminate\Support\Facades\Log;
 
 class TemplateSetup extends Command

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class FrontLinkGroup extends Model
 {
-    use \GP247\Core\Admin\Models\ModelTrait;
+    use \GP247\Core\Models\ModelTrait;
     
     public $table = GP247_DB_PREFIX.'front_link_group';
     protected $guarded   = [];

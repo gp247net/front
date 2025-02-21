@@ -3,11 +3,11 @@
 namespace GP247\Front\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use GP247\Core\Admin\Models\AdminStore;
+use GP247\Core\Models\AdminStore;
 class FrontLayoutBlock extends Model
 {
-    use \GP247\Core\Admin\Models\ModelTrait;
-    use \GP247\Core\Admin\Models\UuidTrait;
+    use \GP247\Core\Models\ModelTrait;
+    use \GP247\Core\Models\UuidTrait;
 
     public $table = GP247_DB_PREFIX.'front_layout_block';
     protected $guarded = [];
