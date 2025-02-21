@@ -85,8 +85,8 @@ class DataFrontDefaultSeeder extends Seeder
 
         Languages::insertOrIgnore(
             [
-                ['code' => 'admin.menu_titles.ADMIN_CONTENT','text' => 'CMS','position' => 'admin.menu_titles','location' => 'vi'],
-                ['code' => 'admin.menu_titles.ADMIN_CONTENT','text' => 'CMS','position' => 'admin.menu_titles','location' => 'en'],
+                ['code' => 'admin.menu_titles.ADMIN_CONTENT','text' => 'Quản lý nội dung','position' => 'admin.menu_titles','location' => 'vi'],
+                ['code' => 'admin.menu_titles.ADMIN_CONTENT','text' => 'Content manager system','position' => 'admin.menu_titles','location' => 'en'],
                 ['code' => 'admin.menu_titles.layout_block','text' => 'Khối bố cục','position' => 'admin.menu_titles','location' => 'vi'],
                 ['code' => 'admin.menu_titles.layout_block','text' => 'Layout block','position' => 'admin.menu_titles','location' => 'en'],
                 ['code' => 'admin.menu_titles.link_block','text' => 'Quản lý liên kết','position' => 'admin.menu_titles','location' => 'vi'],
