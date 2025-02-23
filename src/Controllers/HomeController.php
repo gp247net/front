@@ -104,13 +104,33 @@ class HomeController extends RootFrontController
         $keyword = request('keyword');
         $keyword = gp247_clean(data:$keyword, hight:true);
 
-        $itemsList = (new FrontPage)
-        ->setLimit(gp247_config('page_list'))
-        ->setKeyword($keyword)
-        ->setPaginate()
-        ->getData();
+        $searchMode = config('gp247-config.cart.GP247_SEARCH_MODE');
+        if (strtoupper($searchMode) === 'PRODUCT' && class_exists('\GP247\Cart\Models\ShopProduct')) {
+            $itemsList = (new \GP247\Cart\Models\ShopProduct)
+            ->setLimit(gp247_config('product_list'))
+            ->setKeyword($keyword)
+            ->setPaginate()
+            ->getData();
+            $view = $this->GP247TemplatePath . '.screen.shop_search';
+            $layout_page = 'shop_search';
+        } else {
+            if (gp247_config_global('News') && class_exists('\App\GP247\Plugins\News\Models\NewsContent')) {
+                $itemsList = (new \App\GP247\Plugins\News\Models\NewsContent)
+                ->setLimit(gp247_config('page_list'))
+                ->setKeyword($keyword)
+                ->setPaginate()
+                ->getData();
+            } else {
+                $itemsList = (new FrontPage)
+                ->setLimit(gp247_config('page_list'))
+                ->setKeyword($keyword)
+                ->setPaginate()
+                ->getData();
+            }
+            $view = $this->GP247TemplatePath . '.screen.front_search';
+            $layout_page = 'front_search';
+        }
 
-        $view = $this->GP247TemplatePath . '.screen.page_list';
         gp247_check_view($view);
 
         return view(
@@ -118,7 +138,7 @@ class HomeController extends RootFrontController
             array(
                 'title'       => gp247_language_render('action.search') . ': ' . $keyword,
                 'itemsList'   => $itemsList,
-                'layout_page' => 'front_search',
+                'layout_page' => $layout_page,
                 'breadcrumbs' => [
                     ['url'    => '', 'title' => gp247_language_render('action.search')],
                 ],
