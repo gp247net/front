@@ -71,7 +71,7 @@ class FrontServiceProvider extends ServiceProvider
 
         $this->initial();
 
-        if (GP247_ACTIVE == 1 && \Illuminate\Support\Facades\Storage::disk('local')->exists('gp247-installed.txt')) {
+        if (function_exists('gp247_check_core_actived') && gp247_check_core_actived()) {
 
             //Load helper
             try {
@@ -109,21 +109,6 @@ class FrontServiceProvider extends ServiceProvider
 
             $this->loadViewsFrom(app_path().'/GP247/Templates', 'GP247TemplatePath');
             $this->loadViewsFrom(__DIR__.'/Views', 'gp247-front');
-
-            //Route Api
-            try {
-                if (config('gp247-config.env.GP247_API_MODE')) {
-                    if (file_exists($routes = __DIR__.'/Api/routes.php')) {
-                        $this->loadRoutesFrom($routes);
-                    }
-                }
-            } catch (\Throwable $e) {
-                $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
-                gp247_report($msg);
-                echo $msg;
-                exit;
-            }
-
 
             try {
                 $this->registerRouteMiddleware();

@@ -70,3 +70,19 @@ Route::group(
         }
     }
 );
+
+
+// Api routes
+if (config('gp247-config.env.GP247_API_MODE')) {
+    Route::group(
+        [
+            'middleware' => GP247_API_MIDDLEWARE,
+            'prefix' => 'api',
+        ],
+        function () {
+            if (file_exists($filename = __DIR__ . '/Routes/api.php')) {
+                $this->loadRoutesFrom($filename);
+            }
+        }
+    );
+}
