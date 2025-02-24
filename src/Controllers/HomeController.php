@@ -104,7 +104,8 @@ class HomeController extends RootFrontController
         $keyword = request('keyword');
         $keyword = gp247_clean(data:$keyword, hight:true);
 
-        $searchMode = config('gp247-config.cart.GP247_SEARCH_MODE');
+        $searchMode = config('gp247-config.front.GP247_SEARCH_MODE');
+
         if (strtoupper($searchMode) === 'PRODUCT' && class_exists('\GP247\Cart\Models\ShopProduct')) {
             $itemsList = (new \GP247\Cart\Models\ShopProduct)
             ->setLimit(gp247_config('product_list'))
@@ -114,7 +115,7 @@ class HomeController extends RootFrontController
             $view = $this->GP247TemplatePath . '.screen.shop_search';
             $layout_page = 'shop_search';
         } else {
-            if (gp247_config_global('News') && class_exists('\App\GP247\Plugins\News\Models\NewsContent')) {
+            if ((strtoupper($searchMode) === 'NEWS' && gp247_config_global('News') && class_exists('\App\GP247\Plugins\News\Models\NewsContent'))) {
                 $itemsList = (new \App\GP247\Plugins\News\Models\NewsContent)
                 ->setLimit(gp247_config('page_list'))
                 ->setKeyword($keyword)

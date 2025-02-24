@@ -33,5 +33,6 @@ return [
             'bottom' => 'admin.layout_block_position.bottom',
             'footer' => 'admin.layout_block_position.footer',
         ],
+        'GP247_SEARCH_MODE' => env('GP247_SEARCH_MODE', 'PRODUCT'), //PRODUCT, NEWS, PAGE
     ],
 ];
