@@ -24,6 +24,7 @@
   "extra": {
       "laravel": {
           "dont-discover": [
+              "GP247\\Front\\FrontServiceProvider"
           ],
           "providers": [
             "GP247\\Front\\FrontServiceProvider"

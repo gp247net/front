@@ -35,6 +35,14 @@ composer require gp247/front
 // });
 ```
 
+3. Register the service provider in `bootstrap/providers.php`:
+```php
+return [
+    // ... existing providers
+    GP247\Front\FrontServiceProvider::class,
+];
+```
+
 ## Key Features
 
 ### Page Management
