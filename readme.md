@@ -43,6 +43,11 @@ return [
 ];
 ```
 
+4. Run the installation command:
+```bash
+php artisan gp247:front-install
+```
+
 ## Key Features
 
 ### Page Management

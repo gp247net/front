@@ -42,6 +42,11 @@ return [
 ];
 ```
 
+4. Chạy lệnh cài đặt:
+```bash
+php artisan gp247:front-install
+```
+
 ## Tính năng chính
 
 ### Quản lý Trang
