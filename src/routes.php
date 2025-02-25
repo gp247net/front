@@ -45,10 +45,9 @@ Route::group(
             return redirect($urlBack);
         })->name('front.locale');
 
-        if (file_exists($filename = __DIR__ . '/Routes/front.php')) {
+        foreach (glob(__DIR__ . '/Routes/Front/*.php') as $filename) {
             $this->loadRoutesFrom($filename);
         }
-
   
         //--Please keep 2 lines route (pages + pageNotFound) at the bottom
         Route::get($langUrl.'{alias}'.$suffix, $nameSpaceHome.'\HomeController@pageDetailProcessFront')->name('front.page.detail');
@@ -65,7 +64,7 @@ Route::group(
         'middleware' => GP247_ADMIN_MIDDLEWARE,
     ],
     function () {
-        if (file_exists($filename = __DIR__ . '/Routes/admin.php')) {
+        foreach (glob(__DIR__ . '/Routes/Admin/*.php') as $filename) {
             $this->loadRoutesFrom($filename);
         }
     }
@@ -80,7 +79,7 @@ if (config('gp247-config.env.GP247_API_MODE')) {
             'prefix' => 'api',
         ],
         function () {
-            if (file_exists($filename = __DIR__ . '/Routes/api.php')) {
+            foreach (glob(__DIR__ . '/Routes/Api/*.php') as $filename) {
                 $this->loadRoutesFrom($filename);
             }
         }
