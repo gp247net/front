@@ -4,6 +4,38 @@ use Illuminate\Support\Facades\Route;
 
 $langUrl = GP247_SEO_LANG ?'{lang?}/' : '';
 $suffix = GP247_SUFFIX_URL;
+
+// Admin routes
+Route::group(
+    [
+        'prefix' => GP247_ADMIN_PREFIX,
+        'middleware' => GP247_ADMIN_MIDDLEWARE,
+    ],
+    function () {
+        foreach (glob(__DIR__ . '/Routes/Admin/*.php') as $filename) {
+            $this->loadRoutesFrom($filename);
+        }
+    }
+);
+
+
+// Api routes
+if (config('gp247-config.env.GP247_API_MODE')) {
+    Route::group(
+        [
+            'middleware' => GP247_API_MIDDLEWARE,
+            'prefix' => 'api',
+        ],
+        function () {
+            foreach (glob(__DIR__ . '/Routes/Api/*.php') as $filename) {
+                $this->loadRoutesFrom($filename);
+            }
+        }
+    );
+}
+
+
+// Front routes
 Route::group(
     [
         'middleware' => GP247_FRONT_MIDDLEWARE,
@@ -55,33 +87,3 @@ Route::group(
 
     }
 );
-
-
-// Admin routes
-Route::group(
-    [
-        'prefix' => GP247_ADMIN_PREFIX,
-        'middleware' => GP247_ADMIN_MIDDLEWARE,
-    ],
-    function () {
-        foreach (glob(__DIR__ . '/Routes/Admin/*.php') as $filename) {
-            $this->loadRoutesFrom($filename);
-        }
-    }
-);
-
-
-// Api routes
-if (config('gp247-config.env.GP247_API_MODE')) {
-    Route::group(
-        [
-            'middleware' => GP247_API_MIDDLEWARE,
-            'prefix' => 'api',
-        ],
-        function () {
-            foreach (glob(__DIR__ . '/Routes/Api/*.php') as $filename) {
-                $this->loadRoutesFrom($filename);
-            }
-        }
-    );
-}
