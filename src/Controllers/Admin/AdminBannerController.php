@@ -139,7 +139,7 @@ class AdminBannerController extends RootFrontAdminController
             'dataType'          => $this->dataType,
             'url_action'        => gp247_route_admin('admin_banner.create'),
         ];
-        return view('gp247-front::admin.banner')
+        return view('gp247-front-admin::admin.banner')
             ->with($data);
     }
 
@@ -219,7 +219,7 @@ class AdminBannerController extends RootFrontAdminController
             'dataType'          => $this->dataType,
             'url_action'        => gp247_route_admin('admin_banner.post_edit', ['id' => $banner['id']]),
         ];
-        return view('gp247-front::admin.banner')
+        return view('gp247-front-admin::admin.banner')
             ->with($data);
     }
 

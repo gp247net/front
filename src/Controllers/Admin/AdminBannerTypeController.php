@@ -59,7 +59,7 @@ class AdminBannerTypeController extends RootFrontAdminController
         $data['resultItems'] = gp247_language_render('admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'total' =>  $dataTmp->total()]);
 
         $data['layout'] = 'index';
-        return view('gp247-front::admin.banner_type')
+        return view('gp247-front-admin::admin.banner_type')
             ->with($data);
     }
 
@@ -149,7 +149,7 @@ class AdminBannerTypeController extends RootFrontAdminController
         $data['resultItems'] = gp247_language_render('admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'total' =>  $dataTmp->total()]);
 
         $data['layout'] = 'edit';
-        return view('gp247-front::admin.banner_type')
+        return view('gp247-front-admin::admin.banner_type')
         ->with($data);
     }
 

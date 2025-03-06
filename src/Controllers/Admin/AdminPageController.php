@@ -118,7 +118,7 @@ class AdminPageController extends RootFrontAdminController
             'page'              => $page,
             'url_action'        => gp247_route_admin('admin_page.create'),
         ];
-        return view('gp247-front::admin.page')
+        return view('gp247-front-admin::admin.page')
             ->with($data);
     }
 
@@ -212,7 +212,7 @@ class AdminPageController extends RootFrontAdminController
             'page'              => $page,
             'url_action'        => gp247_route_admin('admin_page.post_edit', ['id' => $page['id']]),
         ];
-        return view('gp247-front::admin.page')
+        return view('gp247-front-admin::admin.page')
             ->with($data);
     }
 

@@ -137,7 +137,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
             'layout'            => [],
             'url_action'        => gp247_route_admin('admin_layout_block.post_create'),
         ];
-        return view('gp247-front::admin.layout_block')
+        return view('gp247-front-admin::admin.layout_block')
             ->with($data);
     }
 
@@ -211,7 +211,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
             'storeId' => $layout->store_id,
             'url_action' => gp247_route_admin('admin_layout_block.edit', ['id' => $layout['id']]),
         ];
-        return view('gp247-front::admin.layout_block')
+        return view('gp247-front-admin::admin.layout_block')
             ->with($data);
     }
 

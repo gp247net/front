@@ -43,8 +43,8 @@ class FrontInstall extends Command
 
         //== Begin setup template default
         // Copy template default
-        $this->call('vendor:publish', ['--tag' => 'gp247:template-public']);
-        $this->call('vendor:publish', ['--tag' => 'gp247:template-view']);
+        $this->call('vendor:publish', ['--tag' => 'gp247:public-front-template']);
+        $this->call('vendor:publish', ['--tag' => 'gp247:view-front-template']);
 
         //Setup template default for Root store
         // This command can only be run after the above default template copy command is successful.

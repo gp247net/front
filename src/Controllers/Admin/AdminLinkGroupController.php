@@ -22,7 +22,7 @@ class AdminLinkGroupController extends RootFrontAdminController
         $data['title_action'] = '<i class="fa fa-plus" aria-hidden="true"></i> ' . gp247_language_render('admin.link_group.add_new_title');
         $data['url_action'] = gp247_route_admin('admin_link_group.create');
         $data['layout'] = 'index';
-        return view('gp247-front::admin.link_group')
+        return view('gp247-front-admin::admin.link_group')
         ->with($data);
     }
 
@@ -73,7 +73,7 @@ class AdminLinkGroupController extends RootFrontAdminController
         $data['url_action'] = gp247_route_admin('admin_link_group.edit', ['id' => $banner_type['id']]);
         $data['banner_type'] = $banner_type;
         $data['layout'] = 'edit';
-        return view('gp247-front::admin.link_group')
+        return view('gp247-front-admin::admin.link_group')
         ->with($data);
     }
 

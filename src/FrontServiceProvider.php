@@ -108,7 +108,7 @@ class FrontServiceProvider extends ServiceProvider
             }
 
             $this->loadViewsFrom(app_path().'/GP247/Templates', 'GP247TemplatePath');
-            $this->loadViewsFrom(__DIR__.'/Views', 'gp247-front');
+            $this->loadViewsFrom(__DIR__.'/Views', 'gp247-front-admin');
 
             try {
                 $this->registerRouteMiddleware();
@@ -230,9 +230,9 @@ class FrontServiceProvider extends ServiceProvider
     protected function registerPublishing()
     {
         if ($this->app->runningInConsole()) {
-            $this->publishes([__DIR__.'/Views/template/public' => public_path('GP247/Templates/Default')], 'gp247:template-public');
-            $this->publishes([__DIR__.'/Views/template/view' => app_path('GP247/Templates/Default')], 'gp247:template-view');
-            $this->publishes([__DIR__.'/Views/admin' => resource_path('views/vendor/gp247-front')], 'gp247:view-front');
+            $this->publishes([__DIR__.'/Views/template/public' => public_path('GP247/Templates/Default')], 'gp247:public-front-template');
+            $this->publishes([__DIR__.'/Views/template/view' => app_path('GP247/Templates/Default')], 'gp247:view-front-template');
+            $this->publishes([__DIR__.'/Views/admin' => resource_path('views/vendor/gp247-front')], 'gp247:view-front-admin');
         }
     }
 

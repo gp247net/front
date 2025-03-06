@@ -135,7 +135,7 @@ class AdminLinkController extends RootFrontAdminController
             'layout'            => 'single',
             'url_action'        => gp247_route_admin('admin_link.create'),
         ];
-        return view('gp247-front::admin.link')
+        return view('gp247-front-admin::admin.link')
             ->with($data);
     }
 
@@ -157,7 +157,7 @@ class AdminLinkController extends RootFrontAdminController
             'layout'            => 'collection',
             'url_action'        => gp247_route_admin('admin_link.collection_create'),
         ];
-        return view('gp247-front::admin.link')
+        return view('gp247-front-admin::admin.link')
             ->with($data);
     }
 
@@ -265,7 +265,7 @@ class AdminLinkController extends RootFrontAdminController
             'layout'            => $link->type == 'collection' ? 'collection': 'single',
             'url_action'        => gp247_route_admin('admin_link.edit', ['id' => $link['id']]),
         ];
-        return view('gp247-front::admin.link')
+        return view('gp247-front-admin::admin.link')
             ->with($data);
     }
 
