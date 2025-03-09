@@ -2,10 +2,8 @@
   function formatNumber (num) {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
   }
-
 </script>
-
-<script src="{{ gp247_file('js/sweetalert2.all.min.js') }}"></script>
+<script src="{{ gp247_file($GP247TemplateFile.'/js/sweetalert2.all.min.js') }}"></script>
 <script>
       function alertJs(type = 'error', msg = '') {
       const Toast = Swal.mixin({

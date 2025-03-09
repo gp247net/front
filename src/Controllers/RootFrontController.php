@@ -18,11 +18,11 @@ class RootFrontController extends Controller
      */
     public function pageNotFound()
     {
-        if (!view()->exists($this->GP247TemplatePath . '.404')) {
+        if (!view()->exists($this->GP247TemplatePath . '.screen.404')) {
             return abort(404);
         }
         return view(
-            $this->GP247TemplatePath . '.404',
+            $this->GP247TemplatePath . '.screen.404',
                 [
                 'title' => gp247_language_render('front.404'),
                 'msg' => gp247_language_render('front.404_detail'),
@@ -39,9 +39,9 @@ class RootFrontController extends Controller
      */
     public function itemNotFound()
     {
-        gp247_check_view( $this->GP247TemplatePath . '.notfound');
+        gp247_check_view( $this->GP247TemplatePath . '.screen.notfound');
         return view(
-            $this->GP247TemplatePath . '.notfound',
+            $this->GP247TemplatePath . '.screen.notfound',
             [
                 'title' => gp247_language_render('front.notfound'),
                 'msg' => gp247_language_render('front.notfound_detail'),

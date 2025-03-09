@@ -36,7 +36,7 @@
     <div class="page">
         {{-- Block block_menu --}}
         @section('block_menu')
-            @include($GP247TemplatePath.'.block_menu')
+            @include($GP247TemplatePath.'.layout.block_menu')
         @show
         {{--// Block block_menu --}}
 
@@ -106,7 +106,7 @@
 
         {{-- Block bottom --}}
         @section('block_bottom')
-            @include($GP247TemplatePath.'.block_bottom')
+            @include($GP247TemplatePath.'.layout.block_bottom')
         @show
         {{-- //Block bottom --}}
 
@@ -115,7 +115,7 @@
             <!--Module bottom -->
             @includeIf($GP247TemplatePath.'.common.render_block', ['positionBlock' => 'footer'])
             <!--//Module bottom -->
-            @include($GP247TemplatePath.'.block_footer')
+            @include($GP247TemplatePath.'.layout.block_footer')
         @show
         {{-- //Block footer --}}
 
