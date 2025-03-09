@@ -95,18 +95,6 @@ class FrontServiceProvider extends ServiceProvider
                 exit;
             }
 
-            //Route
-            try {
-                if (file_exists($routes = __DIR__.'/routes.php')) {
-                    $this->loadRoutesFrom($routes);
-                }
-            } catch (\Throwable $e) {
-                $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
-                gp247_report($msg);
-                echo $msg;
-                exit;
-            }
-
             $this->loadViewsFrom(app_path().'/GP247/Templates', 'GP247TemplatePath');
             $this->loadViewsFrom(__DIR__.'/Views', 'gp247-front-admin');
 
