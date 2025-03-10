@@ -43,14 +43,86 @@
                     @endforeach
                     @endif
 
+          {{-- Proces for gpt24/cart --}}
+          @if(function_exists('gp247_cart'))
+                    @if (gp247_config('link_account', null, 1))
+                    @guest
+                    <li class="rd-nav-item"><a class="rd-nav-link" href="#"><i class="fa fa-lock"></i> {{ gp247_language_render('front.account') }}</a>
+                        <ul class="rd-menu rd-navbar-dropdown">
+                            <li class="rd-dropdown-item">
+                                <a class="rd-dropdown-link" href="{{ gp247_route_front('login') }}"><i class="fa fa-user"></i> {{ gp247_language_render('front.login') }}</a>
+                            </li>
+
+                            <li class="rd-dropdown-item">
+                                <a class="rd-dropdown-link" href="{{ gp247_route_front('wishlist') }}"><i class="fas fa-heart"></i> {{ gp247_language_render('front.wishlist') }} 
+                                    <span class="count gp247-wishlist"
+                                    id="shopping-wishlist">{{ gp247_cart()->instance('wishlist')->count() }}</span>
+                                </a>
+                            </li>
+                            <li class="rd-dropdown-item">
+                                <a class="rd-dropdown-link" href="{{ gp247_route_front('compare') }}"><i class="fa fa-exchange"></i> {{ gp247_language_render('front.compare') }} 
+                                    <span class="count gp247-compare"
+                                    id="shopping-compare">{{ gp247_cart()->instance('compare')->count() }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    @else
+                    <li class="rd-nav-item"><a class="rd-nav-link" href="#"><i class="fa fa-lock"></i> {{ gp247_language_render('customer.my_profile') }}</a>
+                        <ul class="rd-menu rd-navbar-dropdown">
+                            <li class="rd-dropdown-item"><a class="rd-dropdown-link" href="{{ gp247_route_front('customer.index') }}"><i class="fa fa-user"></i> {{ gp247_language_render('front.my_profile') }}</a></li>
+                            <li class="rd-dropdown-item"><a class="rd-dropdown-link" href="{{ gp247_route_front('logout') }}" rel="nofollow" onclick="event.preventDefault();
+                               document.getElementById('logout-form').submit();"><i class="fa fa-power-off"></i> {{ gp247_language_render('front.logout') }}</a></li>
+                            <li class="rd-dropdown-item">
+                                <a class="rd-dropdown-link" href="{{ gp247_route_front('wishlist') }}"><i class="fas fa-heart"></i> {{ gp247_language_render('front.wishlist') }} 
+                                    <span class="count gp247-wishlist"
+                                    id="shopping-wishlist">{{ gp247_cart()->instance('wishlist')->count() }}</span>
+                                </a>
+                            </li>
+                            <li class="rd-dropdown-item">
+                                <a class="rd-dropdown-link" href="{{ gp247_route_front('compare') }}"><i class="fa fa-exchange"></i> {{ gp247_language_render('front.compare') }} 
+                                    <span class="count gp247-compare"
+                                    id="shopping-compare">{{ gp247_cart()->instance('compare')->count() }}</span>
+                                </a>
+                            </li>
+                            <form id="logout-form" action="{{ gp247_route_front('logout') }}" method="POST" style="display: none;">
+                              @csrf
+                            </form>
+                        </ul>
+                    </li>
+                    @endguest
+                    @endif
+
+                    @if (gp247_config('link_currency', null, 1))
+                      @if ( function_exists('gp247_currency_all') && count(gp247_currency_all())>1)
+                      <li class="rd-nav-item">
+                          <a class="rd-nav-link" href="#">
+                              {{ gp247_currency_info()['name'] }} <i class="fas fa-caret-down"></i>
+                          </a>
+                          <ul class="rd-menu rd-navbar-dropdown">
+                              @foreach (gp247_currency_all() as $key => $currency)
+                              <li class="rd-dropdown-item" {{ ($currency->code ==  gp247_currency_info()['code']) ? 'disabled': '' }}>
+                                  <a class="rd-dropdown-link" href="{{ gp247_route_front('front.currency', ['code' => $currency->code]) }}">
+                                      {{ $currency->name }}
+                                  </a>
+                              </li>
+                              @endforeach
+                          </ul>
+                      </li>
+                      @endif
+                    @endif
+                @endif
+                {{-- End process for gpt24/cart --}}
+
                     @if (gp247_config('link_language', null, 1))
-                    @if (count($gp247_languages)>1)
+                    @if ( function_exists('gp247_language_all') && count(gp247_language_all())>1)
                     <li class="rd-nav-item">
                         <a class="rd-nav-link" href="#">
-                            <img src="{{ gp247_file($gp247_languages[app()->getLocale()]['icon']) }}" style="height: 25px;"> <i class="fas fa-caret-down"></i>
+                            <img src="{{ gp247_file(gp247_language_all()[app()->getLocale()]['icon']) }}" style="height: 25px;"> <i class="fas fa-caret-down"></i>
                         </a>
                         <ul class="rd-menu rd-navbar-dropdown">
-                            @foreach ($gp247_languages as $key => $language)
+                            @foreach (gp247_language_all() as $key => $language)
                             <li class="rd-dropdown-item">
                                 <a class="rd-dropdown-link" href="{{ gp247_route_front('front.locale', ['code' => $key]) }}">
                                     <img src="{{ gp247_file($language['icon']) }}" style="height: 25px;"> {{ $language['name'] }}
@@ -61,7 +133,6 @@
                     </li>
                     @endif
                     @endif
-
                   </ul>
                 </div>
 
@@ -76,6 +147,20 @@
                       </div>
                     </form>
                   </div>
+
+                  @if (gp247_config('link_cart', null, 1) && function_exists('gp247_cart'))
+                  <!-- RD Navbar Basket-->
+                  <div class="rd-navbar-basket-wrap">
+                    <a href="{{ gp247_route_front('cart') }}">
+                    <button class="rd-navbar-basket fl-bigmug-line-shopping202">
+                      <span class="count gp247-cart" id="shopping-cart">{{ gp247_cart()->instance('default')->count() }}</span>
+                    </button>
+                    </a>
+                  </div>
+                  <a title="{{ gp247_language_render('cart.page_title') }}" style="margin-top:10px;" class="rd-navbar-basket rd-navbar-basket-mobile fl-bigmug-line-shopping202 rd-navbar-fixed-element-2" href="{{ gp247_route_front('cart') }}">
+                    <span class="count gp247-cart">{{ gp247_cart()->instance('default')->count() }}</span>
+                 </a>
+                @endif
 
                 </div>
               </div>
