@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+$langUrl = GP247_SEO_LANG ?'{lang?}/' : '';
+$suffix = GP247_SUFFIX_URL;
+
 if (file_exists(app_path('GP247/Front/Controllers/HomeController.php'))) {
     $nameSpaceHome = 'App\GP247\Front\Controllers';
 } else {
