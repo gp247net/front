@@ -341,6 +341,8 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'front.welcome_back','text' => 'Welcome back!','position' => 'front','location' => 'en'],
                 ['code' => 'front.email','text' => 'Email','position' => 'front','location' => 'vi'],
                 ['code' => 'front.email','text' => 'Email','position' => 'front','location' => 'en'],
+                ['code' => 'front.store_list','text' => 'Cửa hàng','position' => 'front','location' => 'vi'],
+                ['code' => 'front.store_list','text' => 'Store list','position' => 'front','location' => 'en'],
             ]
         );
 
