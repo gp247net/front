@@ -84,7 +84,11 @@ class AdminLinkController extends RootFrontAdminController
                 if (!empty($dataStores[$row['id']])) {
                     $storeTmp = $dataStores[$row['id']]->pluck('code', 'id')->toArray();
                     $storeTmp = array_map(function ($code) {
-                        return '<a target=_new href="'.gp247_store_get_domain_from_code($code).'">'.$code.'</a>';
+                        if (is_null($code)) {
+                            return ;
+                        }
+                        $domain = gp247_store_get_domain_from_code($code);
+                        return '<a target="_blank" href="'.$domain.'" title="'.$code.'">'.$code.'</a>';
                     }, $storeTmp);
                     $dataMap['shop_store'] = '<i class="nav-icon fab fa-shopify"></i> '.implode('<br><i class="nav-icon fab fa-shopify"></i> ', $storeTmp);
                 } else {
