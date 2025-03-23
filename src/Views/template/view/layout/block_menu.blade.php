@@ -46,21 +46,21 @@
           {{-- Proces for gpt24/cart --}}
           @if(function_exists('gp247_cart'))
                     @if (gp247_config('link_account', null, 1))
-                    @guest
+                    @if(function_exists('customer') && !customer()->user())
                     <li class="rd-nav-item"><a class="rd-nav-link" href="#"><i class="fa fa-lock"></i> {{ gp247_language_render('front.account') }}</a>
                         <ul class="rd-menu rd-navbar-dropdown">
                             <li class="rd-dropdown-item">
-                                <a class="rd-dropdown-link" href="{{ gp247_route_front('login') }}"><i class="fa fa-user"></i> {{ gp247_language_render('front.login') }}</a>
+                                <a class="rd-dropdown-link" href="{{ gp247_route_front('customer.login') }}"><i class="fa fa-user"></i> {{ gp247_language_render('front.login') }}</a>
                             </li>
 
                             <li class="rd-dropdown-item">
-                                <a class="rd-dropdown-link" href="{{ gp247_route_front('wishlist') }}"><i class="fas fa-heart"></i> {{ gp247_language_render('front.wishlist') }} 
+                                <a class="rd-dropdown-link" href="{{ gp247_route_front('cart.wishlist') }}"><i class="fas fa-heart"></i> {{ gp247_language_render('front.wishlist') }} 
                                     <span class="count gp247-wishlist"
                                     id="shopping-wishlist">{{ gp247_cart()->instance('wishlist')->count() }}</span>
                                 </a>
                             </li>
                             <li class="rd-dropdown-item">
-                                <a class="rd-dropdown-link" href="{{ gp247_route_front('compare') }}"><i class="fa fa-exchange"></i> {{ gp247_language_render('front.compare') }} 
+                                <a class="rd-dropdown-link" href="{{ gp247_route_front('cart.compare') }}"><i class="fa fa-exchange"></i> {{ gp247_language_render('front.compare') }} 
                                     <span class="count gp247-compare"
                                     id="shopping-compare">{{ gp247_cart()->instance('compare')->count() }}</span>
                                 </a>
@@ -71,22 +71,22 @@
                     @else
                     <li class="rd-nav-item"><a class="rd-nav-link" href="#"><i class="fa fa-lock"></i> {{ gp247_language_render('customer.my_profile') }}</a>
                         <ul class="rd-menu rd-navbar-dropdown">
-                            <li class="rd-dropdown-item"><a class="rd-dropdown-link" href="{{ gp247_route_front('customer.index') }}"><i class="fa fa-user"></i> {{ gp247_language_render('front.my_profile') }}</a></li>
-                            <li class="rd-dropdown-item"><a class="rd-dropdown-link" href="{{ gp247_route_front('logout') }}" rel="nofollow" onclick="event.preventDefault();
+                            <li class="rd-dropdown-item"><a class="rd-dropdown-link" href="{{ gp247_route_front('customer.index') }}"><i class="fa fa-user"></i> {{ gp247_language_render('customer.my_profile') }}</a></li>
+                            <li class="rd-dropdown-item"><a class="rd-dropdown-link" href="{{ gp247_route_front('customer.logout') }}" rel="nofollow" onclick="event.preventDefault();
                                document.getElementById('logout-form').submit();"><i class="fa fa-power-off"></i> {{ gp247_language_render('front.logout') }}</a></li>
                             <li class="rd-dropdown-item">
-                                <a class="rd-dropdown-link" href="{{ gp247_route_front('wishlist') }}"><i class="fas fa-heart"></i> {{ gp247_language_render('front.wishlist') }} 
+                                <a class="rd-dropdown-link" href="{{ gp247_route_front('cart.wishlist') }}"><i class="fas fa-heart"></i> {{ gp247_language_render('front.wishlist') }} 
                                     <span class="count gp247-wishlist"
                                     id="shopping-wishlist">{{ gp247_cart()->instance('wishlist')->count() }}</span>
                                 </a>
                             </li>
                             <li class="rd-dropdown-item">
-                                <a class="rd-dropdown-link" href="{{ gp247_route_front('compare') }}"><i class="fa fa-exchange"></i> {{ gp247_language_render('front.compare') }} 
+                                <a class="rd-dropdown-link" href="{{ gp247_route_front('cart.compare') }}"><i class="fa fa-exchange"></i> {{ gp247_language_render('front.compare') }} 
                                     <span class="count gp247-compare"
                                     id="shopping-compare">{{ gp247_cart()->instance('compare')->count() }}</span>
                                 </a>
                             </li>
-                            <form id="logout-form" action="{{ gp247_route_front('logout') }}" method="POST" style="display: none;">
+                            <form id="logout-form" action="{{ gp247_route_front('customer.logout') }}" method="POST" style="display: none;">
                               @csrf
                             </form>
                         </ul>
