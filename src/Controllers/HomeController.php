@@ -114,6 +114,15 @@ class HomeController extends RootFrontController
             ->getData();
             $view = $this->GP247TemplatePath . '.screen.shop_search';
             $layout_page = 'shop_search';
+            $subPath = 'screen.shop_search';
+            if (!view()->exists($view)) {
+                if (!view()->exists('gp247-shop-front::'.$subPath)) {
+                    gp247_report('View not found '.$view);
+                    echo  gp247_language_render('front.view_not_exist', ['view' => $view]);
+                    exit();
+                }
+                $view = 'gp247-shop-front::'.$subPath;
+            }
         } else {
             if ((strtoupper($searchMode) === 'NEWS' && gp247_config_global('News') && class_exists('\App\GP247\Plugins\News\Models\NewsContent'))) {
                 $itemsList = (new \App\GP247\Plugins\News\Models\NewsContent)

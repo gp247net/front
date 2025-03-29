@@ -10,6 +10,7 @@ Use paginate: $itemsList->appends(request()->except(['page','_token']))->links()
 @extends($GP247TemplatePath.'.layout')
 
 @section('block_main_content_center')
+<div class="col-lg-9 col-xl-9">
 <h6 class="aside-title">{{ $title }}</h6>
 <section class="section section-xl bg-default">
     <div class="container">
@@ -38,6 +39,7 @@ Use paginate: $itemsList->appends(request()->except(['page','_token']))->links()
       </div>
     </div>
   </section>
+</div>
 @endsection
 
 @push('scripts')
