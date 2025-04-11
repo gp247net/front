@@ -58,6 +58,16 @@ php artisan gp247:front-install
 - Hệ thống Mẫu Linh hoạt
 - Bố cục tùy chỉnh cho từng phần
 - Thiết kế tương thích
+- Tùy chỉnh giao diện quản trị:
+  ```bash
+  php artisan vendor:publish --tag=gp247:view-front-admin
+  ```
+  Các view sẽ được lưu trữ tại: `resources/views/vendor/gp247-front`
+- Cập nhật view của template Default:
+  ```bash
+  php artisan vendor:publish --tag=gp247:view-front-template
+  ```
+  Các view sẽ được lưu trữ tại: `app/GP247/Templates/Default`
 
 ### Mở rộng
 - Hỗ trợ Plugin

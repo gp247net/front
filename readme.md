@@ -57,8 +57,18 @@ php artisan gp247:front-install
 
 ### Interface
 - Flexible Template System
-- Customizable layouts per section
+- Customizable layouts for each section
 - Responsive design
+- Admin interface customization:
+  ```bash
+  php artisan vendor:publish --tag=gp247:view-front-admin
+  ```
+  Views will be stored at: `resources/views/vendor/gp247-front`
+- Update Default template views:
+  ```bash
+  php artisan vendor:publish --tag=gp247:view-front-template
+  ```
+  Views will be stored at: `app/GP247/Templates/Default`
 
 ### Extensions
 - Plugin support
