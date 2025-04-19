@@ -26,7 +26,7 @@ class FrontSubscribe extends Model
         //Uuid
         static::creating(function ($model) {
             if (empty($model->{$model->getKeyName()})) {
-                $model->{$model->getKeyName()} = gp247_generate_id($type = 'front_subscribe');
+                $model->{$model->getKeyName()} = gp247_generate_id();
             }
         });
     }

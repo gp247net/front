@@ -45,7 +45,7 @@ class FrontLayoutBlock extends Model
         //Uuid
         static::creating(function ($model) {
             if (empty($model->{$model->getKeyName()})) {
-                $model->{$model->getKeyName()} = gp247_generate_id($type = 'front_layout_block');
+                $model->{$model->getKeyName()} = gp247_generate_id();
             }
         });
     }

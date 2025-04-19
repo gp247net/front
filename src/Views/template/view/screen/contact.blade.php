@@ -84,7 +84,7 @@ $layout_page = front_contact
 
                     {{-- Button submit --}}
                     <div class="btn-toolbar form-group">
-                        <button class="button-secondary button-zakaria"  id="gp247_button-form-process">{{ gp247_language_render('action.submit') }}</button>
+                        <button class="button-secondary button-zakaria"  id="gp247-button-process">{{ gp247_language_render('action.submit') }}</button>
 
                     </div>
                     {{--// Button submit --}}
