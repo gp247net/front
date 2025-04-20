@@ -91,7 +91,6 @@
                             </form>
                         </ul>
                     </li>
-                    @endguest
                     @endif
 
                     @if (gp247_config('link_currency', null, 1))
