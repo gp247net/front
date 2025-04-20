@@ -17,7 +17,9 @@ if (!function_exists('gp247_route_front') && !in_array('gp247_route_front', conf
         if (!GP247_SEO_LANG) {
             $param = Arr::except($param, ['lang']);
         } else {
-            $arrRouteExcludeLanguage = ['front.home','front.locale', 'front.banner.click'];
+            $arrRouteExcludeLanguage = explode(',', config('gp247-config.front.route.GP247_ROUTE_EXCLUDE_LANGUAGE', ''));
+            // add default route exclude language
+            $arrRouteExcludeLanguage = array_merge($arrRouteExcludeLanguage, ['front.home','front.locale', 'front.banner.click']);
             if (!key_exists('lang', $param) && !in_array($name, $arrRouteExcludeLanguage)) {
                 $param['lang'] = app()->getLocale();
             }

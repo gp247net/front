@@ -10,6 +10,11 @@ return [
             //Prefix lange on url, as domain.com/en/abc.html
             //If value is empty, it will not be displayed, as dommain.com/abc.html
             'GP247_SEO_LANG' => env('GP247_SEO_LANG', 0),
+
+            //Route exclude language, ex: front.home, front.locale, front.banner.click
+            //when GP247_SEO_LANG = 1, url of this route will not be displayed with language, as domain.com/abc.html
+            // default: front.home, front.locale, front.banner.click will not be displayed with language on url
+            'GP247_ROUTE_EXCLUDE_LANGUAGE' => env('GP247_ROUTE_EXCLUDE_LANGUAGE', ''),
         ],
         'GP247_TEMPLATE_FRONT_DEFAULT' => env('GP247_TEMPLATE_FRONT_DEFAULT', 'Default'),
         'GP247_SUFFIX_URL'    => env('GP247_SUFFIX_URL', '.html'), //Suffix url, ex: domain.com/news/1.html 
