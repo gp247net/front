@@ -14,6 +14,7 @@ if (!function_exists('gp247_route_front') && !in_array('gp247_route_front', conf
      */
     function gp247_route_front($name, $param = [])
     {
+        $name = trim($name);
         if (!GP247_SEO_LANG) {
             $param = Arr::except($param, ['lang']);
         } else {
