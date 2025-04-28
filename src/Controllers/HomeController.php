@@ -101,7 +101,7 @@ class HomeController extends RootFrontController
      */
     private function _search()
     {
-        $keyword = request('keyword');
+        $keyword = request('keyword', '');
         $keyword = gp247_clean(data:$keyword, hight:true);
 
         $searchMode = config('gp247-config.front.GP247_SEARCH_MODE');
