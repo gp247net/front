@@ -2,10 +2,10 @@
 use Illuminate\Support\Facades\Route;
 
 // Banner
-if (file_exists(app_path('GP247/Front/Controllers/Admin/AdminBannerController.php'))) {
-    $nameSpaceAdminBanner = 'App\GP247\Front\Controllers\Admin';
+if (file_exists(app_path('GP247/Front/Admin/Controllers/AdminBannerController.php'))) {
+    $nameSpaceAdminBanner = 'App\GP247\Front\Admin\Controllers';
 } else {
-    $nameSpaceAdminBanner = 'GP247\Front\Controllers\Admin';
+    $nameSpaceAdminBanner = 'GP247\Front\Admin\Controllers';
 }
 Route::group(['prefix' => 'banner'], function () use ($nameSpaceAdminBanner) {
     Route::get('/', $nameSpaceAdminBanner.'\AdminBannerController@index')->name('admin_banner.index');
@@ -17,10 +17,10 @@ Route::group(['prefix' => 'banner'], function () use ($nameSpaceAdminBanner) {
 });
 
 // Banner type
-if (file_exists(app_path('GP247/Front/Controllers/Admin/AdminBannerTypeController.php'))) {
-    $nameSpaceAdminBannerType = 'App\GP247\Front\Controllers\Admin';
+if (file_exists(app_path('GP247/Front/Admin/Controllers/AdminBannerTypeController.php'))) {
+    $nameSpaceAdminBannerType = 'App\GP247\Front\Admin\Controllers';
 } else {
-    $nameSpaceAdminBannerType = 'GP247\Front\Controllers\Admin';
+    $nameSpaceAdminBannerType = 'GP247\Front\Admin\Controllers';
 }
 Route::group(['prefix' => 'banner_type'], function () use ($nameSpaceAdminBannerType) {
     Route::get('/', $nameSpaceAdminBannerType.'\AdminBannerTypeController@index')->name('admin_banner_type.index');

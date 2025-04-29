@@ -1,10 +1,10 @@
 <?php
-namespace GP247\Front\Controllers\Admin;
+namespace GP247\Front\Admin\Controllers;
 
 use GP247\Core\Models\AdminLanguage;
 use GP247\Front\Models\FrontBanner;
 use GP247\Front\Models\FrontBannerType;
-use GP247\Front\Controllers\Admin\RootFrontAdminController;
+use GP247\Front\Admin\Controllers\RootFrontAdminController;
 use Illuminate\Support\Facades\Validator;
 
 class AdminBannerController extends RootFrontAdminController

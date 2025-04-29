@@ -2,10 +2,10 @@
 use Illuminate\Support\Facades\Route;
 
 // Link
-if (file_exists(app_path('GP247/Front/Controllers/Admin/AdminLinkController.php'))) {
-    $nameSpaceAdminLink = 'App\GP247\Front\Controllers\Admin';
+if (file_exists(app_path('GP247/Front/Admin/Controllers/AdminLinkController.php'))) {
+    $nameSpaceAdminLink = 'App\GP247\Front\Admin\Controllers';
 } else {
-    $nameSpaceAdminLink = 'GP247\Front\Controllers\Admin';
+    $nameSpaceAdminLink = 'GP247\Front\Admin\Controllers';
 }
 Route::group(['prefix' => 'link'], function () use ($nameSpaceAdminLink) {
     Route::get('/', $nameSpaceAdminLink.'\AdminLinkController@index')->name('admin_link.index');
@@ -19,10 +19,10 @@ Route::group(['prefix' => 'link'], function () use ($nameSpaceAdminLink) {
 });
 
 // Link group
-if (file_exists(app_path('GP247/Front/Controllers/Admin/AdminLinkGroupController.php'))) {
-    $nameSpaceAdminLinkGroup = 'App\GP247\Front\Controllers\Admin';
+if (file_exists(app_path('GP247/Front/Admin/Controllers/AdminLinkGroupController.php'))) {
+    $nameSpaceAdminLinkGroup = 'App\GP247\Front\Admin\Controllers';
 } else {
-    $nameSpaceAdminLinkGroup = 'GP247\Front\Controllers\Admin';
+    $nameSpaceAdminLinkGroup = 'GP247\Front\Admin\Controllers';
 }
 Route::group(['prefix' => 'link_group'], function () use ($nameSpaceAdminLinkGroup) {
     Route::get('/', $nameSpaceAdminLinkGroup.'\AdminLinkGroupController@index')->name('admin_link_group.index');

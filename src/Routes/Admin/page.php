@@ -2,10 +2,10 @@
 use Illuminate\Support\Facades\Route;
 
 // Page
-if (file_exists(app_path('GP247/Front/Controllers/Admin/AdminPageController.php'))) {
-    $nameSpaceHome = 'App\GP247\Front\Controllers\Admin';
+if (file_exists(app_path('GP247/Front/Admin/Controllers/AdminPageController.php'))) {
+    $nameSpaceHome = 'App\GP247\Front\Admin\Controllers';
 } else {
-    $nameSpaceHome = 'GP247\Front\Controllers\Admin';
+    $nameSpaceHome = 'GP247\Front\Admin\Controllers';
 }
 Route::group(['prefix' => 'page'], function () use ($nameSpaceHome) {
     Route::get('/', $nameSpaceHome.'\AdminPageController@index')->name('admin_page.index');

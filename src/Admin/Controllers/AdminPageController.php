@@ -1,9 +1,9 @@
 <?php
-namespace GP247\Front\Controllers\Admin;
+namespace GP247\Front\Admin\Controllers;
 
 use GP247\Core\Models\AdminLanguage;
 use GP247\Front\Models\FrontPage;
-use GP247\Front\Controllers\Admin\RootFrontAdminController;
+use GP247\Front\Admin\Controllers\RootFrontAdminController;
 use Illuminate\Support\Facades\Validator;
 use GP247\Front\Models\FrontPageDescription;
 

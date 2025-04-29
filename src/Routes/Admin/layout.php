@@ -1,10 +1,10 @@
 <?php
 use Illuminate\Support\Facades\Route;
 // Layout block
-if (file_exists(app_path('GP247/Front/Controllers/Admin/AdminLayoutBlockController.php'))) {
-    $nameSpaceAdminLayoutBlock = 'App\GP247\Front\Controllers\Admin';
+if (file_exists(app_path('GP247/Front/Admin/Controllers/AdminLayoutBlockController.php'))) {
+    $nameSpaceAdminLayoutBlock = 'App\GP247\Front\Admin\Controllers';
 } else {
-    $nameSpaceAdminLayoutBlock = 'GP247\Front\Controllers\Admin';
+    $nameSpaceAdminLayoutBlock = 'GP247\Front\Admin\Controllers';
 }
 Route::group(['prefix' => 'layout_block'], function () use ($nameSpaceAdminLayoutBlock) {
     Route::get('/', $nameSpaceAdminLayoutBlock.'\AdminLayoutBlockController@index')->name('admin_layout_block.index');

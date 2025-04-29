@@ -2,10 +2,10 @@
 use Illuminate\Support\Facades\Route;
 
 // Template
-if (file_exists(app_path('GP247/Front/Controllers/Admin/AdminTemplateController.php'))) {
-    $nameSpaceAdminTemplate = 'App\GP247\Front\Controllers\Admin';
+if (file_exists(app_path('GP247/Front/Admin/Controllers/AdminTemplateController.php'))) {
+    $nameSpaceAdminTemplate = 'App\GP247\Front\Admin\Controllers';
 } else {
-    $nameSpaceAdminTemplate = 'GP247\Front\Controllers\Admin';
+    $nameSpaceAdminTemplate = 'GP247\Front\Admin\Controllers';
 }
 Route::group(['prefix' => 'template'], function () use ($nameSpaceAdminTemplate) {
     //Process import

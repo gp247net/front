@@ -24,7 +24,7 @@ class FrontServiceProvider extends ServiceProvider
             if (!is_dir($directory = app_path('GP247/Front/Controllers'))) {
                 mkdir($directory, 0777, true);
             }
-            if (!is_dir($directory = app_path('GP247/Front/Controllers/Admin'))) {
+            if (!is_dir($directory = app_path('GP247/Front/Admin/Controllers'))) {
                 mkdir($directory, 0777, true);
             }
             if (!is_dir($directory = app_path('GP247/Templates'))) {

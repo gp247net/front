@@ -1,5 +1,5 @@
 <?php
-namespace GP247\Front\Controllers\Admin;
+namespace GP247\Front\Admin\Controllers;
 
 use GP247\Core\Controllers\RootAdminController;
 
