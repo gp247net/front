@@ -101,17 +101,21 @@ class HomeController extends RootFrontController
      */
     private function _search()
     {
-        $keyword = request('keyword', '');
+        $keyword = request('keyword');
         $keyword = gp247_clean(data:$keyword, hight:true);
 
         $searchMode = config('gp247-config.front.GP247_SEARCH_MODE');
 
         if (strtoupper($searchMode) === 'PRODUCT' && class_exists('\GP247\Shop\Models\ShopProduct')) {
-            $itemsList = (new \GP247\Shop\Models\ShopProduct)
-            ->setLimit(gp247_config('product_list'))
-            ->setKeyword($keyword)
-            ->setPaginate()
-            ->getData();
+            if ($keyword) {
+                $itemsList = (new \GP247\Shop\Models\ShopProduct)
+                ->setLimit(gp247_config('product_list'))
+                ->setKeyword($keyword)
+                ->setPaginate()
+                ->getData();
+            } else {
+                $itemsList = collect([]);
+            }
             $view = $this->GP247TemplatePath . '.screen.shop_search';
             $layout_page = 'shop_search';
             $subPath = 'screen.shop_search';
@@ -125,17 +129,25 @@ class HomeController extends RootFrontController
             }
         } else {
             if ((strtoupper($searchMode) === 'NEWS' && gp247_config_global('News') && class_exists('\App\GP247\Plugins\News\Models\NewsContent'))) {
-                $itemsList = (new \App\GP247\Plugins\News\Models\NewsContent)
-                ->setLimit(gp247_config('page_list'))
-                ->setKeyword($keyword)
-                ->setPaginate()
-                ->getData();
+                if ($keyword) {
+                    $itemsList = (new \App\GP247\Plugins\News\Models\NewsContent)
+                    ->setLimit(gp247_config('page_list'))
+                    ->setKeyword($keyword)
+                    ->setPaginate()
+                    ->getData();
+                } else {
+                    $itemsList = collect([]);
+                }
             } else {
-                $itemsList = (new FrontPage)
-                ->setLimit(gp247_config('page_list'))
-                ->setKeyword($keyword)
-                ->setPaginate()
-                ->getData();
+                if ($keyword) {
+                    $itemsList = (new FrontPage)
+                    ->setLimit(gp247_config('page_list'))
+                    ->setKeyword($keyword)
+                    ->setPaginate()
+                    ->getData();
+                } else {
+                    $itemsList = collect([]);
+                }
             }
             $view = $this->GP247TemplatePath . '.screen.front_search';
             $layout_page = 'front_search';
@@ -146,7 +158,7 @@ class HomeController extends RootFrontController
         return view(
             $view,
             array(
-                'title'       => gp247_language_render('action.search') . ': ' . $keyword,
+                'title'       => gp247_language_render('action.search') . ($keyword ? ': ' . $keyword : ''),
                 'itemsList'   => $itemsList,
                 'layout_page' => $layout_page,
                 'breadcrumbs' => [
