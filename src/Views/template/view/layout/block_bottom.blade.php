@@ -1,3 +1,3 @@
 <!--Module bottom -->
-@includeIf($GP247TemplatePath.'.common.render_block', ['positionBlock' => 'bottom'])
+{!! gp247_render_block('bottom', $layout_page ?? null) !!}
 <!--//Module bottom -->
