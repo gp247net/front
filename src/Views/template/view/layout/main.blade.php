@@ -88,7 +88,7 @@
 
                             <!--Block right -->
                             @section('block_main_content_right')
-                                {!! gp247_render_block('right', $layout_page ?? null) !!}
+                             {!! gp247_render_block('right', $layout_page ?? null) !!}
                             @show
                             <!--//Block right -->
 
@@ -99,9 +99,11 @@
         @show
         {{-- //Block main --}}
 
-
         {{-- Block bottom --}}
         @section('block_bottom')
+            <!--Module bottom -->
+            {!! gp247_render_block('bottom', $layout_page ?? null) !!}
+            <!--//Module bottom -->
             @include($GP247TemplatePath.'.layout.block_bottom')
         @show
         {{-- //Block bottom --}}
