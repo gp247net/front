@@ -422,14 +422,6 @@ class DataFrontDefaultSeeder extends Seeder
         $links = [
             // Menu links
             [
-                'name' => 'Plugin',
-                'url' => 'admin::plugin',
-                'target' => '_self',
-                'group' => 'menu', // menu main
-                'sort' => 1,
-                'status' => 1,
-            ],
-            [
                 'name' => 'GP247',
                 'url' => 'https://gp247.net',
                 'target' => '_self',
