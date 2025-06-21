@@ -32,6 +32,10 @@ class AdminPageController extends RootFrontAdminController
             'alias'  => gp247_language_render('admin.page.alias'),
             'status' => gp247_language_render('admin.page.status'),
         ];
+        if ((gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) && session('adminStoreId') == GP247_STORE_ID_ROOT) {
+            // Only show store info if store is root
+            $listTh['shop_store'] = gp247_language_render('front.store_list');
+        }
         $listTh['action'] = gp247_language_render('action.title');
 
         $sort = gp247_clean(request('sort') ?? 'id_desc');
@@ -46,7 +50,15 @@ class AdminPageController extends RootFrontAdminController
             'arrSort'    => $arrSort,
         ];
         $dataTmp = FrontPage::getPageListAdmin($dataSearch);
-
+        if ((gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) && session('adminStoreId') == GP247_STORE_ID_ROOT) {
+            $arrId = $dataTmp->pluck('id')->toArray();
+            // Only show store info if store is root
+            if (function_exists('gp247_get_list_store_of_page')) {
+                $dataStores = gp247_get_list_store_of_page($arrId);
+            } else {
+                $dataStores = [];
+            }
+        }
         $dataTr = [];
         foreach ($dataTmp as $key => $row) {
             $arrAction = [
@@ -55,13 +67,30 @@ class AdminPageController extends RootFrontAdminController
             $arrAction[] = '<a href="#" onclick="deleteItem(\'' . $row['id'] . '\');"  title="' . gp247_language_render('action.delete') . '" class="dropdown-item"><i class="fas fa-trash-alt"></i> '.gp247_language_render('action.remove').'</a>';
             $arrAction[] = '<a target=_new href="' . gp247_route_front('front.page.detail', ['alias' => $row['alias']]) . '" class="dropdown-item"><i class="fas fa-external-link-alt"></i> '.gp247_language_render('action.link').'</a>';
             $action = $this->procesListAction($arrAction);
-            $dataTr[] = [
+            $dataMap = [
                 'title' => $row['title'],
                 'image' => gp247_image_render($row['image'], '50px', '', $row['title']),
                 'alias' => $row['alias'],
                 'status' => $row['status'] ? '<span class="badge badge-success">ON</span>' : '<span class="badge badge-danger">OFF</span>',
-                'action' => $action,
             ];
+            if ((gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) && session('adminStoreId') == GP247_STORE_ID_ROOT) {
+                // Only show store info if store is root
+                if (!empty($dataStores[$row['id']])) {
+                    $storeTmp = $dataStores[$row['id']]->pluck('code', 'id')->toArray();
+                    $storeTmp = array_map(function ($code) {
+                        if (is_null($code)) {
+                            return ;
+                        }
+                        $domain = gp247_store_get_domain_from_code($code);
+                        return '<a target="_blank" href="'.$domain.'" title="'.$code.'">'.$code.'</a>';
+                    }, $storeTmp);
+                    $dataMap['shop_store'] = '<i class="nav-icon fab fa-shopify"></i> '.implode('<br><i class="nav-icon fab fa-shopify"></i> ', $storeTmp);
+                } else {
+                    $dataMap['shop_store'] = '';
+                }
+            }
+            $dataMap['action'] = $action;
+            $dataTr[] = $dataMap;
         }
 
         $data['listTh'] = $listTh;

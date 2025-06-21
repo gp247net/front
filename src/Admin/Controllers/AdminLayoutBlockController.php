@@ -43,7 +43,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
             'status'   => gp247_language_render('admin.layout_block.status'),
             'template'   => 'Template',
         ];
-        if (gp247_store_check_multi_domain_installed() && session('adminStoreId') == GP247_STORE_ID_ROOT) {
+        if ((gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) && session('adminStoreId') == GP247_STORE_ID_ROOT) {
             // Only show store info if store is root
             $listTh['shop_store'] = gp247_language_render('front.store_list');
         }
@@ -83,7 +83,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
                 'template' => $row['template'],
             ];
 
-            if (gp247_store_check_multi_domain_installed() && session('adminStoreId') == GP247_STORE_ID_ROOT) {
+            if ((gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) && session('adminStoreId') == GP247_STORE_ID_ROOT) {
                 $storeCode = gp247_store_get_list_code()[$row['store_id']] ?? '';
                 // Only show store info if store is root
                 $storeTmp['shop_store'] = '<i class="nav-icon fab fa-shopify"></i><a target=_new href="'.gp247_store_get_domain_from_code($storeCode).'">'.$storeCode.'</a>';

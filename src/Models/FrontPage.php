@@ -96,7 +96,7 @@ class FrontPage extends Model
             ->where($tableDescription . '.lang', gp247_get_locale());
 
         $storeId = config('app.storeId');
-        if (gp247_store_check_multi_domain_installed()) {
+        if (gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) {
             $tablePageStore = (new FrontPageStore)->getTable();
             $tableStore = (new AdminStore)->getTable();
             $page = $page->join($tablePageStore, $tablePageStore.'.page_id', $this->getTable() . '.id');
@@ -166,7 +166,7 @@ class FrontPage extends Model
             ->where($tableDescription . '.lang', gp247_get_locale());
 
         $storeId = config('app.storeId');
-        if (gp247_store_check_multi_domain_installed()) {
+        if (gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) {
             $tablePageStore = (new FrontPageStore)->getTable();
             $tableStore = (new AdminStore)->getTable();
             $query = $query->join($tablePageStore, $tablePageStore.'.page_id', $this->getTable() . '.id');

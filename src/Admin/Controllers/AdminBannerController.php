@@ -17,7 +17,7 @@ class AdminBannerController extends RootFrontAdminController
         parent::__construct();
         $this->arrTarget = ['_blank' => '_blank', '_self' => '_self'];
         $this->dataType  = (new FrontBannerType)->pluck('name', 'code')->all();
-        if (gp247_store_check_multi_domain_installed()) {
+        if (gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) {
             $this->dataType['background-store'] = 'Background store';
             $this->dataType['breadcrumb-store'] = 'Breadcrumb store';
         }
@@ -42,9 +42,14 @@ class AdminBannerController extends RootFrontAdminController
             'click'  => gp247_language_render('admin.banner.click'),
             'target' => gp247_language_render('admin.banner.target'),
             'type'   => gp247_language_render('admin.banner.type'),
+            'shop_store' => gp247_language_render('front.store_list'),
             'action' => gp247_language_render('action.title'),
         ];
-
+        if ((gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) && session('adminStoreId') == GP247_STORE_ID_ROOT) {
+            // Only show store info if store is root
+            $listTh['shop_store'] = gp247_language_render('front.store_list');
+        }
+        $listTh['action'] = gp247_language_render('action.title');
 
         $sort = gp247_clean(request('sort') ?? 'id_desc');
         $keyword    = gp247_clean(request('keyword') ?? '');
@@ -61,7 +66,15 @@ class AdminBannerController extends RootFrontAdminController
         ];
 
         $dataTmp = FrontBanner::getBannerListAdmin($dataSearch);
-
+        if ((gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) && session('adminStoreId') == GP247_STORE_ID_ROOT) {
+            $arrId = $dataTmp->pluck('id')->toArray();
+            // Only show store info if store is root
+            if (function_exists('gp247_get_list_store_of_banner')) {
+                $dataStores = gp247_get_list_store_of_banner($arrId);
+            } else {
+                $dataStores = [];
+            }
+        }
         $dataTr = [];
         foreach ($dataTmp as $key => $row) {
             $arrAction = [
@@ -69,9 +82,7 @@ class AdminBannerController extends RootFrontAdminController
             ];
             $arrAction[] = '<a href="#" onclick="deleteItem(\'' . $row['id'] . '\');"  title="' . gp247_language_render('action.delete') . '" class="dropdown-item"><i class="fas fa-trash-alt"></i> '.gp247_language_render('action.remove').'</a>';
             $action = $this->procesListAction($arrAction);
-
-
-            $dataTr[] = [
+            $dataMap = [
                 'image' => gp247_image_render($row->getThumb(), '50px', '', $row['title']),
                 'title' => $row['title'],
                 'url' => $row['url'],
@@ -80,8 +91,26 @@ class AdminBannerController extends RootFrontAdminController
                 'click' => number_format($row['click']),
                 'target' => $row['target'],
                 'type' => $this->dataType[$row['type']]??'N/A',
-                'action' => $action,
             ];
+            if ((gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) && session('adminStoreId') == GP247_STORE_ID_ROOT) {
+                // Only show store info if store is root
+                if (!empty($dataStores[$row['id']])) {
+                    $storeTmp = $dataStores[$row['id']]->pluck('code', 'id')->toArray();
+                    $storeTmp = array_map(function ($code) {
+                        if (is_null($code)) {
+                            return ;
+                        }
+                        $domain = gp247_store_get_domain_from_code($code);
+                        return '<a target=_new href="'.$domain.'">'.$code.'</a>';
+                    }, $storeTmp);
+                    $dataMap['shop_store'] = '<i class="nav-icon fab fa-shopify"></i> '.implode('<br><i class="nav-icon fab fa-shopify"></i> ', $storeTmp);
+                } else {
+                    $dataMap['shop_store'] = '';
+                }
+            }
+            $dataMap['action'] = $action;
+
+            $dataTr[] = $dataMap;
         }
 
         $data['listTh'] = $listTh;

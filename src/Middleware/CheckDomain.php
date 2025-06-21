@@ -17,27 +17,27 @@ class CheckDomain
     public function handle($request, Closure $next)
     {
 
-        if (gp247_store_check_multi_domain_installed() && gp247_config_global('domain_strict')) {
-            //Check domain exist
-            $domain = gp247_store_process_domain(url('/')); //domain currently
-            $domainRoot = gp247_store_process_domain(config('app.url')); //Domain root config in .env
-            $arrDomainPartner = AdminStore::getDomainPartner(); // List domain is partner active
-            $arrDomainActive = AdminStore::getDomainStore(); // List domain is unlock domain
-
-            if (gp247_store_check_multi_partner_installed()) {
-                if (!in_array($domain, $arrDomainPartner) && $domain != $domainRoot) {
-                    echo view('deny_domain')->render();
-                    exit();
-                }
-            }
-
-            if (gp247_store_check_multi_store_installed()) {
-                if (!in_array($domain, $arrDomainActive) && $domain != $domainRoot) {
-                    echo view('deny_domain')->render();
-                    exit();
-                }
-            }
+        if (gp247_config_global('domain_strict')) {
+            $this->processDomainAllow();
         }
         return $next($request);
     }
+
+    private function processDomainAllow()
+    {
+        $domain = gp247_store_process_domain(url('/')); //domain currently
+        $domainRoot = gp247_store_process_domain(config('app.url')); //Domain root config in .env
+        $arrDomainAllow = [];
+        if (gp247_store_check_multi_partner_installed()) {
+            $arrDomainAllow = AdminStore::getDomainPartner(); // List domain is partner active
+        }
+        if (gp247_store_check_multi_store_installed()) {
+            $arrDomainAllow = AdminStore::getDomainStore(); // List domain is partner active
+        }
+        if (!in_array($domain, $arrDomainAllow) && $domain != $domainRoot) {
+            echo view('deny_domain')->render();
+            exit();
+        }
+    }
 }
+

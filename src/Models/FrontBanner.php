@@ -61,7 +61,7 @@ class FrontBanner extends Model
         if ($checkActive) {
             $data = $data->where($this->getTable() .'.status', 1);
         }
-        if (gp247_store_check_multi_domain_installed()) {
+        if (gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) {
             $tableBannerStore = (new FrontBannerStore)->getTable();
             $tableStore = (new AdminStore)->getTable();
             $data = $data->join($tableBannerStore, $tableBannerStore.'.banner_id', $this->getTable() . '.id');
@@ -197,7 +197,7 @@ class FrontBanner extends Model
 
         $storeId = config('app.storeId');
 
-        if (gp247_store_check_multi_domain_installed()) {
+        if (gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) {
             if (!empty($this->gp247_store)) {
                 //If sepcify store id
                 $storeId = $this->gp247_store;
