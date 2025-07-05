@@ -11,7 +11,6 @@ use GP247\Front\Models\FrontLinkGroup;
 use GP247\Front\Models\FrontPage;
 use GP247\Front\Models\FrontPageDescription;
 use GP247\Front\Models\FrontLink;
-use GP247\Front\Models\FrontLinkDescription;
 
 class DataFrontDefaultSeeder extends Seeder
 {

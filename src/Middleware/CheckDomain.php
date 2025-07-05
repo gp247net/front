@@ -35,6 +35,13 @@ class CheckDomain
             $arrDomainAllow = AdminStore::getDomainStore(); // List domain is partner active
         }
         if (!in_array($domain, $arrDomainAllow) && $domain != $domainRoot) {
+            // Check if view file exists before rendering
+            if (!view()->exists('deny_domain')) {
+                // If view doesn't exist, show a simple error message
+                echo '<h1>Access Denied</h1>';
+                echo '<p>This domain is not authorized to access this application.</p>';
+                exit();
+            }
             echo view('deny_domain')->render();
             exit();
         }
