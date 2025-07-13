@@ -332,14 +332,10 @@ class AdminLayoutBlockController extends RootFrontAdminController
         } else {
             $html = '<select name="text" class="form-control text">';
             $storeId = request('store_id');
-            $arrView = [];
-            foreach (glob(app_path() . "/GP247/Templates/".gp247_store_info(key:'template', storeId:$storeId)."/blocks/*.blade.php") as $file) {
-                if (file_exists($file)) {
-                    $arr = explode('/', $file);
-                    $arrView[substr(end($arr), 0, -10)] = substr(end($arr), 0, -10);
-                    $html .='<option value="'.substr(end($arr), 0, -10).'">'.substr(end($arr), 0, -10);
-                    $html .='</option>';
-                }
+            $arrView = $this->getListViewBlock($storeId);
+            foreach ($arrView as $key => $value) {
+                $html .='<option value="'.$key.'">'.$value;
+                $html .='</option>';
             }
             $html .='</select>';
             $html .='<span class="form-text"><i class="fa fa-info-circle"></i>';
@@ -360,7 +356,7 @@ class AdminLayoutBlockController extends RootFrontAdminController
         } else {
             $html = '<select name="text" class="form-control text">';
             $storeId = request('store_id');
-            $arrPage = (new FrontPage)->getListPageAlias($storeId);
+            $arrPage = $this->getListPageBlock($storeId);
             foreach ($arrPage as $value) {
                 $html .='<option value="'.$value.'">'.$value;
                 $html .='</option>';

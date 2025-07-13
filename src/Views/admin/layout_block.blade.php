@@ -228,7 +228,7 @@ $(function () {
        obj.remove();
     }else if(type =='view'){
 
-        var storeId = $('[name="store_id"]').val() ? $('[name="store_id"]').val() : {{ session('adminStoreId') }};
+        var storeId = $('[name="store_id"]').val() ? $('[name="store_id"]').val() : "{{ session('adminStoreId') }}";
         
         $('#loading').show();
         $.ajax({
@@ -242,7 +242,7 @@ $(function () {
         });
     }else if(type =='page'){
 
-        var storeId = $('[name="store_id"]').val() ? $('[name="store_id"]').val() : {{ session('adminStoreId') }};
+        var storeId = $('[name="store_id"]').val() ? $('[name="store_id"]').val() : "{{ session('adminStoreId') }}";
 
         $('#loading').show();
         $.ajax({
