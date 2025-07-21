@@ -67,8 +67,8 @@ class AppConfig extends ExtensionConfigDefault
             }
         }
 
-        //Setup store for Root store
-        $this->setupStore(GP247_STORE_ID_ROOT);
+        //Setup store
+        $this->setupStore();
 
         return $return;
     }
@@ -164,11 +164,13 @@ class AppConfig extends ExtensionConfigDefault
 
     public function setupStore($storeId = null)
     {
-        // Change template for store
-        AdminStore::where('id', $storeId)
-            ->update(['template' => $this->configKey]);
-
-        // Insert layout block for store
-
+        if ($storeId) {
+            // Change template for store
+            AdminStore::where('id', $storeId)
+                ->update(['template' => $this->configKey]);
+            // Insert layout block for store
+        } else {
+            return null;
+        }
     }
 }

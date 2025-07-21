@@ -38,6 +38,7 @@ class TemplateSetup extends Command
         } else {
             $classTemplate = new $classTemplate();
             $classTemplate->install();
+            $classTemplate->setupStore(GP247_STORE_ID_ROOT);
             $this->info('---------------> Setup template default done!');
         }
     }
