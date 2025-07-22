@@ -156,7 +156,11 @@ if (!function_exists('gp247_plugin_process_view') && !in_array('gp247_plugin_pro
         if (strpos($prefix, '.') === false) {
             $prefix = $prefix . '.';
         }
-        $view = $prefix . 'plugin.'.$subPath;
+        // Convert plugin format from 'Plugins/Abc' to 'Plugins.Abc'
+        if (strpos($appPAth, '/') !== false) {
+            $stringPath = str_replace('/', '.', $appPAth);
+        }
+        $view = $prefix . $stringPath.'.'.$subPath;
         if (!view()->exists($view)) {
             $viewPlugin = $appPAth.'::'.$subPath;
             if (view()->exists($viewPlugin)) {
