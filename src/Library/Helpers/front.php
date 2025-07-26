@@ -115,7 +115,8 @@ if (!function_exists('gp247_render_block') && !in_array('gp247_render_block', co
 
         if (isset($GP247LayoutBlock[$positionBlock])) {
             foreach ($GP247LayoutBlock[$positionBlock] as $layout) {
-                $arrPage = explode(',', $layout->page);
+                // Explode by comma and trim each value
+                $arrPage = array_map('trim', explode(',', $layout->page));
                 
                 if ($layout->page == '*' || ($layout_page !== null && in_array($layout_page, $arrPage))) {
                     if ($layout->type == 'html') {
