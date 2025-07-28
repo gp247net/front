@@ -106,13 +106,9 @@ class HomeController extends RootFrontController
 
         $searchMode = config('gp247-config.front.GP247_SEARCH_MODE');
 
-        if (strtoupper($searchMode) === 'PRODUCT' && class_exists('\GP247\Shop\Models\ShopProduct')) {
+        if (strtoupper($searchMode) === 'PRODUCT' && class_exists('\GP247\Shop\Controllers\ShopProductController')) {
             if ($keyword) {
-                $itemsList = (new \GP247\Shop\Models\ShopProduct)
-                ->setLimit(gp247_config('product_list'))
-                ->setKeyword($keyword)
-                ->setPaginate()
-                ->getData();
+                $itemsList = (new \GP247\Shop\Controllers\ShopProductController)->dataFilter();
             } else {
                 $itemsList = collect([]);
             }
