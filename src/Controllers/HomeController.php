@@ -101,8 +101,7 @@ class HomeController extends RootFrontController
      */
     private function _search()
     {
-        $keyword = request('keyword');
-        $keyword = gp247_clean(data:$keyword, hight:true);
+        $keyword = gp247_clean(data:request('keyword'), hight:true);
 
         $searchMode = config('gp247-config.front.GP247_SEARCH_MODE');
 
@@ -149,6 +148,7 @@ class HomeController extends RootFrontController
                 'title'       => gp247_language_render('action.search') . ($keyword ? ': ' . $keyword : ''),
                 'itemsList'   => $itemsList,
                 'layout_page' => $layout_page,
+                'filter_sort' => gp247_clean(data: request('filter_sort'), hight: true),
                 'breadcrumbs' => [
                     ['url'    => '', 'title' => gp247_language_render('action.search')],
                 ],
