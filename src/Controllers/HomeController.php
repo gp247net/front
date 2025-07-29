@@ -15,7 +15,7 @@ class HomeController extends RootFrontController
 
     public function index()
     {
-        $contentHome = (new FrontPage)->getDetail('home', $type = 'alias', $checkActive = 0);
+        $contentHome = (new FrontPage)->getDetail(key: 'home', type: 'alias', checkActive: 0);
         $view = $this->GP247TemplatePath . '.screen.home';
         gp247_check_view($view);
         return view(
@@ -112,17 +112,9 @@ class HomeController extends RootFrontController
             } else {
                 $itemsList = collect([]);
             }
-            $view = $this->GP247TemplatePath . '.screen.shop_search';
             $layout_page = 'shop_search';
             $subPath = 'screen.shop_search';
-            if (!view()->exists($view)) {
-                if (!view()->exists('gp247-shop-front::'.$subPath)) {
-                    gp247_report('View not found '.$view);
-                    echo  gp247_language_render('front.view_not_exist', ['view' => $view]);
-                    exit();
-                }
-                $view = 'gp247-shop-front::'.$subPath;
-            }
+            $view = gp247_shop_process_view($this->GP247TemplatePath, $subPath);
         } else {
             if ((strtoupper($searchMode) === 'NEWS' && gp247_config_global('News') && class_exists('\App\GP247\Plugins\News\Models\NewsContent'))) {
                 if ($keyword) {
