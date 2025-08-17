@@ -149,8 +149,8 @@ if (!function_exists('gp247_render_block') && !in_array('gp247_render_block', co
 }
 
 //Function process view of plugin
-// Prioritize checking the view exists in folder "plugin" the current template
-// If it does not exist, check in the plugin
+// Prioritize checking the view exists in folder "Plugins" the current template
+// If it does not exist, check view in the plugin
 if (!function_exists('gp247_plugin_process_view') && !in_array('gp247_plugin_process_view', config('gp247_functions_except', []))) {
     function gp247_plugin_process_view(string $appPAth, string $prefix, string $subPath)
     {
