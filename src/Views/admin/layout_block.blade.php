@@ -286,7 +286,7 @@ $(function () {
 
 function imagedemo(image) {
       Swal.fire({
-        title: '{{  gp247_language_render('admin.template.image_demo') }}',
+        title: '{{  gp247_language_render('admin.layout_block.image_demo') }}',
         text: '',
         imageUrl: image,
         imageWidth: 600,

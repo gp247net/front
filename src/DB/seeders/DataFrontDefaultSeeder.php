@@ -218,6 +218,8 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'admin.layout_block.helper_html','text' => 'Basic HTML content.','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block.helper_view','text' => 'File trong thư mục "app/GP247/Templates/:template/blocks".','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block.helper_module','text' => 'File trong "app/Plugins/Block". Module phải có hàm render().','position' => 'admin.layout_block','location' => 'vi'],
+                ['code' => 'admin.layout_block.image_demo','text' => 'Ảnh demo','position' => 'admin.layout_block','location' => 'vi'],
+                ['code' => 'admin.layout_block.image_demo','text' => 'Image demo','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.page.title','text' => 'Tiêu đề','position' => 'admin.page','location' => 'vi'],
                 ['code' => 'admin.page.image','text' => 'Hình ảnh','position' => 'admin.page','location' => 'vi'],
                 ['code' => 'admin.page.alias','text' => 'URL tùy chỉnh <span class="seo" title="SEO"><i class="fa fa-coffee" aria-hidden="true"></i></span>','position' => 'admin.page','location' => 'vi'],
