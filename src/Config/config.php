@@ -5,6 +5,7 @@ return [
         'middleware' => [
             1 => 'check.domain',
             2 => 'localization',
+            3 => 'check.active',
         ],
         'route' => [
             //Prefix lange on url, as domain.com/en/abc.html

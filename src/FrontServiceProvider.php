@@ -6,6 +6,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\DB;
 use GP247\Front\Middleware\CheckDomain;
+use GP247\Front\Middleware\CheckActive;
 use GP247\Front\Commands\FrontInstall;
 use GP247\Front\Commands\FrontUninstall;
 use GP247\Front\Commands\MakeTemplate;
@@ -168,6 +169,7 @@ class FrontServiceProvider extends ServiceProvider
      */
     protected $routeMiddleware = [
         'check.domain'     => CheckDomain::class,
+        'check.active'     => CheckActive::class,
     ];
 
     /**
