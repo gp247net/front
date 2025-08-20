@@ -55,14 +55,17 @@ return [
 - Bố cục tùy chỉnh cho từng phần
 - Thiết kế tương thích
 
+Tùy chỉnh giao diện quản trị:
+
 >`php artisan vendor:publish --tag=gp247:view-front-admin`
 
-  Các view sẽ được lưu trữ tại: `resources/views/vendor/gp247-front`
-- Cập nhật view của template Default:
+Các view sẽ được lưu trữ tại: `resources/views/vendor/gp247-front`
+
+Cập nhật view của template Default:
 
 >`php artisan vendor:publish --tag=gp247:view-front-template`
 
-  Các view sẽ được lưu trữ tại: `app/GP247/Templates/Default`
+Các view sẽ được lưu trữ tại: `app/GP247/Templates/Default`
 
 ### Mở rộng
 - Hỗ trợ Plugin

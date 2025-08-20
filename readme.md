@@ -54,12 +54,17 @@ return [
 - Flexible Template System
 - Customizable layouts for each section
 - Responsive design
-- Admin interface customization:
+
+Admin interface customization:
 >`php artisan vendor:publish --tag=gp247:view-front-admin`
-  Views will be stored at: `resources/views/vendor/gp247-front`
-- Update Default template views:
+
+Views will be stored at: `resources/views/vendor/gp247-front`
+
+Update Default template views:
+
 >`php artisan vendor:publish --tag=gp247:view-front-template`
-  Views will be stored at: `app/GP247/Templates/Default`
+
+Views will be stored at: `app/GP247/Templates/Default`
 
 ### Extensions
 - Plugin support
