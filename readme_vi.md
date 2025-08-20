@@ -22,10 +22,8 @@ GP247/Front là một gói CMS (Hệ thống Quản lý Nội dung) toàn diện
 
 ## Cài đặt
 
-1. Cài đặt thông qua Composer:
-```bash
-composer require gp247/front
-```
+
+>`composer require gp247/front`
 
 2. Đảm bảo nội dung trong `routes/web.php` được xóa hoặc comment:
 ```php
@@ -43,9 +41,7 @@ return [
 ```
 
 4. Chạy lệnh cài đặt:
-```bash
-php artisan gp247:front-install
-```
+>`php artisan gp247:front-install`
 
 ## Tính năng chính
 
@@ -58,15 +54,14 @@ php artisan gp247:front-install
 - Hệ thống Mẫu Linh hoạt
 - Bố cục tùy chỉnh cho từng phần
 - Thiết kế tương thích
-- Tùy chỉnh giao diện quản trị:
-  ```bash
-  php artisan vendor:publish --tag=gp247:view-front-admin
-  ```
+
+>`php artisan vendor:publish --tag=gp247:view-front-admin`
+
   Các view sẽ được lưu trữ tại: `resources/views/vendor/gp247-front`
 - Cập nhật view của template Default:
-  ```bash
-  php artisan vendor:publish --tag=gp247:view-front-template
-  ```
+
+>`php artisan vendor:publish --tag=gp247:view-front-template`
+
   Các view sẽ được lưu trữ tại: `app/GP247/Templates/Default`
 
 ### Mở rộng
