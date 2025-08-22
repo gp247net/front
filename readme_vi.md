@@ -22,23 +22,28 @@ GP247/Front là một gói CMS (Hệ thống Quản lý Nội dung) toàn diện
 
 ## Cài đặt
 
+1. Cài đặt gói
 
->`composer require gp247/front`
+    >`composer require gp247/front`
 
-2. Đảm bảo nội dung trong `routes/web.php` được xóa hoặc comment:
-```php
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-```
+
+2. Cấu hình routing: mở file `bootstrap/app.php`:
+
+  - Comment dòng cấu hình web routes:
+
+    ```php
+    //GP247 comment
+    //web: __DIR__.'/../routes/web.php',
+    ```
+
 
 3. Đăng ký service provider trong `bootstrap/providers.php`:
-```php
-return [
-    // ... các providers hiện có
-    GP247\Front\FrontServiceProvider::class,
-];
-```
+    ```php
+    return [
+        // ... các providers hiện có
+        GP247\Front\FrontServiceProvider::class,
+    ];
+    ```
 
 4. Chạy lệnh cài đặt:
 >`php artisan gp247:front-install`

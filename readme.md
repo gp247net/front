@@ -23,22 +23,28 @@ GP247/Front is a comprehensive CMS (Content Management System) package for busin
 
 ## Installation
 
->`composer require gp247/front`
+1. Install package
 
-2. Ensure the content in `routes/web.php` is removed or commented out:
-```php
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-```
+    >`composer require gp247/front`
+
+
+2. Configure routing and exceptions for GP247, open `bootstrap/app.php`:
+
+  - Comment out the web routes line:
+
+    ```php
+    //GP247 comment
+    //web: __DIR__.'/../routes/web.php',
+    ```
+
 
 3. Register the service provider in `bootstrap/providers.php`:
-```php
-return [
-    // ... existing providers
-    GP247\Front\FrontServiceProvider::class,
-];
-```
+    ```php
+    return [
+        // ... existing providers
+        GP247\Front\FrontServiceProvider::class,
+    ];
+    ```
 
 4. Run the installation command:
 >`php artisan gp247:front-install`
