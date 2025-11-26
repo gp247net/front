@@ -8,6 +8,7 @@
 <a href="https://packagist.org/packages/gp247/front"><img src="https://poser.pugx.org/gp247/front/d/total.svg" alt="Tổng lượt tải"></a>
 <a href="https://packagist.org/packages/gp247/front"><img src="https://poser.pugx.org/gp247/front/v/stable.svg" alt="Phiên bản ổn định mới nhất"></a>
 <a href="https://packagist.org/packages/gp247/front"><img src="https://poser.pugx.org/gp247/front/license.svg" alt="Giấy phép"></a>
+<a href="https://deepwiki.com/gp247net/front"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 </p>
 
 ## Giới thiệu
