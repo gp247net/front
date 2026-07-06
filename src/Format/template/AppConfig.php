@@ -142,6 +142,7 @@ class AppConfig extends ExtensionConfigDefault
         $arrData = [
             'title' => $this->title,
             'key' => $this->configKey,
+            'code' => $this->configCode,
             'image' => $this->image,
             'permission' => self::ALLOW,
             'version' => $this->version,
