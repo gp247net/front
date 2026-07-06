@@ -21,7 +21,7 @@ class HomeController extends RootFrontController
         return view(
             $view,
             array(
-                'title'       => gp247_store_info('title'),
+                'title'       => gp247_store_info('name'),
                 'keyword'     => gp247_store_info('keyword'),
                 'description' => gp247_store_info('description'),
                 'storeId'     => config('app.storeId'),
@@ -63,14 +63,14 @@ class HomeController extends RootFrontController
             return view(
                 $view,
                 array(
-                    'title'       => $page->title,
+                    'title'       => $page->name,
                     'description' => $page->description,
                     'keyword'     => $page->keyword,
                     'page'        => $page,
                     'og_image'    => gp247_file($page->getImage()),
                     'layout_page' => 'front_page_detail',
                     'breadcrumbs' => [
-                        ['url'    => '', 'title' => $page->title],
+                        ['url'    => '', 'title' => $page->name],
                     ],
                 )
             );

@@ -6,6 +6,7 @@ return [
             1 => 'check.domain',
             2 => 'localization',
             3 => 'check.active',
+            4 => 'front.redirect',
         ],
         'route' => [
             //Prefix lange on url, as domain.com/en/abc.html
@@ -17,7 +18,9 @@ return [
             // default: front.home, front.locale, front.banner.click will not be displayed with language on url
             'GP247_ROUTE_EXCLUDE_LANGUAGE' => env('GP247_ROUTE_EXCLUDE_LANGUAGE', ''),
         ],
-        'GP247_TEMPLATE_FRONT_DEFAULT' => env('GP247_TEMPLATE_FRONT_DEFAULT', 'Default'),
+        // WHY: 'Default' was removed entirely from the project (modification
+        // 20260705T124936, ADR-014 Amend #1) — GP247Front is now the sole template.
+        'GP247_TEMPLATE_FRONT_DEFAULT' => env('GP247_TEMPLATE_FRONT_DEFAULT', 'GP247Front'),
         'GP247_SUFFIX_URL'    => env('GP247_SUFFIX_URL', '.html'), //Suffix url, ex: domain.com/news/1.html 
 
         'layout_page' => [

@@ -35,16 +35,16 @@ class FrontInstall extends Command
         
         // Install gp247 front
         \DB::connection(GP247_DB_CONNECTION)->table('migrations')->where('migration', '00_00_00_create_tables_front')->delete();
-        $this->call('migrate', ['--path' => '/vendor/gp247/front/src/DB/migrations/00_00_00_create_tables_front.php']);
+        $this->call('migrate', ['--path' => '/vendor/gp247/front/src/Admin/Database/Migrations/00_00_00_create_tables_front.php']);
         $this->info('---------------> Migrate schema Front default done!');
 
-        $this->call('db:seed', ['--class' => '\GP247\Front\DB\seeders\DataFrontDefaultSeeder', '--force' => true]);
+        $this->call('db:seed', ['--class' => '\GP247\Front\Admin\Database\Seeders\DataFrontDefaultSeeder', '--force' => true]);
         $this->info('---------------> Seeding database Front default done!');
 
         //== Begin setup template default
         // Copy template default
-        $this->call('vendor:publish', ['--tag' => 'gp247:public-front-template']);
-        $this->call('vendor:publish', ['--tag' => 'gp247:view-front-template']);
+        $this->call('vendor:publish', ['--tag' => 'gp247:front-public','--force' => true]);
+        $this->call('vendor:publish', ['--tag' => 'gp247:front-view','--force' => true]);
 
         //Setup template default for Root store
         // This command can only be run after the above default template copy command is successful.

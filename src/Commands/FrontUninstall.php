@@ -37,7 +37,7 @@ class FrontUninstall extends Command
                 ->delete();
 
             // Gọi hàm down từ migration để drop tables
-            $migration = require __DIR__.'/../DB/migrations/00_00_00_create_tables_front.php';
+            $migration = require __DIR__.'/../Admin/Database/Migrations/00_00_00_create_tables_front.php';
             $migration->down();
             
             $this->info('---------------> Uninstall Front module successfully!');

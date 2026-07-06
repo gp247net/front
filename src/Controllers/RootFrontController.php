@@ -21,14 +21,18 @@ class RootFrontController extends Controller
         if (!view()->exists($this->GP247TemplatePath . '.screen.404')) {
             return abort(404);
         }
-        return view(
+        // WHY: always respond with HTTP 404 so search engines do not index
+        // "not found" pages as valid content (US-SEO-006).
+        return response()->view(
             $this->GP247TemplatePath . '.screen.404',
-                [
-                'title' => gp247_language_render('front.404'),
-                'msg' => gp247_language_render('front.404_detail'),
+            [
+                'title'       => gp247_language_render('front.404'),
+                'msg'         => gp247_language_render('front.404_detail'),
                 'description' => '',
-                'keyword' => ''
-                ]
+                'keyword'     => '',
+                'canonical'   => '',
+            ],
+            404
         );
     }
 

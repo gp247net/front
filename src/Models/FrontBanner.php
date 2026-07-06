@@ -281,7 +281,7 @@ class FrontBanner extends Model
             $bannerList = $bannerList->where($tableBannerStore . '.store_id', $storeId);
         }
         if ($keyword) {
-            $bannerList->where($tableBanner.'.title', 'like', '%'.$keyword.'%');
+            $bannerList->where($tableBanner.'.name', 'like', '%'.$keyword.'%');
         }
         if ($sort && array_key_exists($sort, $arrSort)) {
             $field = explode('__', $sort)[0];

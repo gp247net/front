@@ -37,7 +37,7 @@ class FrontPage extends Model
     }
     public function getTitle()
     {
-        return $this->getText()->title ?? '';
+        return $this->getText()->name ?? '';
     }
     public function getDescription()
     {
@@ -178,7 +178,7 @@ class FrontPage extends Model
         //search keyword
         if ($this->gp247_keyword !='') {
             $query = $query->where(function ($sql) use ($tableDescription) {
-                $sql->where($tableDescription . '.title', 'like', '%' . $this->gp247_keyword . '%')
+                $sql->where($tableDescription . '.name', 'like', '%' . $this->gp247_keyword . '%')
                 ->orWhere($tableDescription . '.keyword', 'like', '%' . $this->gp247_keyword . '%')
                 ->orWhere($tableDescription . '.description', 'like', '%' . $this->gp247_keyword . '%');
             });
@@ -225,7 +225,7 @@ class FrontPage extends Model
 
         if ($keyword) {
             $pageList = $pageList->where(function ($sql) use ($tableDescription, $keyword) {
-                $sql->where($tableDescription . '.title', 'like', '%' . $keyword . '%');
+                $sql->where($tableDescription . '.name', 'like', '%' . $keyword . '%');
             });
         }
 
@@ -279,7 +279,7 @@ class FrontPage extends Model
                         $data = $data->leftJoin($tablePageStore, $tablePageStore . '.page_id', $table . '.id');
                         $data = $data->where($tablePageStore . '.store_id', $storeId);
                     }
-                    $data = $data->pluck('title', 'id')->toArray();
+                    $data = $data->pluck('name', 'id')->toArray();
                     self::$getListTitleAdmin = $data;
                 }
                 gp247_cache_set($storeCache.'_cache_page_'.gp247_get_locale(), self::$getListTitleAdmin);
@@ -294,7 +294,7 @@ class FrontPage extends Model
                     $data = $data->leftJoin($tablePageStore, $tablePageStore . '.page_id', $table . '.id');
                     $data = $data->where($tablePageStore . '.store_id', $storeId);
                 }
-                $data = $data->pluck('title', 'id')->toArray();
+                $data = $data->pluck('name', 'id')->toArray();
                 self::$getListTitleAdmin = $data;
             }
             return self::$getListTitleAdmin;

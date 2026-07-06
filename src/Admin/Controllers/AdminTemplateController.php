@@ -1,12 +1,12 @@
 <?php
 namespace GP247\Front\Admin\Controllers;
 
-use GP247\Front\Admin\Controllers\RootFrontAdminController;
+use GP247\Core\Controllers\RootAdminController;
 use GP247\Core\Controllers\ExtensionController;
 use GP247\Core\Models\AdminStore;
 
 
-class AdminTemplateController extends RootFrontAdminController
+class AdminTemplateController extends RootAdminController
 {
     use ExtensionController;
 
@@ -27,6 +27,9 @@ class AdminTemplateController extends RootFrontAdminController
             'uninstall' => gp247_route_admin('admin_template.uninstall'),
             'enable' => gp247_route_admin('admin_template.enable'),
             'disable' => gp247_route_admin('admin_template.disable'),
+            // WHY: the TailAdmin-ported extension_upload view links back to the
+            // local list via listUrlAction['urlLocal']; omitting it 500s the import tab.
+            'urlLocal' => gp247_route_admin('admin_template.index'),
             'urlOnline' => gp247_route_admin('admin_template_online.index'),
             'urlImport' => gp247_route_admin('admin_template.import'),
         ];
