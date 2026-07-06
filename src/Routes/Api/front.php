@@ -1,27 +1,25 @@
 <?php
+
+use GP247\Front\Api\FrontController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
     'prefix' => GP247_API_FRONT_PREFIX,
 ], function (){
-    
-    if (file_exists(app_path('GP247/Front/Api/FrontController.php'))) {
-        $nameSpaceFront = 'App\GP247\Front\Api';
-    } else {
-        $nameSpaceFront = 'GP247\Front\Api';
-    }
+
+    $frontController = gp247_namespace(FrontController::class);
     Route::group([
         'prefix' => 'banner',
-    ], function () use($nameSpaceFront) {
-        Route::get('list', $nameSpaceFront.'\FrontController@getBannerList');
-        Route::get('detail/{id}', $nameSpaceFront.'\FrontController@getBannerDetail');
+    ], function () use($frontController) {
+        Route::get('list', $frontController.'@getBannerList');
+        Route::get('detail/{id}', $frontController.'@getBannerDetail');
     });
 
     Route::group([
         'prefix' => 'page',
-    ], function () use($nameSpaceFront) {
-        Route::get('list', $nameSpaceFront.'\FrontController@getPageList');
-        Route::get('detail/{id}', $nameSpaceFront.'\FrontController@getPageDetail');
+    ], function () use($frontController) {
+        Route::get('list', $frontController.'@getPageList');
+        Route::get('detail/{id}', $frontController.'@getPageDetail');
     });
 
 
