@@ -21,6 +21,15 @@ class LayoutBlockManager extends ResourcePanel
     protected ?string $permission = 'admin_layout_block';
 
     /**
+     * `text` carries admin-authored rich HTML (TinyMCE, type=html) or a raw view
+     * name (type=view) — either way it must survive save() unescaped. See
+     * ResourcePanel::$richFields.
+     *
+     * @var array<int, string>
+     */
+    protected array $richFields = ['text'];
+
+    /**
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function baseQuery()

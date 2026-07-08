@@ -22,6 +22,13 @@ class BannerForm extends FormComponent
 {
     protected ?string $permission = 'admin_banner';
 
+    /**
+     * @var array<int, string> `html` holds admin-authored HTML markup (the
+     * banner's rich-text block); it must not be htmlspecialchars-escaped by
+     * the shared save() boundary sanitization.
+     */
+    protected array $richFields = ['html'];
+
     /** @var array<string, mixed> */
     public array $form = [
         'image' => '',

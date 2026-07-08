@@ -43,6 +43,16 @@ class PageForm extends FormComponent
     public array $stores = [];
 
     /**
+     * `content` holds admin-authored rich HTML (TinyMCE, via `<x-gp247::rich-editor>`)
+     * that must survive persist() as-is. `$descriptions` is a page-specific
+     * property (not FormComponent::$richFields' `$form`), so sanitize it
+     * explicitly here instead (RISK-TECH-022 mitigation).
+     *
+     * @var array<int, string>
+     */
+    private const RICH_DESCRIPTION_FIELDS = ['content'];
+
+    /**
      * Load active languages, seed empty (or existing) description rows and, when
      * editing, hydrate the page attributes and assigned stores.
      *
@@ -131,14 +141,13 @@ class PageForm extends FormComponent
         $page->descriptions()->delete();
         $rows = [];
         foreach ($this->descriptions as $code => $row) {
-            $rows[] = [
-                'page_id' => $page->id,
-                'lang' => $code,
-                'name' => $row['name'] ?? '',
-                'keyword' => $row['keyword'] ?? '',
-                'description' => $row['description'] ?? '',
-                'content' => $row['content'] ?? '',
-            ];
+            $fields = ['name' => '', 'keyword' => '', 'description' => '', 'content' => ''];
+            foreach ($fields as $field => $default) {
+                $value = (string) ($row[$field] ?? $default);
+                // WHY: rich HTML fields keep their markup (raw); plain-text fields are XSS-cleaned.
+                $fields[$field] = in_array($field, self::RICH_DESCRIPTION_FIELDS, true) ? $value : gp247_clean($value);
+            }
+            $rows[] = array_merge(['page_id' => $page->id, 'lang' => $code], $fields);
         }
         FrontPageDescription::create($rows);
 

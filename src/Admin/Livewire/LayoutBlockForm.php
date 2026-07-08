@@ -27,6 +27,13 @@ class LayoutBlockForm extends FormComponent
 {
     protected ?string $permission = 'admin_layout_block';
 
+    /**
+     * @var array<int, string> `text` holds admin-authored HTML markup when
+     * type=html (rendered raw on the storefront); it must not be
+     * htmlspecialchars-escaped by the shared save() boundary sanitization.
+     */
+    protected array $richFields = ['text'];
+
     /** @var array<string, mixed> */
     public array $form = [
         'name' => '',

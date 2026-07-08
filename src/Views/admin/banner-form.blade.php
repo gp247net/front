@@ -70,7 +70,7 @@
                 <x-gp247::button variant="secondary" href="{{ gp247_route_admin('admin_banner.index') }}" wire:navigate>
                     {{ gp247_language_render('admin.core.cancel') }}
                 </x-gp247::button>
-                <x-gp247::button type="submit" wire:loading.attr="disabled">
+                <x-gp247::button type="submit" wire:loading.attr="disabled" wire:target="save">
                     <i class="fas fa-save"></i> {{ gp247_language_render('admin.core.save') }}
                 </x-gp247::button>
             </div>
