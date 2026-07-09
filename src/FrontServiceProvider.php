@@ -301,7 +301,7 @@ class FrontServiceProvider extends ServiceProvider
             $this->publishes([__DIR__.'/public' => public_path('GP247/Templates/GP247Front')], 'gp247:front-public');
             $this->publishes([__DIR__.'/Views/front' => app_path('GP247/Templates/GP247Front')], 'gp247:front-view');
             $this->publishes([__DIR__.'/Views/admin' => resource_path('views/vendor/gp247-front-admin')], 'gp247:front-admin');
-            $this->publishes([__DIR__.'/public/js/sweetalert2.all.min.js' => public_path('vendor/gp247-front/js/sweetalert2.all.min.js')], 'gp247:front-assets');
+            $this->publishes([__DIR__.'/public/js/sweetalert2.all.min.js' => public_path('GP247/Core/js/sweetalert2.all.min.js')], 'gp247:front-assets');
         }
     }
 
@@ -322,7 +322,7 @@ class FrontServiceProvider extends ServiceProvider
      */
     protected function ensureSharedAssetsPublished()
     {
-        $target = public_path('vendor/gp247-front/js/sweetalert2.all.min.js');
+        $target = public_path('GP247/Core/js/sweetalert2.all.min.js');
 
         if (!file_exists($target)) {
             if (!is_dir($directory = dirname($target))) {

@@ -14,7 +14,7 @@
     own copy of a third-party library. FrontServiceProvider publishes/copies
     this file automatically; see ensureSharedAssetsPublished().
 --}}
-<script src="{{ gp247_file('vendor/gp247-front/js/sweetalert2.all.min.js') }}"></script>
+<script src="{{ gp247_file('GP247/Core/js/sweetalert2.all.min.js') }}"></script>
 <script>
     function alertJs(type = 'error', msg = '') {
         const Toast = Swal.mixin({
