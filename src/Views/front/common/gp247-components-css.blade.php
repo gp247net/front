@@ -133,6 +133,23 @@
     color: var(--gp247-color-link-hover);
     text-decoration: underline;
 }
+.gp247-footer-links__item--group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.gp247-footer-links__label {
+    color: var(--gp247-color-text);
+    font-weight: 600;
+}
+.gp247-footer-links__children {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gp247-spacing);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
 
 /* breadcrumb */
 .gp247-breadcrumb__path {
