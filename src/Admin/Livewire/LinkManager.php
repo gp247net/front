@@ -28,7 +28,9 @@ class LinkManager extends ResourcePanel
      */
     protected function baseQuery()
     {
-        return FrontLink::query();
+        // Eager-load the parent collection so the list can show its name
+        // without an N+1 query per row.
+        return FrontLink::query()->with('collection');
     }
 
     /**

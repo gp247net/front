@@ -22,6 +22,17 @@ class FrontLink extends Model
         return $this->belongsToMany(AdminStore::class, FrontLinkStore::class, 'link_id', 'store_id');
     }
 
+    /**
+     * The parent collection (a `FrontLink` row with `type = 'collection'`) this
+     * link is nested under, if any.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function collection()
+    {
+        return $this->belongsTo(self::class, 'collection_id', 'id');
+    }
+
     public static function getGroup()
     {
         if (!self::$getGroup) {
