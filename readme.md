@@ -63,20 +63,32 @@ GP247/Front is a comprehensive CMS (Content Management System) package for busin
 - Responsive design
 
 Admin interface customization:
->`php artisan vendor:publish --tag=gp247:view-front-admin`
+>`php artisan vendor:publish --tag=gp247:front-admin`
 
-Views will be stored at: `resources/views/vendor/gp247-front`
+Views will be stored at: `resources/views/vendor/gp247-front-admin`
 
-Update Default template views:
+Update the default template (GP247Front) views:
 
->`php artisan vendor:publish --tag=gp247:view-front-template`
+>`php artisan vendor:publish --tag=gp247:front-view`
 
-Views will be stored at: `app/GP247/Templates/Default`
+Views will be stored at: `app/GP247/Templates/GP247Front`
+
+Publish the default template's public assets (css/js/images):
+
+>`php artisan vendor:publish --tag=gp247:front-public`
+
+Assets will be stored at: `public/GP247/Templates/GP247Front`
 
 ### Extensions
 - Plugin support
 - Custom module integration
 - API for feature development
+
+### Overriding controllers
+
+>Step 1: Copy the controller files you want to override from `vendor/gp247/front/src/Controllers` (or `src/Api/Controllers`) to `app/GP247/Front/Controllers` (or `app/GP247/Front/Api/Controllers`)
+
+>Step 2: Change the namespace from `GP247\Front\Controllers` (or `GP247\Front\Api\Controllers`) to `App\GP247\Front\Controllers` (or `App\GP247\Front\Api\Controllers`) — just prepend `App`, keep the rest as-is.
 
 ## Documentation
 For detailed documentation, visit [documentation](https://gp247.net/en/docs)

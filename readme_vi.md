@@ -63,20 +63,32 @@ GP247/Front là một gói CMS (Hệ thống Quản lý Nội dung) toàn diện
 
 Tùy chỉnh giao diện quản trị:
 
->`php artisan vendor:publish --tag=gp247:view-front-admin`
+>`php artisan vendor:publish --tag=gp247:front-admin`
 
-Các view sẽ được lưu trữ tại: `resources/views/vendor/gp247-front`
+Các view sẽ được lưu trữ tại: `resources/views/vendor/gp247-front-admin`
 
-Cập nhật view của template Default:
+Cập nhật view của template mặc định (GP247Front):
 
->`php artisan vendor:publish --tag=gp247:view-front-template`
+>`php artisan vendor:publish --tag=gp247:front-view`
 
-Các view sẽ được lưu trữ tại: `app/GP247/Templates/Default`
+Các view sẽ được lưu trữ tại: `app/GP247/Templates/GP247Front`
+
+Publish tài nguyên public (css/js/ảnh) của template mặc định:
+
+>`php artisan vendor:publish --tag=gp247:front-public`
+
+Các tài nguyên sẽ được lưu trữ tại: `public/GP247/Templates/GP247Front`
 
 ### Mở rộng
 - Hỗ trợ Plugin
 - Tích hợp module tùy chỉnh
 - API để phát triển tính năng
+
+### Ghi đè (override) controller
+
+>Bước 1: Copy các file controller muốn ghi đè trong `vendor/gp247/front/src/Controllers` (hoặc `src/Api/Controllers`) -> `app/GP247/Front/Controllers` (hoặc `app/GP247/Front/Api/Controllers`)
+
+>Bước 2: Đổi namespace từ `GP247\Front\Controllers` (hoặc `GP247\Front\Api\Controllers`) thành `App\GP247\Front\Controllers` (hoặc `App\GP247\Front\Api\Controllers`) — chỉ thêm `App` vào phía trước, giữ nguyên phần còn lại.
 
 ## Tài liệu
 Để xem tài liệu chi tiết, truy cập [tài liệu](https://gp247.net/vi/docs)
