@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\Cache;
  * list are admin-managed from the "SEO" admin screen
  * (`GP247\Front\Admin\Livewire\SeoSettings`), which also offers a manual
  * cache-rebuild action (modifications `20260711T114155`, `20260711T122929`).
+ * Sitemap URLs contributed by plugins (e.g. News) are picked up via the
+ * `front.seo_sitemap_providers` config registry — see
+ * {@see pluginUrls()} and ADR `seo_plugin-sitemap-extension`
+ * (US-PLG-007, modification `20260711T132909`).
  *
  * @aidlc-unit seo
  * @aidlc-story US-SEO-004
@@ -157,7 +161,56 @@ class SeoController extends RootFrontController
             }
         }
 
+        // Plugin-contributed pages (US-PLG-007, ADR seo_plugin-sitemap-extension)
+        // — front never hardcodes a plugin's name; it only reads whatever
+        // callables plugins registered for themselves.
+        $urls = array_merge($urls, $this->pluginUrls($storeId));
+
         return $urls;
+    }
+
+    /**
+     * Collect sitemap entries contributed by plugins via the
+     * `front.seo_sitemap_providers` config registry. Each plugin appends a
+     * `[Class, 'method']` callable to this array from its own `Provider.php`
+     * (same runtime-append idiom already used there for `layout_page`), gated
+     * by its own `gp247_extension_check_active()` check — so a disabled
+     * plugin is never registered in the first place.
+     *
+     * Each callable is invoked in isolation (try/catch) so a bug in one
+     * plugin cannot break sitemap.xml for the rest of the site (RISK-OPS-006).
+     *
+     * @param  mixed $storeId
+     * @return array
+     */
+    private function pluginUrls($storeId): array
+    {
+        $providers = (array) config('gp247-config.front.seo_sitemap_providers', []);
+        $patterns  = $this->excludedAliasPatterns($storeId);
+
+        $entries = [];
+        foreach ($providers as $callable) {
+            if (!is_callable($callable)) {
+                continue;
+            }
+
+            try {
+                $pluginEntries = (array) call_user_func($callable, $storeId);
+            } catch (\Throwable $e) {
+                gp247_report('#GP247::seo_sitemap_provider:: ' . $e->getMessage() . ' - Line: ' . $e->getLine() . ' - File: ' . $e->getFile());
+
+                continue;
+            }
+
+            foreach ($pluginEntries as $entry) {
+                if (empty($entry['loc']) || $this->isAliasExcluded((string) ($entry['alias'] ?? ''), $patterns)) {
+                    continue;
+                }
+                $entries[] = $entry;
+            }
+        }
+
+        return $entries;
     }
 
     /**

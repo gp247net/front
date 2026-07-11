@@ -30,8 +30,15 @@ return [
             'front_page_detail' => 'admin.layout_block_page.page_detail',
             'front_news_list' => 'admin.layout_block_page.news_list',
             'front_news_detail' => 'admin.layout_block_page.news_detail',
-            'front_search' => 'admin.layout_block_page.search',       
+            'front_search' => 'admin.layout_block_page.search',
         ],
+        // Sitemap URL providers contributed by plugins (US-PLG-007, ADR
+        // seo_plugin-sitemap-extension): each plugin appends a [Class, 'method']
+        // callable to this array from its own Provider.php (same runtime-append
+        // idiom already used above for 'layout_page'), gated by its own
+        // gp247_extension_check_active() check. SeoController::collectUrls()
+        // reads this list — front never hardcodes a plugin's name.
+        'seo_sitemap_providers' => [],
         'layout_position' => [
             'top_site' => 'admin.layout_block_position.top_site',
             'top' => 'admin.layout_block_position.top',
