@@ -33,6 +33,14 @@ class DataFrontDefaultSeeder extends Seeder
             AdminMenu::where('parent_id', $checkIdBlock->id)->delete();
         }
 
+        // Delete old SEO menu group (modification 20260711T114155), mirrors the
+        // ADMIN_CONTENT reseed pattern above so re-running the seeder stays idempotent.
+        $checkIdBlockSeo = AdminMenu::where('key', 'ADMIN_SEO')->first();
+        if ($checkIdBlockSeo) {
+            AdminMenu::where('key', 'ADMIN_SEO')->delete();
+            AdminMenu::where('parent_id', $checkIdBlockSeo->id)->delete();
+        }
+
 
         // Insert new data
         $idBlockAdmin = AdminMenu::insertGetId(
@@ -55,6 +63,66 @@ class DataFrontDefaultSeeder extends Seeder
                 // Template manager
                 ['parent_id' => 3,'sort' => 1,'title' => 'admin.menu_titles.template','icon' => 'fab fa-windows','uri' => 'admin::template','key' => 'TEMPLATE','type' => 0],
 
+            ]
+        );
+
+        // SEO menu group (US-SEO-004, modification 20260711T114155): top-level
+        // group + single "SEO settings" screen (robots.txt, sitemap toggles/rebuild).
+        $idBlockSeo = AdminMenu::insertGetId(
+            [
+                'parent_id' => 0,
+                'sort'      => 55,
+                'title'     => 'admin.menu_titles.ADMIN_SEO',
+                'icon'      => 'nav-icon fas fa-search',
+                'key'       => 'ADMIN_SEO',
+            ]
+        );
+
+        AdminMenu::insertOrIgnore(
+            [
+                ['parent_id' => $idBlockSeo,'sort' => 1,'title' => 'admin.menu_titles.seo_settings','icon' => 'fas fa-cog','uri' => 'admin::seo','key' => null,'type' => 0],
+            ]
+        );
+
+        // SEO settings screen labels (US-SEO-004, modification 20260711T114155).
+        Languages::insertOrIgnore(
+            [
+                ['code' => 'admin.menu_titles.ADMIN_SEO','text' => 'SEO','position' => 'admin.menu_titles','location' => 'vi'],
+                ['code' => 'admin.menu_titles.ADMIN_SEO','text' => 'SEO','position' => 'admin.menu_titles','location' => 'en'],
+                ['code' => 'admin.menu_titles.seo_settings','text' => 'Cấu hình SEO','position' => 'admin.menu_titles','location' => 'vi'],
+                ['code' => 'admin.menu_titles.seo_settings','text' => 'SEO settings','position' => 'admin.menu_titles','location' => 'en'],
+                ['code' => 'admin.seo.title','text' => 'Cấu hình SEO','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.title','text' => 'SEO settings','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.robots_txt','text' => 'Nội dung robots.txt','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.robots_txt','text' => 'robots.txt content','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.robots_txt_help','text' => 'Cẩn thận: "Disallow: /" sẽ chặn toàn bộ website khỏi công cụ tìm kiếm.','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.robots_txt_help','text' => 'Careful: "Disallow: /" blocks the entire website from search engines.','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.robots_txt_too_long','text' => 'Nội dung robots.txt vượt quá độ dài cho phép.','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.robots_txt_too_long','text' => 'robots.txt content exceeds the maximum length.','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.view_robots','text' => 'Xem /robots.txt','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.view_robots','text' => 'View /robots.txt','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.sitemap_title','text' => 'Sitemap.xml','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.sitemap_title','text' => 'Sitemap.xml','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.sitemap_include_products','text' => 'Gồm sản phẩm trong sitemap','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.sitemap_include_products','text' => 'Include products in sitemap','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.sitemap_include_categories','text' => 'Gồm danh mục trong sitemap','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.sitemap_include_categories','text' => 'Include categories in sitemap','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.view_sitemap','text' => 'Xem /sitemap.xml','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.view_sitemap','text' => 'View /sitemap.xml','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.rebuild_sitemap','text' => 'Build lại sitemap ngay','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.rebuild_sitemap','text' => 'Rebuild sitemap now','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.sitemap_rebuilt','text' => 'Đã xoá cache, sitemap sẽ được tạo lại ở lượt truy cập kế tiếp.','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.sitemap_rebuilt','text' => 'Cache cleared — the sitemap will be rebuilt on the next visit.','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.meta_og_note','text' => 'Title/mô tả/từ khoá/ảnh OG mặc định toàn site được quản lý ở màn Thông tin website.','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.meta_og_note','text' => 'Site-wide default title/description/keyword/OG image are managed on the Website info screen.','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.meta_og_link','text' => 'Đi tới Thông tin website','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.meta_og_link','text' => 'Go to Website info','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.exclude_aliases','text' => 'Loại trừ khỏi sitemap','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.exclude_aliases','text' => 'Exclude from sitemap','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.exclude_aliases_help','text' => 'Mỗi dòng 1 alias hoặc pattern (hỗ trợ *), vd "old-product-*". Áp dụng cho trang/sản phẩm/danh mục.','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.exclude_aliases_help','text' => 'One alias or wildcard pattern per line (supports *), e.g. "old-product-*". Applies to pages/products/categories.','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.exclude_aliases_too_long','text' => 'Danh sách loại trừ vượt quá độ dài cho phép.','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.exclude_aliases_too_long','text' => 'The exclusion list exceeds the maximum length.','position' => 'admin.seo','location' => 'en'],
             ]
         );
 

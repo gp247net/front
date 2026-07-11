@@ -12,7 +12,11 @@ use Illuminate\Support\Facades\Cache;
  *
  * Both responses are generated on-demand and cached in the Laravel cache
  * (keyed by store_id) to avoid repeated DB queries on shared hosts
- * without requiring a cron job (US-SEO-004, MC-007).
+ * without requiring a cron job (US-SEO-004, MC-007). `robots.txt` content, the
+ * sitemap product/category inclusion toggles, and a wildcard alias exclusion
+ * list are admin-managed from the "SEO" admin screen
+ * (`GP247\Front\Admin\Livewire\SeoSettings`), which also offers a manual
+ * cache-rebuild action (modifications `20260711T114155`, `20260711T122929`).
  *
  * @aidlc-unit seo
  * @aidlc-story US-SEO-004
@@ -140,10 +144,17 @@ class SeoController extends RootFrontController
         // Front CMS pages
         $urls = array_merge($urls, $this->frontPageUrls($storeId));
 
-        // Shop pages (products + categories) — only when shop package is active
+        // Shop pages (products + categories) — only when shop package is active,
+        // and each type can be toggled off individually from the admin SEO
+        // settings screen (US-SEO-004). Default '1' (included) when unset keeps
+        // pre-existing sites behaving exactly as before this toggle existed.
         if (class_exists(\GP247\Shop\Models\ShopProduct::class)) {
-            $urls = array_merge($urls, $this->shopProductUrls($storeId));
-            $urls = array_merge($urls, $this->shopCategoryUrls($storeId));
+            if (gp247_config('seo.sitemap_include_products', $storeId, '1') != '0') {
+                $urls = array_merge($urls, $this->shopProductUrls($storeId));
+            }
+            if (gp247_config('seo.sitemap_include_categories', $storeId, '1') != '0') {
+                $urls = array_merge($urls, $this->shopCategoryUrls($storeId));
+            }
         }
 
         return $urls;
@@ -166,8 +177,12 @@ class SeoController extends RootFrontController
             ->select($tablePage . '.alias', $tablePage . '.updated_at')
             ->get();
 
+        $patterns = $this->excludedAliasPatterns($storeId);
         $entries = [];
         foreach ($pages as $page) {
+            if ($this->isAliasExcluded($page->alias, $patterns)) {
+                continue;
+            }
             $entries[] = [
                 'loc'        => gp247_route_front('front.page.detail', ['alias' => $page->alias]),
                 'lastmod'    => $page->updated_at?->format('Y-m-d'),
@@ -200,8 +215,12 @@ class SeoController extends RootFrontController
             ->select($model->getTable() . '.alias', $model->getTable() . '.updated_at')
             ->get();
 
+        $patterns = $this->excludedAliasPatterns($storeId);
         $entries = [];
         foreach ($products as $product) {
+            if ($this->isAliasExcluded($product->alias, $patterns)) {
+                continue;
+            }
             $entries[] = [
                 'loc'        => gp247_route_front('product.detail', ['alias' => $product->alias]),
                 'lastmod'    => $product->updated_at?->format('Y-m-d'),
@@ -231,8 +250,12 @@ class SeoController extends RootFrontController
             ->select($model->getTable() . '.alias', $model->getTable() . '.updated_at')
             ->get();
 
+        $patterns = $this->excludedAliasPatterns($storeId);
         $entries = [];
         foreach ($categories as $cat) {
+            if ($this->isAliasExcluded($cat->alias, $patterns)) {
+                continue;
+            }
             $entries[] = [
                 'loc'        => gp247_route_front('category.detail', ['alias' => $cat->alias]),
                 'lastmod'    => $cat->updated_at?->format('Y-m-d'),
@@ -242,5 +265,37 @@ class SeoController extends RootFrontController
         }
 
         return $entries;
+    }
+
+    /**
+     * Admin-configured alias exclusion patterns (US-SEO-004, modification
+     * `20260711T122929`): one wildcard pattern per line in
+     * `seo.sitemap_exclude_aliases`, applied to page/product/category aliases
+     * alike. Home page has no alias so it is never affected.
+     *
+     * @param  mixed $storeId
+     * @return string[]
+     */
+    private function excludedAliasPatterns($storeId): array
+    {
+        $raw = (string) gp247_config('seo.sitemap_exclude_aliases', $storeId, '');
+
+        return array_values(array_filter(array_map('trim', explode("\n", $raw)), fn (string $p) => $p !== ''));
+    }
+
+    /**
+     * @param  string   $alias
+     * @param  string[] $patterns
+     * @return bool
+     */
+    private function isAliasExcluded(string $alias, array $patterns): bool
+    {
+        foreach ($patterns as $pattern) {
+            if (fnmatch($pattern, $alias)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
