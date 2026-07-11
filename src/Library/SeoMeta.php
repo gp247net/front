@@ -198,6 +198,73 @@ class SeoMeta
     }
 
     /**
+     * Build a schema.org/Article JSON-LD string.
+     *
+     * Used for article-style content (e.g. plugin news/blog detail pages) —
+     * unlike Product, there is no price/stock/availability.
+     *
+     * @param string      $headline      Article title.
+     * @param string      $url           Canonical article URL.
+     * @param string|null $imageUrl      Absolute URL to the cover image (optional).
+     * @param string|null $datePublished ISO 8601 publish date (optional).
+     * @param string|null $dateModified  ISO 8601 last-modified date (optional).
+     * @param string|null $description   Short article description.
+     * @return string  JSON-LD encoded string.
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-005
+     */
+    public static function buildArticleJsonLd(
+        string $headline,
+        string $url,
+        ?string $imageUrl,
+        ?string $datePublished,
+        ?string $dateModified,
+        ?string $description
+    ): string {
+        $data = [
+            '@context'    => 'https://schema.org',
+            '@type'       => 'Article',
+            'headline'    => $headline,
+            'url'         => $url,
+            'description' => $description ?? '',
+        ];
+
+        // RISK-OPS-007: only add optional fields when present — a stale/empty
+        // value in the JSON-LD script is worse than omitting the property.
+        if ($imageUrl !== null && $imageUrl !== '') {
+            $data['image'] = $imageUrl;
+        }
+        if ($datePublished !== null && $datePublished !== '') {
+            $data['datePublished'] = $datePublished;
+        }
+        if ($dateModified !== null && $dateModified !== '') {
+            $data['dateModified'] = $dateModified;
+        }
+
+        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+    }
+
+    /**
+     * Whether JSON-LD output (Organization site-wide + any `@push('jsonld')`
+     * per-page entry) is enabled for the given store. Backs the master
+     * toggle on the "Cấu hình SEO" admin screen (`seo.jsonld_enabled`,
+     * default enabled — matches pre-existing behaviour when unset).
+     *
+     * @param mixed $storeId Store id; defaults to the current request's store.
+     * @return bool
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-005
+     */
+    public static function jsonldEnabled($storeId = null): bool
+    {
+        $storeId = $storeId ?? config('app.storeId');
+
+        return gp247_config('seo.jsonld_enabled', $storeId, '1') != '0';
+    }
+
+    /**
      * Resolve the OG image path: use the given value if non-empty,
      * otherwise fall back to the store's default og_image.
      *

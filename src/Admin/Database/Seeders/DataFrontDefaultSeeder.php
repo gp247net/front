@@ -127,6 +127,12 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'admin.seo.plugins_title','text' => 'Plugin sitemap','position' => 'admin.seo','location' => 'en'],
                 ['code' => 'admin.seo.plugins_help','text' => 'Tắt 1 plugin sẽ loại toàn bộ URL của plugin đó khỏi sitemap.xml.','position' => 'admin.seo','location' => 'vi'],
                 ['code' => 'admin.seo.plugins_help','text' => 'Turning a plugin off removes all of its URLs from sitemap.xml.','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.jsonld_title','text' => 'Dữ liệu có cấu trúc (JSON-LD)','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.jsonld_title','text' => 'Structured data (JSON-LD)','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.jsonld_enabled','text' => 'Bật JSON-LD (Organization/Product/Breadcrumb/Article)','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.jsonld_enabled','text' => 'Enable JSON-LD (Organization/Product/Breadcrumb/Article)','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.jsonld_help','text' => 'Tắt khi cần gỡ lỗi Google Rich Results — ảnh hưởng toàn bộ site (trang chủ, sản phẩm, danh mục, nội dung plugin).','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.jsonld_help','text' => 'Turn off to debug Google Rich Results issues — affects the whole site (home, products, categories, plugin content).','position' => 'admin.seo','location' => 'en'],
             ]
         );
 

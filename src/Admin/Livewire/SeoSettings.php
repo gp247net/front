@@ -23,7 +23,9 @@ use Illuminate\Support\Facades\Cache;
  * `seo.sitemap_exclude_aliases`, `seo.plugin_enabled.<key>`). The plugin list
  * itself is read fresh from `config('gp247-config.front.seo_sitemap_providers')`
  * every render — this screen never hardcodes a plugin's name (US-PLG-007, ADR
- * seo_plugin-sitemap-extension). Gated by `admin_seo`.
+ * seo_plugin-sitemap-extension). Also owns `seo.jsonld_enabled`, the master
+ * on/off switch `SeoMeta::jsonldEnabled()` reads (modification 20260711T143819,
+ * amend to ADR seo_head-consolidation). Gated by `admin_seo`.
  *
  * @aidlc-unit seo
  * @aidlc-story US-SEO-004
@@ -46,6 +48,9 @@ class SeoSettings extends GP247AdminComponent
 
     /** admin_config key prefix for the per-plugin sitemap toggle — suffixed with the plugin's registry `key`. */
     private const CONFIG_PLUGIN_ENABLED_PREFIX = 'seo.plugin_enabled.';
+
+    /** admin_config key for the master JSON-LD on/off toggle (SeoMeta::jsonldEnabled()). */
+    private const CONFIG_JSONLD_ENABLED = 'seo.jsonld_enabled';
 
     /** admin_config "code" grouping this screen's rows (mirrors CustomConfigForm::CODE). */
     private const CODE = 'seo_settings';
@@ -70,6 +75,9 @@ class SeoSettings extends GP247AdminComponent
 
     /** @var array<string, bool> Per-plugin sitemap toggle, keyed by the plugin's registry `key`. */
     public array $pluginEnabled = [];
+
+    /** @var bool Master on/off switch for all JSON-LD output (Organization + any @push('jsonld')). */
+    public bool $jsonldEnabled = true;
 
     /**
      * The store this screen edits. WHY: unlike `WebsiteInfo`/`CustomConfigForm`
@@ -103,6 +111,7 @@ class SeoSettings extends GP247AdminComponent
         $this->includeProducts = gp247_config(self::CONFIG_INCLUDE_PRODUCTS, $storeId, '1') != '0';
         $this->includeCategories = gp247_config(self::CONFIG_INCLUDE_CATEGORIES, $storeId, '1') != '0';
         $this->excludeAliases = (string) gp247_config(self::CONFIG_EXCLUDE_ALIASES, $storeId, '');
+        $this->jsonldEnabled = gp247_config(self::CONFIG_JSONLD_ENABLED, $storeId, '1') != '0';
 
         foreach ($this->registeredPlugins() as $plugin) {
             $this->pluginEnabled[$plugin['key']] = gp247_config(self::CONFIG_PLUGIN_ENABLED_PREFIX . $plugin['key'], $storeId, '1') != '0';
@@ -226,6 +235,23 @@ class SeoSettings extends GP247AdminComponent
         $this->authorizeAction('update');
 
         $this->upsertConfig(self::CONFIG_INCLUDE_CATEGORIES, $value ? '1' : '0');
+        $this->notify('success', gp247_language_render('admin.core.setting_saved'));
+    }
+
+    /**
+     * Persist the master JSON-LD on/off toggle (Layer-2 gated). Backs
+     * `SeoMeta::jsonldEnabled()`, which gates Organization JSON-LD in
+     * `MetaHead` and the entire `@stack('jsonld')` in `layout.blade.php`.
+     *
+     * @param mixed $value
+     * @return void
+     * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When denied.
+     */
+    public function updatedJsonldEnabled($value): void
+    {
+        $this->authorizeAction('update');
+
+        $this->upsertConfig(self::CONFIG_JSONLD_ENABLED, $value ? '1' : '0');
         $this->notify('success', gp247_language_render('admin.core.setting_saved'));
     }
 

@@ -42,7 +42,8 @@
     <meta name="twitter:image" content="{{ gp247_file($og_image) }}" />
 @endif
 
-{{-- JSON-LD: Organization (site-wide, no per-page data needed) --}}
+{{-- JSON-LD: Organization (site-wide, no per-page data needed) — gated by seo.jsonld_enabled (modification 20260711T143819) --}}
+@if(\GP247\Front\Library\SeoMeta::jsonldEnabled())
 @php
     $gp247OrgJsonLd = \GP247\Front\Library\SeoMeta::buildOrganizationJsonLd(
         name:    gp247_store_info('name') ?: config('app.name'),
@@ -51,3 +52,4 @@
     );
 @endphp
 <script type="application/ld+json">{!! $gp247OrgJsonLd !!}</script>
+@endif

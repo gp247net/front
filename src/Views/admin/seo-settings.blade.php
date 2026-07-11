@@ -1,11 +1,12 @@
 {{--
     SEO settings screen (US-SEO-004): robots.txt editor, sitemap card (product/
     category toggles + per-plugin toggles grouped together, since both control
-    what appears in sitemap.xml — modification 20260711T135915), wildcard alias
-    exclusion list, manual "rebuild sitemap" action, and quick links to the
-    live /robots.txt, /sitemap.xml and to the existing "Website info" screen
-    for default meta/OG (deliberately not duplicated here — see modification
-    20260711T114155).
+    what appears in sitemap.xml — modification 20260711T135915), structured
+    data (JSON-LD) master toggle (modification 20260711T143819), wildcard
+    alias exclusion list, manual "rebuild sitemap" action, and quick links to
+    the live /robots.txt, /sitemap.xml and to the existing "Website info"
+    screen for default meta/OG (deliberately not duplicated here — see
+    modification 20260711T114155).
 
     @aidlc-unit seo
     @aidlc-story US-SEO-004
@@ -80,6 +81,16 @@
                 </x-gp247::button>
             </div>
         </x-slot:footer>
+    </x-gp247::card>
+
+    <x-gp247::card :title="gp247_language_render('admin.seo.jsonld_title')">
+        <div class="space-y-2">
+            <x-gp247::checkbox
+                wire:model.live="jsonldEnabled"
+                :label="gp247_language_render('admin.seo.jsonld_enabled')"
+            />
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.seo.jsonld_help') }}</p>
+        </div>
     </x-gp247::card>
 
     <x-gp247::card :title="gp247_language_render('admin.seo.exclude_aliases')">

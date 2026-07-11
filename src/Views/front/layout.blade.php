@@ -2,8 +2,10 @@
 <html lang="{{ app()->getLocale() }}" dir="{{ gp247front_is_rtl() ? 'rtl' : 'ltr' }}">
 <head>
     <x-gp247-front::meta-head :title="$title ?? null" :description="$description ?? null" :keyword="$keyword ?? null" :og_image="$og_image ?? null" :canonical="$canonical ?? null" :hreflang="$seoHreflang ?? []" />
-    {{-- Per-page JSON-LD (Product/Breadcrumb) pushed from screen views --}}
-    @stack('jsonld')
+    {{-- Per-page JSON-LD (Product/Breadcrumb/Article) pushed from screen views — gated by seo.jsonld_enabled (modification 20260711T143819) --}}
+    @if(\GP247\Front\Library\SeoMeta::jsonldEnabled())
+        @stack('jsonld')
+    @endif
     <!--Module header -->
     {!! gp247_render_block('header', $layout_page ?? null) !!}
     <!--//Module header -->
