@@ -11,15 +11,19 @@ use Illuminate\Support\Facades\Cache;
  * SEO settings screen — single-record admin screen (ADR-005 settings-screen
  * pattern, mirrors `WebsiteInfo`/`CustomConfigForm`): editable `robots.txt`
  * content, sitemap inclusion toggles for products/categories, a wildcard alias
- * exclusion list, and a manual "rebuild sitemap" action. Fills the previously-
- * unmet acceptance criteria of US-SEO-004 (`SeoController` could only *read*
- * `seo.robots_txt`, never write it; sitemap only refreshed via the 6h cache
- * TTL with no manual trigger; no way to exclude individual URLs).
+ * exclusion list, per-plugin sitemap toggles, and a manual "rebuild sitemap"
+ * action. Fills the previously-unmet acceptance criteria of US-SEO-004
+ * (`SeoController` could only *read* `seo.robots_txt`, never write it;
+ * sitemap only refreshed via the 6h cache TTL with no manual trigger; no way
+ * to exclude individual URLs or whole plugins).
  *
  * Values persist to `admin_config` (group `seo`) the same key names
  * `SeoController` already reads (`seo.robots_txt`,
  * `seo.sitemap_include_products`, `seo.sitemap_include_categories`,
- * `seo.sitemap_exclude_aliases`). Gated by `admin_seo`.
+ * `seo.sitemap_exclude_aliases`, `seo.plugin_enabled.<key>`). The plugin list
+ * itself is read fresh from `config('gp247-config.front.seo_sitemap_providers')`
+ * every render — this screen never hardcodes a plugin's name (US-PLG-007, ADR
+ * seo_plugin-sitemap-extension). Gated by `admin_seo`.
  *
  * @aidlc-unit seo
  * @aidlc-story US-SEO-004
@@ -39,6 +43,9 @@ class SeoSettings extends GP247AdminComponent
 
     /** admin_config key for the sitemap alias exclusion pattern list. */
     private const CONFIG_EXCLUDE_ALIASES = 'seo.sitemap_exclude_aliases';
+
+    /** admin_config key prefix for the per-plugin sitemap toggle — suffixed with the plugin's registry `key`. */
+    private const CONFIG_PLUGIN_ENABLED_PREFIX = 'seo.plugin_enabled.';
 
     /** admin_config "code" grouping this screen's rows (mirrors CustomConfigForm::CODE). */
     private const CODE = 'seo_settings';
@@ -60,6 +67,9 @@ class SeoSettings extends GP247AdminComponent
 
     /** @var string Wildcard alias exclusion patterns, one per line. */
     public string $excludeAliases = '';
+
+    /** @var array<string, bool> Per-plugin sitemap toggle, keyed by the plugin's registry `key`. */
+    public array $pluginEnabled = [];
 
     /**
      * The store this screen edits. WHY: unlike `WebsiteInfo`/`CustomConfigForm`
@@ -93,6 +103,34 @@ class SeoSettings extends GP247AdminComponent
         $this->includeProducts = gp247_config(self::CONFIG_INCLUDE_PRODUCTS, $storeId, '1') != '0';
         $this->includeCategories = gp247_config(self::CONFIG_INCLUDE_CATEGORIES, $storeId, '1') != '0';
         $this->excludeAliases = (string) gp247_config(self::CONFIG_EXCLUDE_ALIASES, $storeId, '');
+
+        foreach ($this->registeredPlugins() as $plugin) {
+            $this->pluginEnabled[$plugin['key']] = gp247_config(self::CONFIG_PLUGIN_ENABLED_PREFIX . $plugin['key'], $storeId, '1') != '0';
+        }
+    }
+
+    /**
+     * Plugins currently registered into the sitemap provider registry
+     * (US-PLG-007, ADR seo_plugin-sitemap-extension) — read fresh from
+     * `config()` so this screen never hardcodes a plugin's name; whatever a
+     * plugin registered in its own `Provider.php` is what shows up here.
+     *
+     * @return array<int, array{key:string, label:string}>
+     */
+    private function registeredPlugins(): array
+    {
+        $plugins = [];
+        foreach ((array) config('gp247-config.front.seo_sitemap_providers', []) as $provider) {
+            if (!is_array($provider) || empty($provider['key'])) {
+                continue;
+            }
+            $plugins[] = [
+                'key' => (string) $provider['key'],
+                'label' => (string) ($provider['label'] ?? $provider['key']),
+            ];
+        }
+
+        return $plugins;
     }
 
     /**
@@ -192,6 +230,25 @@ class SeoSettings extends GP247AdminComponent
     }
 
     /**
+     * Persist a per-plugin sitemap toggle (Layer-2 gated). The wire path is
+     * `pluginEnabled.<key>`, so `$key` here is the plugin's registry key
+     * (matches `$provider['key']` that `SeoController::pluginUrls()` checks
+     * against `seo.plugin_enabled.<key>`).
+     *
+     * @param mixed  $value
+     * @param string $key
+     * @return void
+     * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When denied.
+     */
+    public function updatedPluginEnabled($value, string $key): void
+    {
+        $this->authorizeAction('update');
+
+        $this->upsertConfig(self::CONFIG_PLUGIN_ENABLED_PREFIX . $key, $value ? '1' : '0');
+        $this->notify('success', gp247_language_render('admin.core.setting_saved'));
+    }
+
+    /**
      * Force the sitemap cache to rebuild on the next visit (Layer-2 gated).
      *
      * @return void
@@ -213,6 +270,7 @@ class SeoSettings extends GP247AdminComponent
         return view('gp247-front-admin::seo-settings', [
             'robotsMaxLength' => self::CONFIG_VALUE_MAX_LENGTH,
             'excludeAliasesMaxLength' => self::CONFIG_VALUE_MAX_LENGTH,
+            'plugins' => $this->registeredPlugins(),
         ])->layout('gp247-admin::layouts.admin', ['title' => gp247_language_render('admin.seo.title')]);
     }
 }

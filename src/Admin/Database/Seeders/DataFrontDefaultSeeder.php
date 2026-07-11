@@ -123,6 +123,10 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'admin.seo.exclude_aliases_help','text' => 'One alias or wildcard pattern per line (supports *), e.g. "old-product-*". Applies to pages/products/categories.','position' => 'admin.seo','location' => 'en'],
                 ['code' => 'admin.seo.exclude_aliases_too_long','text' => 'Danh sách loại trừ vượt quá độ dài cho phép.','position' => 'admin.seo','location' => 'vi'],
                 ['code' => 'admin.seo.exclude_aliases_too_long','text' => 'The exclusion list exceeds the maximum length.','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.plugins_title','text' => 'Sitemap theo plugin','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.plugins_title','text' => 'Plugin sitemap','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.plugins_help','text' => 'Tắt 1 plugin sẽ loại toàn bộ URL của plugin đó khỏi sitemap.xml.','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.plugins_help','text' => 'Turning a plugin off removes all of its URLs from sitemap.xml.','position' => 'admin.seo','location' => 'en'],
             ]
         );
 

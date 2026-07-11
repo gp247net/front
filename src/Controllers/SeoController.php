@@ -171,11 +171,14 @@ class SeoController extends RootFrontController
 
     /**
      * Collect sitemap entries contributed by plugins via the
-     * `front.seo_sitemap_providers` config registry. Each plugin appends a
-     * `[Class, 'method']` callable to this array from its own `Provider.php`
+     * `front.seo_sitemap_providers` config registry. Each plugin appends
+     * `{key, label, callback}` to this array from its own `Provider.php`
      * (same runtime-append idiom already used there for `layout_page`), gated
      * by its own `gp247_extension_check_active()` check — so a disabled
-     * plugin is never registered in the first place.
+     * plugin is never registered in the first place. `key` also lets the
+     * admin toggle a whole plugin's sitemap contribution off independently
+     * (`seo.plugin_enabled.<key>`, default enabled — modification
+     * `20260711T135121`, {@see \GP247\Front\Admin\Livewire\SeoSettings}).
      *
      * Each callable is invoked in isolation (try/catch) so a bug in one
      * plugin cannot break sitemap.xml for the rest of the site (RISK-OPS-006).
@@ -189,7 +192,14 @@ class SeoController extends RootFrontController
         $patterns  = $this->excludedAliasPatterns($storeId);
 
         $entries = [];
-        foreach ($providers as $callable) {
+        foreach ($providers as $provider) {
+            $key      = is_array($provider) ? ($provider['key'] ?? null) : null;
+            $callable = is_array($provider) ? ($provider['callback'] ?? null) : $provider;
+
+            if ($key !== null && gp247_config('seo.plugin_enabled.' . $key, $storeId, '1') == '0') {
+                continue;
+            }
+
             if (!is_callable($callable)) {
                 continue;
             }

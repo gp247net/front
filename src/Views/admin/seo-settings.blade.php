@@ -11,6 +11,7 @@
     Variables:
       - $robotsMaxLength (int)
       - $excludeAliasesMaxLength (int)
+      - $plugins (array<int, array{key:string, label:string}>)
 --}}
 @php
     $input = 'w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-mono transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100';
@@ -78,6 +79,20 @@
             </div>
         </div>
     </x-gp247::card>
+
+    @if (count($plugins))
+        <x-gp247::card :title="gp247_language_render('admin.seo.plugins_title')">
+            <div class="space-y-4">
+                @foreach ($plugins as $plugin)
+                    <x-gp247::checkbox
+                        wire:model.live="pluginEnabled.{{ $plugin['key'] }}"
+                        :label="$plugin['label']"
+                    />
+                @endforeach
+            </div>
+            <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.seo.plugins_help') }}</p>
+        </x-gp247::card>
+    @endif
 
     <x-gp247::card>
         <p class="text-sm text-gray-600 dark:text-gray-300">
