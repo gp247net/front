@@ -12,11 +12,13 @@ use Illuminate\Support\Facades\Cache;
  *
  * Both responses are generated on-demand and cached in the Laravel cache
  * (keyed by store_id) to avoid repeated DB queries on shared hosts
- * without requiring a cron job (US-SEO-004, MC-007). `robots.txt` content, the
- * sitemap product/category inclusion toggles, and a wildcard alias exclusion
- * list are admin-managed from the "SEO" admin screen
- * (`GP247\Front\Admin\Livewire\SeoSettings`), which also offers a manual
- * cache-rebuild action (modifications `20260711T114155`, `20260711T122929`).
+ * without requiring a cron job (US-SEO-004, MC-007). `robots.txt` content is
+ * admin-managed from "Meta & JSON-LD" (`GP247\Front\Admin\Livewire\SeoMetaSettings`);
+ * the sitemap product/category inclusion toggles and a wildcard alias exclusion
+ * list are admin-managed from "Sitemap.xml"
+ * (`GP247\Front\Admin\Livewire\SeoSitemapSettings`), which also offers a manual
+ * cache-rebuild action (modifications `20260711T114155`, `20260711T122929`,
+ * split into 2 screens in `20260711T154553`).
  * Sitemap URLs contributed by plugins (e.g. News) are picked up via the
  * `front.seo_sitemap_providers` config registry — see
  * {@see pluginUrls()} and ADR `seo_plugin-sitemap-extension`
@@ -178,7 +180,7 @@ class SeoController extends RootFrontController
      * plugin is never registered in the first place. `key` also lets the
      * admin toggle a whole plugin's sitemap contribution off independently
      * (`seo.plugin_enabled.<key>`, default enabled — modification
-     * `20260711T135121`, {@see \GP247\Front\Admin\Livewire\SeoSettings}).
+     * `20260711T135121`, {@see \GP247\Front\Admin\Livewire\SeoSitemapSettings}).
      *
      * Each callable is invoked in isolation (try/catch) so a bug in one
      * plugin cannot break sitemap.xml for the rest of the site (RISK-OPS-006).

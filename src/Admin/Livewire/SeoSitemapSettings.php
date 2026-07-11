@@ -8,34 +8,28 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * SEO settings screen — single-record admin screen (ADR-005 settings-screen
- * pattern, mirrors `WebsiteInfo`/`CustomConfigForm`): editable `robots.txt`
- * content, sitemap inclusion toggles for products/categories, a wildcard alias
- * exclusion list, per-plugin sitemap toggles, and a manual "rebuild sitemap"
- * action. Fills the previously-unmet acceptance criteria of US-SEO-004
- * (`SeoController` could only *read* `seo.robots_txt`, never write it;
- * sitemap only refreshed via the 6h cache TTL with no manual trigger; no way
- * to exclude individual URLs or whole plugins).
+ * "Sitemap.xml" admin screen — single-record settings screen (ADR-005
+ * pattern, mirrors `WebsiteInfo`/`CustomConfigForm`): sitemap inclusion
+ * toggles for products/categories, a wildcard alias exclusion list,
+ * per-plugin sitemap toggles, and a manual "rebuild sitemap" action. Split
+ * out of the former combined `SeoSettings` screen (modification
+ * 20260711T154553) so sitemap management and robots/JSON-LD editing
+ * (`SeoMetaSettings`) can be granted as separate RBAC permissions.
  *
  * Values persist to `admin_config` (group `seo`) the same key names
- * `SeoController` already reads (`seo.robots_txt`,
- * `seo.sitemap_include_products`, `seo.sitemap_include_categories`,
- * `seo.sitemap_exclude_aliases`, `seo.plugin_enabled.<key>`). The plugin list
- * itself is read fresh from `config('gp247-config.front.seo_sitemap_providers')`
- * every render — this screen never hardcodes a plugin's name (US-PLG-007, ADR
- * seo_plugin-sitemap-extension). Also owns `seo.jsonld_enabled`, the master
- * on/off switch `SeoMeta::jsonldEnabled()` reads (modification 20260711T143819,
- * amend to ADR seo_head-consolidation). Gated by `admin_seo`.
+ * `SeoController` already reads (`seo.sitemap_include_products`,
+ * `seo.sitemap_include_categories`, `seo.sitemap_exclude_aliases`,
+ * `seo.plugin_enabled.<key>`). The plugin list itself is read fresh from
+ * `config('gp247-config.front.seo_sitemap_providers')` every render — this
+ * screen never hardcodes a plugin's name (US-PLG-007, ADR
+ * seo_plugin-sitemap-extension). Gated by `admin_seo_sitemap`.
  *
  * @aidlc-unit seo
  * @aidlc-story US-SEO-004
  */
-class SeoSettings extends GP247AdminComponent
+class SeoSitemapSettings extends GP247AdminComponent
 {
-    protected ?string $permission = 'admin_seo';
-
-    /** admin_config key for the robots.txt body. */
-    private const CONFIG_ROBOTS = 'seo.robots_txt';
+    protected ?string $permission = 'admin_seo_sitemap';
 
     /** admin_config key for the "include products in sitemap" toggle. */
     private const CONFIG_INCLUDE_PRODUCTS = 'seo.sitemap_include_products';
@@ -49,20 +43,11 @@ class SeoSettings extends GP247AdminComponent
     /** admin_config key prefix for the per-plugin sitemap toggle — suffixed with the plugin's registry `key`. */
     private const CONFIG_PLUGIN_ENABLED_PREFIX = 'seo.plugin_enabled.';
 
-    /** admin_config key for the master JSON-LD on/off toggle (SeoMeta::jsonldEnabled()). */
-    private const CONFIG_JSONLD_ENABLED = 'seo.jsonld_enabled';
-
     /** admin_config "code" grouping this screen's rows (mirrors CustomConfigForm::CODE). */
-    private const CODE = 'seo_settings';
+    private const CODE = 'seo_sitemap_settings';
 
     /** `admin_config.value` is VARCHAR(500) — shared by every config key in the system. */
     private const CONFIG_VALUE_MAX_LENGTH = 500;
-
-    /** Same default `SeoController::robots()` falls back to when no custom value is saved. */
-    private const DEFAULT_ROBOTS = "User-agent: *\nDisallow: /admin/\nDisallow: /gp247-admin/\n";
-
-    /** @var string Current robots.txt body (bound to the textarea). */
-    public string $robotsTxt = '';
 
     /** @var bool Whether shop products are included in sitemap.xml. */
     public bool $includeProducts = true;
@@ -76,17 +61,13 @@ class SeoSettings extends GP247AdminComponent
     /** @var array<string, bool> Per-plugin sitemap toggle, keyed by the plugin's registry `key`. */
     public array $pluginEnabled = [];
 
-    /** @var bool Master on/off switch for all JSON-LD output (Organization + any @push('jsonld')). */
-    public bool $jsonldEnabled = true;
-
     /**
      * The store this screen edits. WHY: unlike `WebsiteInfo`/`CustomConfigForm`
      * (always `GP247_STORE_ID_ROOT`, a single canonical "root store info"
      * record), this screen must key off the exact same store id
-     * `SeoController::sitemap()`/`robots()` resolve at request time
-     * (`config('app.storeId')`) — otherwise a saved robots.txt or a sitemap
-     * rebuild would silently target the wrong store's cache/config row and
-     * never reach the visitor.
+     * `SeoController::sitemap()` resolves at request time
+     * (`config('app.storeId')`) — otherwise a sitemap rebuild would silently
+     * target the wrong store's cache/config row and never reach the visitor.
      *
      * @return mixed Store UUID.
      */
@@ -107,11 +88,9 @@ class SeoSettings extends GP247AdminComponent
 
         $storeId = $this->storeId();
 
-        $this->robotsTxt = (string) gp247_config(self::CONFIG_ROBOTS, $storeId, self::DEFAULT_ROBOTS);
         $this->includeProducts = gp247_config(self::CONFIG_INCLUDE_PRODUCTS, $storeId, '1') != '0';
         $this->includeCategories = gp247_config(self::CONFIG_INCLUDE_CATEGORIES, $storeId, '1') != '0';
         $this->excludeAliases = (string) gp247_config(self::CONFIG_EXCLUDE_ALIASES, $storeId, '');
-        $this->jsonldEnabled = gp247_config(self::CONFIG_JSONLD_ENABLED, $storeId, '1') != '0';
 
         foreach ($this->registeredPlugins() as $plugin) {
             $this->pluginEnabled[$plugin['key']] = gp247_config(self::CONFIG_PLUGIN_ENABLED_PREFIX . $plugin['key'], $storeId, '1') != '0';
@@ -158,35 +137,10 @@ class SeoSettings extends GP247AdminComponent
     }
 
     /**
-     * Persist the robots.txt body on blur (Layer-2 gated). Rejected (not saved)
-     * when it exceeds the shared `admin_config.value` column length.
-     *
-     * @param mixed $value
-     * @return void
-     * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When denied.
-     */
-    public function updatedRobotsTxt($value): void
-    {
-        $this->authorizeAction('update');
-
-        $clean = gp247_clean((string) $value, hight: true);
-
-        if (mb_strlen($clean) > self::CONFIG_VALUE_MAX_LENGTH) {
-            $this->notify('error', gp247_language_render('admin.seo.robots_txt_too_long'));
-
-            return;
-        }
-
-        $this->upsertConfig(self::CONFIG_ROBOTS, $clean);
-        $this->notify('success', gp247_language_render('admin.core.setting_saved'));
-    }
-
-    /**
      * Persist the alias exclusion pattern list on blur (Layer-2 gated). Each
      * line is a wildcard pattern (`*`/`?`, matched via `fnmatch()` by
      * `SeoController`) applied to page/product/category aliases. Rejected (not
-     * saved) when it exceeds the shared `admin_config.value` column length —
-     * same handling as `updatedRobotsTxt()`.
+     * saved) when it exceeds the shared `admin_config.value` column length.
      *
      * @param mixed $value
      * @return void
@@ -239,23 +193,6 @@ class SeoSettings extends GP247AdminComponent
     }
 
     /**
-     * Persist the master JSON-LD on/off toggle (Layer-2 gated). Backs
-     * `SeoMeta::jsonldEnabled()`, which gates Organization JSON-LD in
-     * `MetaHead` and the entire `@stack('jsonld')` in `layout.blade.php`.
-     *
-     * @param mixed $value
-     * @return void
-     * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When denied.
-     */
-    public function updatedJsonldEnabled($value): void
-    {
-        $this->authorizeAction('update');
-
-        $this->upsertConfig(self::CONFIG_JSONLD_ENABLED, $value ? '1' : '0');
-        $this->notify('success', gp247_language_render('admin.core.setting_saved'));
-    }
-
-    /**
      * Persist a per-plugin sitemap toggle (Layer-2 gated). The wire path is
      * `pluginEnabled.<key>`, so `$key` here is the plugin's registry key
      * (matches `$provider['key']` that `SeoController::pluginUrls()` checks
@@ -293,10 +230,9 @@ class SeoSettings extends GP247AdminComponent
      */
     public function render(): View
     {
-        return view('gp247-front-admin::seo-settings', [
-            'robotsMaxLength' => self::CONFIG_VALUE_MAX_LENGTH,
+        return view('gp247-front-admin::seo-sitemap-settings', [
             'excludeAliasesMaxLength' => self::CONFIG_VALUE_MAX_LENGTH,
             'plugins' => $this->registeredPlugins(),
-        ])->layout('gp247-admin::layouts.admin', ['title' => gp247_language_render('admin.seo.title')]);
+        ])->layout('gp247-admin::layouts.admin', ['title' => gp247_language_render('admin.seo.sitemap_title')]);
     }
 }

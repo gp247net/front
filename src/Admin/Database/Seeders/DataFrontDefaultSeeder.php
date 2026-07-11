@@ -67,7 +67,9 @@ class DataFrontDefaultSeeder extends Seeder
         );
 
         // SEO menu group (US-SEO-004, modification 20260711T114155): top-level
-        // group + single "SEO settings" screen (robots.txt, sitemap toggles/rebuild).
+        // group + 2 screens (split modification 20260711T154553, each its own
+        // RBAC permission) — "Meta & JSON-LD" (robots.txt + JSON-LD toggle) and
+        // "Sitemap.xml" (sitemap toggles/rebuild).
         $idBlockSeo = AdminMenu::insertGetId(
             [
                 'parent_id' => 0,
@@ -80,7 +82,8 @@ class DataFrontDefaultSeeder extends Seeder
 
         AdminMenu::insertOrIgnore(
             [
-                ['parent_id' => $idBlockSeo,'sort' => 1,'title' => 'admin.menu_titles.seo_settings','icon' => 'fas fa-cog','uri' => 'admin::seo','key' => null,'type' => 0],
+                ['parent_id' => $idBlockSeo,'sort' => 1,'title' => 'admin.menu_titles.seo_meta_settings','icon' => 'fas fa-code','uri' => 'admin::seo_meta','key' => null,'type' => 0],
+                ['parent_id' => $idBlockSeo,'sort' => 2,'title' => 'admin.menu_titles.seo_sitemap_settings','icon' => 'fas fa-sitemap','uri' => 'admin::seo_sitemap','key' => null,'type' => 0],
             ]
         );
 
@@ -89,10 +92,12 @@ class DataFrontDefaultSeeder extends Seeder
             [
                 ['code' => 'admin.menu_titles.ADMIN_SEO','text' => 'SEO','position' => 'admin.menu_titles','location' => 'vi'],
                 ['code' => 'admin.menu_titles.ADMIN_SEO','text' => 'SEO','position' => 'admin.menu_titles','location' => 'en'],
-                ['code' => 'admin.menu_titles.seo_settings','text' => 'Cấu hình SEO','position' => 'admin.menu_titles','location' => 'vi'],
-                ['code' => 'admin.menu_titles.seo_settings','text' => 'SEO settings','position' => 'admin.menu_titles','location' => 'en'],
-                ['code' => 'admin.seo.title','text' => 'Cấu hình SEO','position' => 'admin.seo','location' => 'vi'],
-                ['code' => 'admin.seo.title','text' => 'SEO settings','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.menu_titles.seo_meta_settings','text' => 'Meta & JSON-LD','position' => 'admin.menu_titles','location' => 'vi'],
+                ['code' => 'admin.menu_titles.seo_meta_settings','text' => 'Meta & JSON-LD','position' => 'admin.menu_titles','location' => 'en'],
+                ['code' => 'admin.menu_titles.seo_sitemap_settings','text' => 'Sitemap.xml','position' => 'admin.menu_titles','location' => 'vi'],
+                ['code' => 'admin.menu_titles.seo_sitemap_settings','text' => 'Sitemap.xml','position' => 'admin.menu_titles','location' => 'en'],
+                ['code' => 'admin.seo.meta_title','text' => 'Meta & JSON-LD','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.meta_title','text' => 'Meta & JSON-LD','position' => 'admin.seo','location' => 'en'],
                 ['code' => 'admin.seo.robots_txt','text' => 'Nội dung robots.txt','position' => 'admin.seo','location' => 'vi'],
                 ['code' => 'admin.seo.robots_txt','text' => 'robots.txt content','position' => 'admin.seo','location' => 'en'],
                 ['code' => 'admin.seo.robots_txt_help','text' => 'Cẩn thận: "Disallow: /" sẽ chặn toàn bộ website khỏi công cụ tìm kiếm.','position' => 'admin.seo','location' => 'vi'],
