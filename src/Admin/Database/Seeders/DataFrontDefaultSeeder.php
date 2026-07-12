@@ -67,9 +67,11 @@ class DataFrontDefaultSeeder extends Seeder
         );
 
         // SEO menu group (US-SEO-004, modification 20260711T114155): top-level
-        // group + 2 screens (split modification 20260711T154553, each its own
-        // RBAC permission) — "Meta & JSON-LD" (robots.txt + JSON-LD toggle) and
-        // "Sitemap.xml" (sitemap toggles/rebuild).
+        // group + 3 screens — "Meta & JSON-LD" and "Sitemap.xml" (split
+        // modification 20260711T154553, each its own RBAC permission), plus
+        // "Redirect 301" (modification 20260712T011152, US-SEO-006) — kept in
+        // this group rather than a new Unit/menu, same "1 screen/1 permission"
+        // pattern (see modification_analysis_20260712T011152.md).
         $idBlockSeo = AdminMenu::insertGetId(
             [
                 'parent_id' => 0,
@@ -84,6 +86,7 @@ class DataFrontDefaultSeeder extends Seeder
             [
                 ['parent_id' => $idBlockSeo,'sort' => 1,'title' => 'admin.menu_titles.seo_meta_settings','icon' => 'fas fa-code','uri' => 'admin::seo_meta','key' => null,'type' => 0],
                 ['parent_id' => $idBlockSeo,'sort' => 2,'title' => 'admin.menu_titles.seo_sitemap_settings','icon' => 'fas fa-sitemap','uri' => 'admin::seo_sitemap','key' => null,'type' => 0],
+                ['parent_id' => $idBlockSeo,'sort' => 3,'title' => 'admin.menu_titles.seo_redirect_settings','icon' => 'fas fa-random','uri' => 'admin::seo_redirect','key' => null,'type' => 0],
             ]
         );
 
@@ -138,6 +141,25 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'admin.seo.jsonld_enabled','text' => 'Enable JSON-LD (Organization/Product/Breadcrumb/Article)','position' => 'admin.seo','location' => 'en'],
                 ['code' => 'admin.seo.jsonld_help','text' => 'Tắt khi cần gỡ lỗi Google Rich Results — ảnh hưởng toàn bộ site (trang chủ, sản phẩm, danh mục, nội dung plugin).','position' => 'admin.seo','location' => 'vi'],
                 ['code' => 'admin.seo.jsonld_help','text' => 'Turn off to debug Google Rich Results issues — affects the whole site (home, products, categories, plugin content).','position' => 'admin.seo','location' => 'en'],
+                // Redirect 301 screen labels (US-SEO-006, modification 20260712T011152).
+                ['code' => 'admin.menu_titles.seo_redirect_settings','text' => 'Redirect 301','position' => 'admin.menu_titles','location' => 'vi'],
+                ['code' => 'admin.menu_titles.seo_redirect_settings','text' => 'Redirect 301','position' => 'admin.menu_titles','location' => 'en'],
+                ['code' => 'admin.seo_redirect.title','text' => 'Redirect 301','position' => 'admin.seo_redirect','location' => 'vi'],
+                ['code' => 'admin.seo_redirect.title','text' => 'Redirect 301','position' => 'admin.seo_redirect','location' => 'en'],
+                ['code' => 'admin.seo_redirect.add_new','text' => 'Thêm redirect','position' => 'admin.seo_redirect','location' => 'vi'],
+                ['code' => 'admin.seo_redirect.add_new','text' => 'Add redirect','position' => 'admin.seo_redirect','location' => 'en'],
+                ['code' => 'admin.seo_redirect.from','text' => 'Từ (URL cũ)','position' => 'admin.seo_redirect','location' => 'vi'],
+                ['code' => 'admin.seo_redirect.from','text' => 'From (old URL)','position' => 'admin.seo_redirect','location' => 'en'],
+                ['code' => 'admin.seo_redirect.to','text' => 'Đến (URL mới)','position' => 'admin.seo_redirect','location' => 'vi'],
+                ['code' => 'admin.seo_redirect.to','text' => 'To (new URL)','position' => 'admin.seo_redirect','location' => 'en'],
+                ['code' => 'admin.seo_redirect.code','text' => 'Mã chuyển hướng','position' => 'admin.seo_redirect','location' => 'vi'],
+                ['code' => 'admin.seo_redirect.code','text' => 'Redirect code','position' => 'admin.seo_redirect','location' => 'en'],
+                ['code' => 'admin.seo_redirect.code_permanent','text' => 'Vĩnh viễn','position' => 'admin.seo_redirect','location' => 'vi'],
+                ['code' => 'admin.seo_redirect.code_permanent','text' => 'Permanent','position' => 'admin.seo_redirect','location' => 'en'],
+                ['code' => 'admin.seo_redirect.code_temporary','text' => 'Tạm thời','position' => 'admin.seo_redirect','location' => 'vi'],
+                ['code' => 'admin.seo_redirect.code_temporary','text' => 'Temporary','position' => 'admin.seo_redirect','location' => 'en'],
+                ['code' => 'admin.seo_redirect.homepage_warning','text' => 'Cảnh báo: đang redirect trang chủ ("/") — mọi khách truy cập trang chủ sẽ bị chuyển hướng.','position' => 'admin.seo_redirect','location' => 'vi'],
+                ['code' => 'admin.seo_redirect.homepage_warning','text' => 'Warning: this redirects the homepage ("/") — every visitor to the homepage will be redirected away.','position' => 'admin.seo_redirect','location' => 'en'],
             ]
         );
 
