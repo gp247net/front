@@ -70,7 +70,7 @@
                     </template>
                 </div>
 
-                <x-gp247::input type="number" min="0" :label="gp247_language_render('admin.core.sort')"
+                <x-gp247::input type="number" min="0" :label="gp247_language_render('admin.sort')"
                     name="sort" wire:model="form.sort" :error="$errors->first('form.sort')" required />
             </div>
 
@@ -123,14 +123,14 @@
             @endif
 
             {{-- Status --}}
-            <x-gp247::checkbox :label="gp247_language_render('admin.core.active')" wire:model="form.status" value="1" />
+            <x-gp247::checkbox :label="gp247_language_render('admin.active')" wire:model="form.status" value="1" />
 
             <div class="flex items-center justify-end gap-2 border-t border-gray-200 pt-4 dark:border-gray-700">
                 <x-gp247::button variant="secondary" href="{{ gp247_route_admin('admin_layout_block.index') }}" wire:navigate>
-                    {{ gp247_language_render('admin.core.cancel') }}
+                    {{ gp247_language_render('admin.cancel') }}
                 </x-gp247::button>
                 <x-gp247::button type="submit" wire:loading.attr="disabled" wire:target="save">
-                    <i class="fas fa-save"></i> {{ gp247_language_render('admin.core.save') }}
+                    <i class="fas fa-save"></i> {{ gp247_language_render('admin.save') }}
                 </x-gp247::button>
             </div>
         </form>

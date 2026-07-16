@@ -20,16 +20,16 @@
         </x-slot:actions>
     </x-gp247::list-toolbar>
 
-    <x-gp247::table :empty="$rows->isEmpty() ? gp247_language_render('admin.core.no_records') : null">
+    <x-gp247::table :empty="$rows->isEmpty() ? gp247_language_render('admin.no_records') : null">
         <x-slot:head>
             <tr>
                 <th class="w-10 px-4 py-3"></th>
                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.banner.image') }}</th>
                 <x-gp247::th-sort field="name" :sort-field="$sortField" :sort-dir="$sortDir">{{ gp247_language_render('admin.banner.title') }}</x-gp247::th-sort>
                 <x-gp247::th-sort field="type" :sort-field="$sortField" :sort-dir="$sortDir">{{ gp247_language_render('admin.banner.type') }}</x-gp247::th-sort>
-                <x-gp247::th-sort field="sort" :sort-field="$sortField" :sort-dir="$sortDir">{{ gp247_language_render('admin.core.sort') }}</x-gp247::th-sort>
-                <x-gp247::th-sort field="status" :sort-field="$sortField" :sort-dir="$sortDir">{{ gp247_language_render('admin.core.status') }}</x-gp247::th-sort>
-                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.core.actions') }}</th>
+                <x-gp247::th-sort field="sort" :sort-field="$sortField" :sort-dir="$sortDir">{{ gp247_language_render('admin.sort') }}</x-gp247::th-sort>
+                <x-gp247::th-sort field="status" :sort-field="$sortField" :sort-dir="$sortDir">{{ gp247_language_render('admin.status') }}</x-gp247::th-sort>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.actions') }}</th>
             </tr>
         </x-slot:head>
 
@@ -52,7 +52,7 @@
                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $row->type }}</td>
                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{{ $row->sort }}</td>
                 <td class="px-4 py-3">
-                    <x-gp247::badge :color="$row->status ? 'green' : 'gray'">{{ $row->status ? gp247_language_render('admin.core.active') : gp247_language_render('admin.core.inactive') }}</x-gp247::badge>
+                    <x-gp247::badge :color="$row->status ? 'green' : 'gray'">{{ $row->status ? gp247_language_render('admin.active') : gp247_language_render('admin.inactive') }}</x-gp247::badge>
                 </td>
                 <td class="px-4 py-3">
                     <x-gp247::row-actions

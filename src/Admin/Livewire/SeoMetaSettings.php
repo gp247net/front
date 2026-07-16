@@ -113,7 +113,7 @@ class SeoMetaSettings extends GP247AdminComponent
         }
 
         $this->upsertConfig(self::CONFIG_ROBOTS, $clean);
-        $this->notify('success', gp247_language_render('admin.core.setting_saved'));
+        $this->notify('success', gp247_language_render('admin.setting_saved'));
     }
 
     /**
@@ -130,7 +130,7 @@ class SeoMetaSettings extends GP247AdminComponent
         $this->authorizeAction('update');
 
         $this->upsertConfig(self::CONFIG_JSONLD_ENABLED, $value ? '1' : '0');
-        $this->notify('success', gp247_language_render('admin.core.setting_saved'));
+        $this->notify('success', gp247_language_render('admin.setting_saved'));
     }
 
     /**

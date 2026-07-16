@@ -69,13 +69,13 @@
                     @error('form.group')<p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                 </div>
 
-                <x-gp247::input type="number" min="0" :label="gp247_language_render('admin.core.sort')"
+                <x-gp247::input type="number" min="0" :label="gp247_language_render('admin.sort')"
                     name="sort" wire:model="form.sort" :error="$errors->first('form.sort')" required />
             </div>
 
             @if ($multiStore)
                 <div class="space-y-1">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">{{ gp247_language_render('admin.core.store') }}</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">{{ gp247_language_render('admin.store') }}</label>
                     <div class="flex flex-wrap gap-3">
                         @foreach ($storeList as $storeId => $storeName)
                             <x-gp247::checkbox :label="$storeName" wire:model="stores" value="{{ $storeId }}" id="lnkm-store-{{ $storeId }}" />
@@ -84,14 +84,14 @@
                 </div>
             @endif
 
-            <x-gp247::checkbox :label="gp247_language_render('admin.core.active')" wire:model="form.status" value="1" />
+            <x-gp247::checkbox :label="gp247_language_render('admin.active')" wire:model="form.status" value="1" />
 
             <div class="flex items-center justify-between border-t border-gray-200 pt-4 dark:border-gray-700">
                 <x-gp247::button variant="secondary" href="{{ gp247_route_admin('admin_link.index') }}" wire:navigate>
-                    {{ gp247_language_render($editingId ? 'admin.core.cancel' : 'admin.core.reset') }}
+                    {{ gp247_language_render($editingId ? 'admin.cancel' : 'admin.reset') }}
                 </x-gp247::button>
                 <x-gp247::button type="submit" wire:loading.attr="disabled">
-                    <i class="fas fa-save"></i> {{ gp247_language_render($editingId ? 'admin.core.update' : 'admin.core.submit') }}
+                    <i class="fas fa-save"></i> {{ gp247_language_render($editingId ? 'admin.update' : 'admin.submit') }}
                 </x-gp247::button>
             </div>
         </form>
@@ -110,7 +110,7 @@
             @endif
         </div>
 
-        <x-gp247::table :empty="$rows->isEmpty() ? gp247_language_render('admin.core.no_records') : null">
+        <x-gp247::table :empty="$rows->isEmpty() ? gp247_language_render('admin.no_records') : null">
             <x-slot:head>
                 <tr>
                     <th class="cursor-pointer px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400" wire:click="setSort('name')">
@@ -123,9 +123,9 @@
                         {{ gp247_language_render('admin.link.group') }} @if ($sortField === 'group')<span class="text-[10px]">{{ $sortDir === 'asc' ? '▲' : '▼' }}</span>@endif
                     </th>
                     <th class="cursor-pointer px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400" wire:click="setSort('status')">
-                        {{ gp247_language_render('admin.core.status') }} @if ($sortField === 'status')<span class="text-[10px]">{{ $sortDir === 'asc' ? '▲' : '▼' }}</span>@endif
+                        {{ gp247_language_render('admin.status') }} @if ($sortField === 'status')<span class="text-[10px]">{{ $sortDir === 'asc' ? '▲' : '▼' }}</span>@endif
                     </th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.core.action') }}</th>
+                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.action') }}</th>
                 </tr>
             </x-slot:head>
 
@@ -144,7 +144,7 @@
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $row->collection->name ?? '-' }}</td>
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $row->group }}</td>
                     <td class="px-4 py-3">
-                        <x-gp247::badge :color="$row->status ? 'green' : 'gray'">{{ $row->status ? gp247_language_render('admin.core.active') : gp247_language_render('admin.core.inactive') }}</x-gp247::badge>
+                        <x-gp247::badge :color="$row->status ? 'green' : 'gray'">{{ $row->status ? gp247_language_render('admin.active') : gp247_language_render('admin.inactive') }}</x-gp247::badge>
                     </td>
                     <td class="px-4 py-3">
                         <div class="flex items-center justify-end gap-1">

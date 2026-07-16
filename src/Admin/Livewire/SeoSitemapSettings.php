@@ -159,7 +159,7 @@ class SeoSitemapSettings extends GP247AdminComponent
         }
 
         $this->upsertConfig(self::CONFIG_EXCLUDE_ALIASES, $clean);
-        $this->notify('success', gp247_language_render('admin.core.setting_saved'));
+        $this->notify('success', gp247_language_render('admin.setting_saved'));
     }
 
     /**
@@ -174,7 +174,7 @@ class SeoSitemapSettings extends GP247AdminComponent
         $this->authorizeAction('update');
 
         $this->upsertConfig(self::CONFIG_INCLUDE_PRODUCTS, $value ? '1' : '0');
-        $this->notify('success', gp247_language_render('admin.core.setting_saved'));
+        $this->notify('success', gp247_language_render('admin.setting_saved'));
     }
 
     /**
@@ -189,7 +189,7 @@ class SeoSitemapSettings extends GP247AdminComponent
         $this->authorizeAction('update');
 
         $this->upsertConfig(self::CONFIG_INCLUDE_CATEGORIES, $value ? '1' : '0');
-        $this->notify('success', gp247_language_render('admin.core.setting_saved'));
+        $this->notify('success', gp247_language_render('admin.setting_saved'));
     }
 
     /**
@@ -208,7 +208,7 @@ class SeoSitemapSettings extends GP247AdminComponent
         $this->authorizeAction('update');
 
         $this->upsertConfig(self::CONFIG_PLUGIN_ENABLED_PREFIX . $key, $value ? '1' : '0');
-        $this->notify('success', gp247_language_render('admin.core.setting_saved'));
+        $this->notify('success', gp247_language_render('admin.setting_saved'));
     }
 
     /**

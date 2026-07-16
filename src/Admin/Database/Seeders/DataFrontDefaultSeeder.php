@@ -455,6 +455,8 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'front.email','text' => 'Email','position' => 'front','location' => 'en'],
                 ['code' => 'front.store_list','text' => 'Cửa hàng','position' => 'front','location' => 'vi'],
                 ['code' => 'front.store_list','text' => 'Store list','position' => 'front','location' => 'en'],
+                ['code' => 'front.view_all','text' => 'Xem tất cả','position' => 'front','location' => 'vi'],
+                ['code' => 'front.view_all','text' => 'View all','position' => 'front','location' => 'en'],
             ]
         );
 
@@ -664,8 +666,8 @@ class DataFrontDefaultSeeder extends Seeder
             ['code' => 'admin.link_group.name',    'text' => 'Tên',                 'position' => 'admin.link_group', 'location' => 'vi'],
 
             // Core
-            ['code' => 'admin.core.store', 'text' => 'Store',    'position' => 'admin.core', 'location' => 'en'],
-            ['code' => 'admin.core.store', 'text' => 'Cửa hàng', 'position' => 'admin.core', 'location' => 'vi'],
+            ['code' => 'admin.store', 'text' => 'Store',    'position' => 'admin.common', 'location' => 'en'],
+            ['code' => 'admin.store', 'text' => 'Cửa hàng', 'position' => 'admin.common', 'location' => 'vi'],
         ]);
 
         // --- FrontSeoLangSeeder (merged) ---

@@ -167,7 +167,7 @@ class PageForm extends FormComponent
     {
         parent::save();
 
-        session()->flash('gp247_admin_success', gp247_language_render('admin.core.save_success'));
+        session()->flash('gp247_admin_success', gp247_language_render('admin.save_success'));
         $this->redirectRoute('admin_page.index', navigate: true);
     }
 
