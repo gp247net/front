@@ -86,7 +86,7 @@
                     <div class="relative hidden lg:block shrink-0" x-data="{ open: false }" @keydown.escape.window="open = false" @click.outside="open = false">
                         <button type="button" @click="open = !open" class="btn-outline btn-sm flex items-center gap-2" :aria-expanded="open.toString()">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-                            {{ gp247_language_quickly('front.all_categories', 'Tất cả danh mục') }}
+                            {{ gp247_language_quickly('front.all_categories', 'All categories') }}
                         </button>
                         <div x-show="open" x-cloak x-transition
                              class="absolute start-0 top-full mt-2 z-40 w-[min(90vw,48rem)] rounded-xl bg-white shadow-soft border border-ink-100 p-6 grid grid-cols-3 gap-x-8 gap-y-6">
