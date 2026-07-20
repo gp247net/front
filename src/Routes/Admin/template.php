@@ -25,5 +25,9 @@ Route::group(['prefix' => 'template'], function () use ($templateController) {
         Route::get('/online', $templateOnlineController.'@index')->name('admin_template_online.index');
         Route::post('/online/install', $templateOnlineController.'@install')
         ->name('admin_template_online.install');
+        Route::post('/online/update', $templateOnlineController.'@update')
+        ->name('admin_template_online.update');
+        Route::post('/online/check-update', $templateOnlineController.'@checkUpdate')
+        ->name('admin_template_online.check-update');
     }
 });

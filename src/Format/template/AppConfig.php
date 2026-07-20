@@ -1,6 +1,6 @@
 <?php
 /**
- * Template format 1.0
+ * Template format 2.0
  */
 #App\GP247\Templates\Extension_Key\AppConfig.php
 namespace App\GP247\Templates\Extension_Key;
