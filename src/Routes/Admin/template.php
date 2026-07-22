@@ -29,5 +29,7 @@ Route::group(['prefix' => 'template'], function () use ($templateController) {
         ->name('admin_template_online.update');
         Route::post('/online/check-update', $templateOnlineController.'@checkUpdate')
         ->name('admin_template_online.check-update');
+        Route::post('/online/save-license', $templateOnlineController.'@saveLicense')
+        ->name('admin_template_online.save-license');
     }
 });
