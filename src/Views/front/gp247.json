@@ -7,8 +7,9 @@
     "configGroup": "Templates",
     "configCode": "GP247Front",
     "configKey": "GP247Front",
-    "version": "1.0",
-    "requireCore": ["1.1"],
+    "version": "2.0",
+    "requireCore": ["2.0"],
+    "requireUpdateFrom": "2.0",
     "requirePackages": ["gp247/front"],
     "requireExtensions": []
 }
