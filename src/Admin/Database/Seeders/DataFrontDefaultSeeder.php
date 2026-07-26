@@ -46,7 +46,7 @@ class DataFrontDefaultSeeder extends Seeder
         $idBlockAdmin = AdminMenu::insertGetId(
             [
                 'parent_id' => 0,
-                'sort'      => 50,
+                'sort'      => 100,
                 'title'     => 'admin.menu_titles.ADMIN_CONTENT',
                 'icon'      => 'nav-icon fas fa-book-open',
                 'key'       => 'ADMIN_CONTENT',
@@ -75,7 +75,7 @@ class DataFrontDefaultSeeder extends Seeder
         $idBlockSeo = AdminMenu::insertGetId(
             [
                 'parent_id' => 0,
-                'sort'      => 55,
+                'sort'      => 70,
                 'title'     => 'admin.menu_titles.ADMIN_SEO',
                 'icon'      => 'nav-icon fas fa-search',
                 'key'       => 'ADMIN_SEO',
