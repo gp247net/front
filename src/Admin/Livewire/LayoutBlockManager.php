@@ -220,13 +220,31 @@ class LayoutBlockManager extends ResourcePanel
     }
 
     /**
+     * Build options for the page-SCOPE multi-select: '*' (all) first, then each
+     * registered page-TYPE from config('gp247-config.front.layout_page').
+     *
+     * WHY: page scope is matched against $layout_page (the page-type each
+     * screen/controller emits) at render time — NOT against CMS page aliases,
+     * which never match. Mirrors positionOptions() ↔ layout_position; each
+     * package registers its own page-types (front: config; shop:
+     * ShopServiceProvider; plugin: Provider). Modification 20260728T224338, ADR
+     * front-admin_layout-block-page-scope-registry.
+     *
      * @return array<int, array{id: string, label: string}>
+     *
+     * @aidlc-unit front-admin
+     * @aidlc-story US-FADM-004
+     * @aidlc-adr ADR-front-admin-layout-block-page-scope
      */
     protected function pageOptions(): array
     {
-        $opts = [['id' => '*', 'label' => gp247_language_render('admin.layout_block_page.all')]];
-        foreach ($this->getListPageBlock() as $alias) {
-            $opts[] = ['id' => $alias, 'label' => $alias];
+        // WHY: prefix each option with its page-type key ("shop_cart — Cart")
+        // so admins can identify exactly which storefront page a block targets
+        // — the key is the token matched against $layout_page at render — and
+        // can filter the searchable-select by typing the key.
+        $opts = [['id' => '*', 'label' => '* — ' . gp247_language_render('admin.layout_block_page.all')]];
+        foreach ((array) config('gp247-config.front.layout_page', []) as $code => $langKey) {
+            $opts[] = ['id' => (string) $code, 'label' => $code . ' — ' . gp247_language_render((string) $langKey)];
         }
         return $opts;
     }

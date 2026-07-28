@@ -16,8 +16,16 @@ use Illuminate\Contracts\View\View;
  * The "text" content field switches per type on Livewire re-render:
  *   html  → TinyMCE rich editor
  *   view  → select of template block view files (blocks/*.blade.php)
- *   page  → select of store page aliases
+ *   page  → select of CMS page aliases (content pulled from FrontPage)
  * No jQuery, no AJAX — lists are resolved server-side in render().
+ *
+ * The "page" SCOPE field (which storefront pages a block appears on) is a
+ * separate concern from the type=page content select above: it lists
+ * page-TYPES (front_home, shop_item_list, shop_cart, front_page_detail, ...)
+ * from the runtime registry config('gp247-config.front.layout_page'), because
+ * at render time layout->page is matched against $layout_page — the page-type
+ * each screen/controller emits — not against a CMS alias (ADR
+ * front-admin_layout-block-page-scope-registry).
  *
  * @aidlc-unit front-admin
  * @aidlc-story US-FADM-004
@@ -201,18 +209,27 @@ class LayoutBlockForm extends FormComponent
 
     /**
      * Build options array for the page-scope multi-select: '*' (all) first,
-     * then each store page alias, formatted for <x-gp247::searchable-select>.
+     * then each registered page-TYPE, formatted for <x-gp247::searchable-select>.
      *
      * @return array<int, array{id: string, label: string}>
      *
      * @aidlc-unit front-admin
      * @aidlc-story US-FADM-004
+     * @aidlc-adr ADR-front-admin-layout-block-page-scope
      */
     protected function pageOptions(): array
     {
-        $opts = [['id' => '*', 'label' => gp247_language_render('admin.layout_block_page.all')]];
-        foreach ($this->getListPageBlock() as $alias) {
-            $opts[] = ['id' => $alias, 'label' => $alias];
+        // WHY: page-SCOPE options are page-TYPES matched against $layout_page at
+        // render time, sourced from the runtime registry (mirrors
+        // positionOptions() ↔ layout_position); each package registers its own
+        // page-types (front: config; shop: ShopServiceProvider; plugin:
+        // Provider). CMS page aliases never match $layout_page, so they are NOT
+        // used here (ADR front-admin_layout-block-page-scope-registry). Label is
+        // prefixed with the key ("shop_cart — Cart") so admins can identify and
+        // filter by the exact page-type token.
+        $opts = [['id' => '*', 'label' => '* — ' . gp247_language_render('admin.layout_block_page.all')]];
+        foreach ((array) config('gp247-config.front.layout_page', []) as $code => $langKey) {
+            $opts[] = ['id' => (string) $code, 'label' => $code . ' — ' . gp247_language_render((string) $langKey)];
         }
         return $opts;
     }

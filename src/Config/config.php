@@ -23,13 +23,17 @@ return [
         'GP247_TEMPLATE_FRONT_DEFAULT' => env('GP247_TEMPLATE_FRONT_DEFAULT', 'GP247Front'),
         'GP247_SUFFIX_URL'    => env('GP247_SUFFIX_URL', '.html'), //Suffix url, ex: domain.com/news/1.html 
 
+        // Page-type registry for LayoutBlock "Page" scope (matched at render
+        // against $layout_page). Runtime-append: shop adds its page-types in
+        // ShopServiceProvider, plugins in their Provider (same idiom as
+        // seo_sitemap_providers). Keep ONLY tokens some screen/controller
+        // actually emits — stale front_contact/front_about/front_news_* were
+        // removed (modification 20260728T224338, ADR
+        // front-admin_layout-block-page-scope-registry): no screen emitted them
+        // and news is owned by the News plugin (news_index/category/detail).
         'layout_page' => [
             'front_home' => 'admin.layout_block_page.home',
-            'front_contact' => 'admin.layout_block_page.contact',
-            'front_about' => 'admin.layout_block_page.about',
             'front_page_detail' => 'admin.layout_block_page.page_detail',
-            'front_news_list' => 'admin.layout_block_page.news_list',
-            'front_news_detail' => 'admin.layout_block_page.news_detail',
             'front_search' => 'admin.layout_block_page.search',
         ],
         // Sitemap URL providers contributed by plugins (US-PLG-007, ADR
