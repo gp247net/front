@@ -81,6 +81,7 @@
                 :options="$pageOptions"
                 :error="$errors->first('form.page')"
                 multiple
+                allow-custom
                 required />
 
             {{-- Content field: switches per type on Livewire re-render --}}

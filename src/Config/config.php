@@ -24,18 +24,13 @@ return [
         'GP247_SUFFIX_URL'    => env('GP247_SUFFIX_URL', '.html'), //Suffix url, ex: domain.com/news/1.html 
 
         // Page-type registry for LayoutBlock "Page" scope (matched at render
-        // against $layout_page). Runtime-append: shop adds its page-types in
-        // ShopServiceProvider, plugins in their Provider (same idiom as
-        // seo_sitemap_providers). Keep ONLY tokens some screen/controller
-        // actually emits — stale front_contact/front_about/front_news_* were
-        // removed (modification 20260728T224338, ADR
-        // front-admin_layout-block-page-scope-registry): no screen emitted them
-        // and news is owned by the News plugin (news_index/category/detail).
-        'layout_page' => [
-            'front_home' => 'admin.layout_block_page.home',
-            'front_page_detail' => 'admin.layout_block_page.page_detail',
-            'front_search' => 'admin.layout_block_page.search',
-        ],
+        // against $layout_page). Base = front's own page-types, sourced from the
+        // FrontLayoutPage enum — single source of truth (token + label +
+        // registration in one place; ADR front-admin_layout-page-enum-catalog,
+        // modification 20260729T054157). Runtime-append: shop adds its page-types
+        // in ShopServiceProvider, plugins in their Provider (same idiom as
+        // seo_sitemap_providers).
+        'layout_page' => \GP247\Front\Support\FrontLayoutPage::registry(),
         // Sitemap URL providers contributed by plugins (US-PLG-007, ADR
         // seo_plugin-sitemap-extension): each plugin appends a [Class, 'method']
         // callable to this array from its own Provider.php (same runtime-append

@@ -4,6 +4,7 @@ namespace GP247\Front\Controllers;
 use GP247\Front\Controllers\RootFrontController;
 use GP247\Front\Models\FrontPage;
 use GP247\Front\Models\FrontBanner;
+use GP247\Front\Support\FrontLayoutPage;
 
 class HomeController extends RootFrontController
 {
@@ -26,7 +27,7 @@ class HomeController extends RootFrontController
                 'description' => gp247_store_info('description'),
                 'storeId'     => config('app.storeId'),
                 'contentHome' => $contentHome,
-                'layout_page' => 'front_home',
+                'layout_page' => FrontLayoutPage::Home->value,
             )
         );
     }
@@ -68,7 +69,7 @@ class HomeController extends RootFrontController
                     'keyword'     => $page->keyword,
                     'page'        => $page,
                     'og_image'    => gp247_file($page->getImage()),
-                    'layout_page' => 'front_page_detail',
+                    'layout_page' => FrontLayoutPage::PageDetail->value,
                     'breadcrumbs' => [
                         ['url'    => '', 'title' => $page->name],
                     ],
@@ -111,6 +112,11 @@ class HomeController extends RootFrontController
             } else {
                 $itemsList = collect([]);
             }
+            // WHY: 'shop_search' is a shop-owned page-type (ShopLayoutPage::Search),
+            // but front must not hard-reference a shop class (NFR-MAINT-001 — front
+            // stays installable without shop). This unified search controller only
+            // reaches here when shop is present (class_exists guard above), so the
+            // literal token is kept rather than importing ShopLayoutPage.
             $layout_page = 'shop_search';
             $subPath = 'screen.shop_search';
             $view = gp247_shop_process_view($this->GP247TemplatePath, $subPath);
@@ -137,7 +143,7 @@ class HomeController extends RootFrontController
                 }
             }
             $view = $this->GP247TemplatePath . '.screen.front_search';
-            $layout_page = 'front_search';
+            $layout_page = FrontLayoutPage::Search->value;
         }
 
         gp247_check_view($view);
