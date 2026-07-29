@@ -197,10 +197,6 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'admin.menu_titles.link_block','text' => 'Link manager','position' => 'admin.menu_titles','location' => 'en'],
                 ['code' => 'admin.menu_titles.page_manager','text' => 'Quản lý trang','position' => 'admin.menu_titles','location' => 'vi'],
                 ['code' => 'admin.menu_titles.page_manager','text' => 'Page manager','position' => 'admin.menu_titles','location' => 'en'],
-                ['code' => 'admin.menu_titles.banner','text' => 'Banner','position' => 'admin.menu_titles','location' => 'vi'],
-                ['code' => 'admin.menu_titles.banner','text' => 'Banners','position' => 'admin.menu_titles','location' => 'en'],
-                ['code' => 'admin.menu_titles.page_manager','text' => 'Quản lý trang','position' => 'admin.menu_titles','location' => 'vi'],
-                ['code' => 'admin.menu_titles.page_manager','text' => 'Page manager','position' => 'admin.menu_titles','location' => 'en'],
                 ['code' => 'admin.link.list','text' => 'Danh sách liên kết','position' => 'admin.link','location' => 'vi'],
                 ['code' => 'admin.link.list','text' => 'Link list','position' => 'admin.link','location' => 'en'],
                 ['code' => 'admin.link.type','text' => 'Loại liên kết','position' => 'admin.link','location' => 'vi'],
@@ -447,8 +443,6 @@ class DataFrontDefaultSeeder extends Seeder
                 ['code' => 'front.search','text' => 'Search','position' => 'front','location' => 'en'],
                 ['code' => 'front.search_result','text' => 'Kết quả tìm kiếm','position' => 'front','location' => 'vi'],
                 ['code' => 'front.search_result','text' => 'Search result','position' => 'front','location' => 'en'],
-                ['code' => 'front.view_not_exist','text' => 'Không có view :view','position' => 'front','location' => 'vi'],
-                ['code' => 'front.view_not_exist','text' => 'View not found :view','position' => 'front','location' => 'en'],
                 ['code' => 'front.welcome_back','text' => 'Chào mừng trở lại','position' => 'front','location' => 'vi'],
                 ['code' => 'front.welcome_back','text' => 'Welcome back!','position' => 'front','location' => 'en'],
                 ['code' => 'front.email','text' => 'Email','position' => 'front','location' => 'vi'],
@@ -588,18 +582,6 @@ class DataFrontDefaultSeeder extends Seeder
         // --- FrontAdminLangSeeder (merged) ---
         Languages::insertOrIgnore([
             // Banner
-            ['code' => 'admin.banner.title',   'text' => 'Banners',     'position' => 'admin.banner', 'location' => 'en'],
-            ['code' => 'admin.banner.title',   'text' => 'Banner',      'position' => 'admin.banner', 'location' => 'vi'],
-            ['code' => 'admin.banner.add_new', 'text' => 'New banner',  'position' => 'admin.banner', 'location' => 'en'],
-            ['code' => 'admin.banner.add_new', 'text' => 'Thêm banner', 'position' => 'admin.banner', 'location' => 'vi'],
-            ['code' => 'admin.banner.image',   'text' => 'Image',       'position' => 'admin.banner', 'location' => 'en'],
-            ['code' => 'admin.banner.image',   'text' => 'Hình ảnh',    'position' => 'admin.banner', 'location' => 'vi'],
-            ['code' => 'admin.banner.url',     'text' => 'URL',         'position' => 'admin.banner', 'location' => 'en'],
-            ['code' => 'admin.banner.url',     'text' => 'Đường dẫn',   'position' => 'admin.banner', 'location' => 'vi'],
-            ['code' => 'admin.banner.type',    'text' => 'Type',        'position' => 'admin.banner', 'location' => 'en'],
-            ['code' => 'admin.banner.type',    'text' => 'Loại',        'position' => 'admin.banner', 'location' => 'vi'],
-            ['code' => 'admin.banner.target',  'text' => 'Target',      'position' => 'admin.banner', 'location' => 'en'],
-            ['code' => 'admin.banner.target',  'text' => 'Mở tại',      'position' => 'admin.banner', 'location' => 'vi'],
             ['code' => 'admin.banner.html',    'text' => 'HTML content', 'position' => 'admin.banner', 'location' => 'en'],
             ['code' => 'admin.banner.html',    'text' => 'Nội dung HTML', 'position' => 'admin.banner', 'location' => 'vi'],
 
@@ -608,48 +590,15 @@ class DataFrontDefaultSeeder extends Seeder
             ['code' => 'admin.banner_type.title',   'text' => 'Loại banner',      'position' => 'admin.banner_type', 'location' => 'vi'],
             ['code' => 'admin.banner_type.add_new', 'text' => 'New banner type',  'position' => 'admin.banner_type', 'location' => 'en'],
             ['code' => 'admin.banner_type.add_new', 'text' => 'Thêm loại banner', 'position' => 'admin.banner_type', 'location' => 'vi'],
-            ['code' => 'admin.banner_type.code',    'text' => 'Code',             'position' => 'admin.banner_type', 'location' => 'en'],
-            ['code' => 'admin.banner_type.code',    'text' => 'Mã',               'position' => 'admin.banner_type', 'location' => 'vi'],
-            ['code' => 'admin.banner_type.name',    'text' => 'Name',             'position' => 'admin.banner_type', 'location' => 'en'],
-            ['code' => 'admin.banner_type.name',    'text' => 'Tên',              'position' => 'admin.banner_type', 'location' => 'vi'],
 
             // Page
-            ['code' => 'admin.page.title',       'text' => 'Pages',          'position' => 'admin.page', 'location' => 'en'],
-            ['code' => 'admin.page.title',       'text' => 'Trang nội dung', 'position' => 'admin.page', 'location' => 'vi'],
-            ['code' => 'admin.page.add_new',     'text' => 'New page',       'position' => 'admin.page', 'location' => 'en'],
             ['code' => 'admin.page.add_new',     'text' => 'Thêm trang',     'position' => 'admin.page', 'location' => 'vi'],
             ['code' => 'admin.page.title_field', 'text' => 'Title',          'position' => 'admin.page', 'location' => 'en'],
             ['code' => 'admin.page.title_field', 'text' => 'Tiêu đề',        'position' => 'admin.page', 'location' => 'vi'],
-            ['code' => 'admin.page.image',       'text' => 'Image',          'position' => 'admin.page', 'location' => 'en'],
-            ['code' => 'admin.page.image',       'text' => 'Hình ảnh',       'position' => 'admin.page', 'location' => 'vi'],
-            ['code' => 'admin.page.alias',       'text' => 'Alias',          'position' => 'admin.page', 'location' => 'en'],
-            ['code' => 'admin.page.alias',       'text' => 'Đường dẫn',      'position' => 'admin.page', 'location' => 'vi'],
-            ['code' => 'admin.page.keyword',     'text' => 'Keyword',        'position' => 'admin.page', 'location' => 'en'],
-            ['code' => 'admin.page.keyword',     'text' => 'Từ khóa',        'position' => 'admin.page', 'location' => 'vi'],
-            ['code' => 'admin.page.description', 'text' => 'Description',    'position' => 'admin.page', 'location' => 'en'],
-            ['code' => 'admin.page.description', 'text' => 'Mô tả',          'position' => 'admin.page', 'location' => 'vi'],
-            ['code' => 'admin.page.content',     'text' => 'Content',        'position' => 'admin.page', 'location' => 'en'],
-            ['code' => 'admin.page.content',     'text' => 'Nội dung',       'position' => 'admin.page', 'location' => 'vi'],
-            ['code' => 'admin.page.status',      'text' => 'Status',         'position' => 'admin.page', 'location' => 'en'],
-            ['code' => 'admin.page.status',      'text' => 'Trạng thái',     'position' => 'admin.page', 'location' => 'vi'],
 
             // Link
             ['code' => 'admin.link.title',           'text' => 'Links',            'position' => 'admin.link', 'location' => 'en'],
             ['code' => 'admin.link.title',           'text' => 'Liên kết',         'position' => 'admin.link', 'location' => 'vi'],
-            ['code' => 'admin.link.add_new',         'text' => 'New link',         'position' => 'admin.link', 'location' => 'en'],
-            ['code' => 'admin.link.add_new',         'text' => 'Thêm liên kết',    'position' => 'admin.link', 'location' => 'vi'],
-            ['code' => 'admin.link.name',            'text' => 'Name',             'position' => 'admin.link', 'location' => 'en'],
-            ['code' => 'admin.link.name',            'text' => 'Tên',              'position' => 'admin.link', 'location' => 'vi'],
-            ['code' => 'admin.link.url',             'text' => 'URL',              'position' => 'admin.link', 'location' => 'en'],
-            ['code' => 'admin.link.url',             'text' => 'Đường dẫn',        'position' => 'admin.link', 'location' => 'vi'],
-            ['code' => 'admin.link.target',          'text' => 'Target',           'position' => 'admin.link', 'location' => 'en'],
-            ['code' => 'admin.link.target',          'text' => 'Mở tại',           'position' => 'admin.link', 'location' => 'vi'],
-            ['code' => 'admin.link.group',           'text' => 'Group',            'position' => 'admin.link', 'location' => 'en'],
-            ['code' => 'admin.link.group',           'text' => 'Nhóm',             'position' => 'admin.link', 'location' => 'vi'],
-            ['code' => 'admin.link.collection',      'text' => 'Collection',       'position' => 'admin.link', 'location' => 'en'],
-            ['code' => 'admin.link.collection',      'text' => 'Bộ sưu tập',       'position' => 'admin.link', 'location' => 'vi'],
-            ['code' => 'admin.link.type',            'text' => 'Type',             'position' => 'admin.link', 'location' => 'en'],
-            ['code' => 'admin.link.type',            'text' => 'Loại',             'position' => 'admin.link', 'location' => 'vi'],
             ['code' => 'admin.link.type_single',     'text' => 'Single link',      'position' => 'admin.link', 'location' => 'en'],
             ['code' => 'admin.link.type_single',     'text' => 'Liên kết đơn',     'position' => 'admin.link', 'location' => 'vi'],
             ['code' => 'admin.link.type_collection', 'text' => 'Collection',       'position' => 'admin.link', 'location' => 'en'],
@@ -660,23 +609,13 @@ class DataFrontDefaultSeeder extends Seeder
             ['code' => 'admin.link_group.title',   'text' => 'Nhóm liên kết',       'position' => 'admin.link_group', 'location' => 'vi'],
             ['code' => 'admin.link_group.add_new', 'text' => 'New link group',      'position' => 'admin.link_group', 'location' => 'en'],
             ['code' => 'admin.link_group.add_new', 'text' => 'Thêm nhóm liên kết', 'position' => 'admin.link_group', 'location' => 'vi'],
-            ['code' => 'admin.link_group.code',    'text' => 'Code',                'position' => 'admin.link_group', 'location' => 'en'],
-            ['code' => 'admin.link_group.code',    'text' => 'Mã',                  'position' => 'admin.link_group', 'location' => 'vi'],
-            ['code' => 'admin.link_group.name',    'text' => 'Name',                'position' => 'admin.link_group', 'location' => 'en'],
-            ['code' => 'admin.link_group.name',    'text' => 'Tên',                 'position' => 'admin.link_group', 'location' => 'vi'],
 
             // Core
-            ['code' => 'admin.store', 'text' => 'Store',    'position' => 'admin.common', 'location' => 'en'],
-            ['code' => 'admin.store', 'text' => 'Cửa hàng', 'position' => 'admin.common', 'location' => 'vi'],
         ]);
 
         // --- FrontSeoLangSeeder (merged) ---
         Languages::insertOrIgnore([
             // 404 page
-            ['code' => 'front.404',        'text' => 'Trang không tìm thấy',                 'position' => 'front', 'location' => 'vi'],
-            ['code' => 'front.404',        'text' => 'Page Not Found',                        'position' => 'front', 'location' => 'en'],
-            ['code' => 'front.404_detail', 'text' => 'Trang bạn tìm không tồn tại.',         'position' => 'front', 'location' => 'vi'],
-            ['code' => 'front.404_detail', 'text' => 'The page you requested was not found.', 'position' => 'front', 'location' => 'en'],
 
             // Sitemap
             ['code' => 'front.seo.sitemap_title',   'text' => 'Sơ đồ trang',     'position' => 'front.seo', 'location' => 'vi'],
