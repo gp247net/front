@@ -1,15 +1,13 @@
-<p align="center">
-    <img src="https://static.gp247.net/logo/logo.png" width="150">
-</p>
-<p align="center">Front-end package for GP247<br>
-    <code><b>composer require gp247/front</b></code></p>
+![GP247](https://static.gp247.net/logo/logo.png)
 
-<p align="center">
-<a href="https://packagist.org/packages/gp247/front"><img src="https://poser.pugx.org/gp247/front/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/gp247/front"><img src="https://poser.pugx.org/gp247/front/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/gp247/front"><img src="https://poser.pugx.org/gp247/front/license.svg" alt="License"></a>
-<a href="https://deepwiki.com/gp247net/front"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
-</p>
+Front-end package for GP247
+
+`composer require gp247/front`
+
+[![Total Downloads](https://poser.pugx.org/gp247/front/d/total.svg)](https://packagist.org/packages/gp247/front)
+[![Latest Stable Version](https://poser.pugx.org/gp247/front/v/stable.svg)](https://packagist.org/packages/gp247/front)
+[![License](https://poser.pugx.org/gp247/front/license.svg)](https://packagist.org/packages/gp247/front)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/gp247net/front)
 
 
 ## Introduction
