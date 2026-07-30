@@ -1,4 +1,13 @@
-![GP247](https://static.gp247.net/logo/logo.png)
+```
+  _____  _____     ___  _  _   _____ 
+ / ____|  __ \   |__ \| || | |___  |
+| |  __| |__) |     ) | || |_   / / 
+| | |_ |  ___/     / /|__   _| / /  
+| |__| | |        / /_   | |  / /   
+ \_____|_|       |____|  |_| /_/    
+```
+
+> 🌐 **Language:** 🇬🇧 English (current) · [🇻🇳 Tiếng Việt](readme_vi.md)
 
 Front-end package for GP247
 
