@@ -73,12 +73,17 @@ class SeoMeta
             return [];
         }
 
-        $languages = \GP247\Core\Models\AdminLanguage::getAll();
+        // WHY getListActive() + $lang->code: AdminLanguage has no getAll()
+        // method and no `language` column — the model keys active languages by
+        // their `code` column (fixed in modification 20260802T080856; the old
+        // getAll()/`$lang->language` form threw and was never reached because
+        // no controller wired this helper yet — US-SEO-003 <head> wiring).
+        $languages = \GP247\Core\Models\AdminLanguage::getListActive();
         $links     = [];
 
         foreach ($languages as $lang) {
-            $params         = array_merge($routeParams, ['lang' => $lang->language]);
-            $links[$lang->language] = gp247_route_front($routeName, $params);
+            $params              = array_merge($routeParams, ['lang' => $lang->code]);
+            $links[$lang->code]  = gp247_route_front($routeName, $params);
         }
 
         return $links;

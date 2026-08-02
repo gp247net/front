@@ -12,6 +12,14 @@ $suffix = GP247_SUFFIX_URL;
 $seoController = gp247_namespace(SeoController::class);
 
 Route::get('/sitemap.xml', $seoController . '@sitemap')->name('front.sitemap');
+// Child sitemaps for paginated stores: /sitemap-{type}[-{lang}]-{page}.xml
+// (e.g. /sitemap-products-vi-1.xml). Registered before the {alias}.html
+// catch-all; the segment is validated by SitemapBuilder (invalid ⇒ 404).
+Route::get('/sitemap-{segment}.xml', $seoController . '@sitemapSegment')
+    ->where('segment', '[A-Za-z0-9\-]+')
+    ->name('front.sitemap.segment');
+// Human-readable stylesheet referenced by the sitemaps' xml-stylesheet PI.
+Route::get('/sitemap.xsl', $seoController . '@sitemapStylesheet')->name('front.sitemap.xsl');
 Route::get('/robots.txt',  $seoController . '@robots')->name('front.robots');
 
 $homeController = gp247_namespace(HomeController::class);

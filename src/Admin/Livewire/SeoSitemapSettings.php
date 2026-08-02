@@ -5,7 +5,6 @@ namespace GP247\Front\Admin\Livewire;
 use GP247\Core\AdminShell\Infrastructure\GP247AdminComponent;
 use GP247\Core\Models\AdminConfig;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * "Sitemap.xml" admin screen — single-record settings screen (ADR-005
@@ -214,6 +213,11 @@ class SeoSitemapSettings extends GP247AdminComponent
     /**
      * Force the sitemap cache to rebuild on the next visit (Layer-2 gated).
      *
+     * WHY a version bump instead of Cache::forget: a paginated sitemap spans
+     * many dynamic cache keys (the root index plus one per child segment). One
+     * version increment invalidates them all at once without enumerating the
+     * segment list — see {@see \GP247\Front\Controllers\SeoController::bumpCacheVersion()}.
+     *
      * @return void
      * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When denied.
      */
@@ -221,7 +225,7 @@ class SeoSitemapSettings extends GP247AdminComponent
     {
         $this->authorizeAction('update');
 
-        Cache::forget('gp247_sitemap_' . $this->storeId());
+        \GP247\Front\Controllers\SeoController::bumpCacheVersion($this->storeId());
         $this->notify('success', gp247_language_render('admin.seo.sitemap_rebuilt'));
     }
 
