@@ -218,6 +218,13 @@ class PageManager extends ResourcePanel
         if (gp247_store_check_multi_partner_installed() || gp247_store_check_multi_store_installed()) {
             $page->stores()->sync($this->stores);
         }
+
+        // WHY: FrontPage::getListTitleAdmin() caches page-title lists per store x
+        // locale; without this the admin dropdown would serve stale titles until the
+        // TTL expires. Version-bump invalidates every variant at once (RISK-TECH-cache-stale-key).
+        if (function_exists('gp247_cache_clear')) {
+            gp247_cache_clear('cache_page');
+        }
     }
 
     /**
@@ -229,6 +236,11 @@ class PageManager extends ResourcePanel
         $model = FrontPage::find($id);
         if ($model !== null) {
             $model->delete();
+            // WHY: keep the cached page-title dropdown consistent after a delete
+            // (same reason as persist()); version-bump clears every store x locale.
+            if (function_exists('gp247_cache_clear')) {
+                gp247_cache_clear('cache_page');
+            }
         }
     }
 

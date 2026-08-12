@@ -270,7 +270,11 @@ class FrontPage extends Model
         $tableDescription = (new FrontPageDescription)->getTable();
         $table = (new AdminPage)->getTable();
         if (gp247_config_global('cache_status') && gp247_config_global('cache_page')) {
-            if (!Cache::has($storeCache.'_cache_page_'.gp247_get_locale())) {
+            // Embed the group version so gp247_cache_clear('cache_page') (a version
+            // bump) invalidates every store x locale variant at once — the `database`
+            // cache driver cannot wildcard-forget the old per-store/locale keys.
+            $cacheKey = $storeCache.'_cache_page_'.gp247_get_locale().'_v'.gp247_cache_version('page');
+            if (!Cache::has($cacheKey)) {
                 if (self::$getListTitleAdmin === null) {
                     $data = self::join($tableDescription, $tableDescription.'.page_id', $table.'.id')
                     ->where('lang', gp247_get_locale());
@@ -282,9 +286,9 @@ class FrontPage extends Model
                     $data = $data->pluck('name', 'id')->toArray();
                     self::$getListTitleAdmin = $data;
                 }
-                gp247_cache_set($storeCache.'_cache_page_'.gp247_get_locale(), self::$getListTitleAdmin);
+                gp247_cache_set($cacheKey, self::$getListTitleAdmin);
             }
-            return Cache::get($storeCache.'_cache_page_'.gp247_get_locale());
+            return Cache::get($cacheKey);
         } else {
             if (self::$getListTitleAdmin === null) {
                 $data = self::join($tableDescription, $tableDescription.'.page_id', $table.'.id')
