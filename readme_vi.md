@@ -9,7 +9,7 @@
 
 > 🌐 **Ngôn ngữ:** 🇻🇳 Tiếng Việt (hiện tại) · [🇬🇧 English](readme.md)
 
-Gói xử lý giao diện cho gp247
+Gói nền tảng frontend & CMS cho GP247
 
 `composer require gp247/front`
 
@@ -20,13 +20,16 @@ Gói xử lý giao diện cho gp247
 
 ## Giới thiệu
 
-GP247/Front là một gói CMS (Hệ thống Quản lý Nội dung) toàn diện cho doanh nghiệp, cung cấp các tính năng:
+GP247/Front là **gói nền tảng cho toàn bộ tầng frontend** của GP247 — không phải lớp giao diện/theme thuần túy. Gói này vừa cung cấp **website công khai (storefront)** và **hệ quản lý nội dung (CMS)**, vừa là **hạ tầng dùng chung** để các gói frontend khác (như `gp247/shop`) kế thừa. Đây là thành phần **bắt buộc** cho một site GP247 đầy đủ, đóng vai trò cho tầng frontend tương tự như `gp247/core` cho tầng quản trị.
 
-- Quản lý Nội dung Trang
-- Hệ thống Mẫu Linh hoạt
-- Hệ thống Plugin Mở rộng
-- Quản lý Điều hướng & Liên kết
-- Tích hợp Biểu mẫu Liên hệ & Đăng ký
+Các tính năng chính:
+
+- Quản lý nội dung trang (Page / CMS)
+- Hệ thống template linh hoạt + cơ chế resolve view theo template đang dùng
+- Hệ thống plugin mở rộng
+- Quản lý điều hướng, menu, liên kết & banner
+- Tích hợp biểu mẫu liên hệ & đăng ký
+- Hạ tầng dùng chung cho frontend (base Livewire component, layout, route) để các gói khác cắm vào
 
 ## Cài đặt
 

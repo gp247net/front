@@ -9,7 +9,7 @@
 
 > 🌐 **Language:** 🇬🇧 English (current) · [🇻🇳 Tiếng Việt](readme_vi.md)
 
-Front-end package for GP247
+Frontend foundation & CMS package for GP247
 
 `composer require gp247/front`
 
@@ -21,13 +21,16 @@ Front-end package for GP247
 
 ## Introduction
 
-GP247/Front is a comprehensive CMS (Content Management System) package for businesses, providing features:
+GP247/Front is the **foundation package for GP247's entire frontend tier** — not a mere presentation/theme layer. It provides both the **public-facing storefront** and a **content management system (CMS)**, and serves as the **shared infrastructure** that other frontend packages (such as `gp247/shop`) build on. It is a **required** component of a full GP247 site, playing the role for the frontend tier that `gp247/core` plays for the admin tier.
 
-- Page Content Management
-- Flexible Template System
-- Extensible Plugin System  
-- Navigation & Link Management
-- Integrated Contact & Subscription Forms
+Key features:
+
+- Page content management (Page / CMS)
+- Flexible template system + active-template view resolution
+- Extensible plugin system
+- Navigation, menu, link & banner management
+- Integrated contact & subscription forms
+- Shared frontend infrastructure (base Livewire components, layout, routes) for other packages to plug into
 
 ## Installation
 

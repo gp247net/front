@@ -1,6 +1,6 @@
 {
   "name": "gp247/front",
-  "description": "Process front for gp247",
+  "description": "Frontend foundation & CMS package for GP247",
   "keywords": ["gp247","front"],
   "homepage": "https://gp247.net",
   "license": "MIT",
