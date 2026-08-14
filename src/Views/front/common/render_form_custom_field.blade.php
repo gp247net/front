@@ -13,15 +13,23 @@
     Bootstrap templates; only value escaping is reused from it (gp247_form_render_escape)
     to keep the P0 output-encoding contract (decode-then-encode, no double-encode).
 
-    Variables (unchanged from vendor):
+    Variables:
     - $object: model instance (or []) passed by the including view
+    - $customFieldType: optional prefixed table name (e.g. gp247_shop_customer)
+      supplied by the including view when no model is bound (register form), so
+      the EAV type is still known and required fields render.
 
     @aidlc-unit frontend-template-dev
     @aidlc-story US-TPL-009, US-CMP-custom-field-hardening
     @aidlc-adr ADR-014, ADR-compat-foundation-custom-field-integrity
 --}}
 @php
-    $type = is_object($object) ? $object->getTable() : '';
+    // WHY: registration binds no model ($object = []), so getTable() cannot supply
+    // the EAV type; the including view passes it as $customFieldType. This is the
+    // render half of the register POST validator's contract (customer.php always
+    // validates customer custom fields). A bound model still wins for profile/admin,
+    // where $customFieldType is inert. See modification 20260814T140030.
+    $type = is_object($object) ? $object->getTable() : ($customFieldType ?? '');
     $fields = is_object($object) ? $object->getCustomFields() : [];
     $customFields = gp247_custom_field_list($type);
 @endphp
