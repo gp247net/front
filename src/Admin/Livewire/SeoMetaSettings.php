@@ -4,6 +4,7 @@ namespace GP247\Front\Admin\Livewire;
 
 use GP247\Core\AdminShell\Infrastructure\GP247AdminComponent;
 use GP247\Core\Models\AdminConfig;
+use GP247\Front\Controllers\SeoController;
 use Illuminate\Contracts\View\View;
 
 /**
@@ -37,8 +38,6 @@ class SeoMetaSettings extends GP247AdminComponent
     /** `admin_config.value` is VARCHAR(500) — shared by every config key in the system. */
     private const CONFIG_VALUE_MAX_LENGTH = 500;
 
-    /** Same default `SeoController::robots()` falls back to when no custom value is saved. */
-    private const DEFAULT_ROBOTS = "User-agent: *\nDisallow: /admin/\nDisallow: /gp247-admin/\n";
 
     /** @var string Current robots.txt body (bound to the textarea). */
     public string $robotsTxt = '';
@@ -73,7 +72,11 @@ class SeoMetaSettings extends GP247AdminComponent
 
         $storeId = $this->storeId();
 
-        $this->robotsTxt = (string) gp247_config(self::CONFIG_ROBOTS, $storeId, self::DEFAULT_ROBOTS);
+        // WHY reuse SeoController::defaultRobots(): the editor prefill must match
+        // exactly what SeoController::robots() serves when nothing is saved yet —
+        // including the configurable admin prefix (default `gp247_admin`), so a
+        // single source of truth prevents the two from drifting.
+        $this->robotsTxt = (string) gp247_config(self::CONFIG_ROBOTS, $storeId, SeoController::defaultRobots());
         $this->jsonldEnabled = gp247_config(self::CONFIG_JSONLD_ENABLED, $storeId, '1') != '0';
     }
 

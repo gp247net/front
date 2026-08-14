@@ -126,7 +126,7 @@ class SeoController extends RootFrontController
         if ($custom) {
             $content = $custom;
         } else {
-            $content = "User-agent: *\nDisallow: /admin/\nDisallow: /gp247-admin/\n";
+            $content = self::defaultRobots();
         }
 
         // Always append the Sitemap directive so crawlers can discover it.
@@ -138,6 +138,28 @@ class SeoController extends RootFrontController
         return response($content, 200, [
             'Content-Type' => 'text/plain; charset=UTF-8',
         ]);
+    }
+
+    /**
+     * Default robots.txt body used when no custom value has been saved.
+     *
+     * WHY the admin Disallow is built from config, not hardcoded: the admin
+     * path prefix is configurable (`GP247_ADMIN_PREFIX`, default `gp247_admin`).
+     * A hardcoded literal (the old `/gp247-admin/`) both used the wrong
+     * separator and failed to track a site that customized the prefix — leaving
+     * the real admin path crawlable while blocking a path that does not exist.
+     * The `SeoMetaSettings` screen reuses this so its editor prefill matches.
+     *
+     * @return string robots.txt body (no trailing Sitemap directive).
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-004
+     */
+    public static function defaultRobots(): string
+    {
+        $adminPrefix = trim((string) config('gp247-config.env.GP247_ADMIN_PREFIX'), '/');
+
+        return "User-agent: *\nDisallow: /admin/\nDisallow: /{$adminPrefix}/\n";
     }
 
     /**
