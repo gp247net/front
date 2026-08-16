@@ -3,6 +3,7 @@
 namespace GP247\Front\Admin\Livewire;
 
 use GP247\Core\AdminShell\Infrastructure\FormComponent;
+use GP247\Core\AdminShell\Infrastructure\HasValidationLabels;
 use GP247\Front\Models\FrontBanner;
 use GP247\Front\Models\FrontBannerType;
 use Illuminate\Contracts\View\View;
@@ -20,6 +21,8 @@ use Illuminate\Contracts\View\View;
  */
 class BannerForm extends FormComponent
 {
+    use HasValidationLabels;
+
     protected ?string $permission = 'admin_banner';
 
     /**
@@ -80,6 +83,22 @@ class BannerForm extends FormComponent
             'form.type' => ['nullable', 'string', 'max:255'],
             'form.target' => ['required', 'in:_self,_blank'],
             'form.sort' => ['required', 'numeric', 'min:0'],
+        ];
+    }
+
+    /**
+     * Reuse the existing v1 banner label keys for validator attributes.
+     *
+     * @return array<string, string>
+     */
+    protected function attributeLabels(): array
+    {
+        return [
+            'form.name' => 'admin.banner.title',
+            'form.url' => 'admin.banner.url',
+            'form.type' => 'admin.banner.type',
+            'form.target' => 'admin.banner.target',
+            'form.sort' => 'admin.sort',
         ];
     }
 

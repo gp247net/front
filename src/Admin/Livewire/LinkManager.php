@@ -2,6 +2,7 @@
 
 namespace GP247\Front\Admin\Livewire;
 
+use GP247\Core\AdminShell\Infrastructure\HasValidationLabels;
 use GP247\Core\AdminShell\Infrastructure\ResourcePanel;
 use GP247\Front\Models\FrontLink;
 use GP247\Front\Models\FrontLinkGroup;
@@ -18,6 +19,8 @@ use Illuminate\Contracts\View\View;
  */
 class LinkManager extends ResourcePanel
 {
+    use HasValidationLabels;
+
     protected ?string $permission = 'admin_link';
 
     /** @var array<int, int> Store ids assigned to the link (multistore). */
@@ -120,6 +123,23 @@ class LinkManager extends ResourcePanel
             'form.target'        => $isCollection ? ['nullable', 'in:_self,_blank'] : ['required', 'in:_self,_blank'],
             'form.collection_id' => ['nullable', 'string', 'max:255'],
             'form.sort'          => ['required', 'numeric', 'min:0'],
+        ];
+    }
+
+    /**
+     * Reuse the existing v1 link label keys for validator attributes.
+     *
+     * @return array<string, string>
+     */
+    protected function attributeLabels(): array
+    {
+        return [
+            'form.name' => 'admin.link.name',
+            'form.group' => 'admin.link.group',
+            'form.url' => 'admin.link.url',
+            'form.target' => 'admin.link.target',
+            'form.collection_id' => 'admin.link.collection',
+            'form.sort' => 'admin.sort',
         ];
     }
 

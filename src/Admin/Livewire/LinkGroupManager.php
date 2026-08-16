@@ -2,6 +2,7 @@
 
 namespace GP247\Front\Admin\Livewire;
 
+use GP247\Core\AdminShell\Infrastructure\HasValidationLabels;
 use GP247\Core\AdminShell\Infrastructure\ResourcePanel;
 use GP247\Front\Models\FrontLinkGroup;
 use Illuminate\Validation\Rule;
@@ -18,6 +19,8 @@ use Illuminate\Validation\Rule;
  */
 class LinkGroupManager extends ResourcePanel
 {
+    use HasValidationLabels;
+
     protected ?string $permission = 'admin_link';
 
     /**
@@ -101,6 +104,19 @@ class LinkGroupManager extends ResourcePanel
                 'max:100',
                 Rule::unique((new FrontLinkGroup())->getTable(), 'code')->ignore($this->editingId),
             ],
+        ];
+    }
+
+    /**
+     * Reuse the existing v1 link-group label keys for validator attributes.
+     *
+     * @return array<string, string>
+     */
+    protected function attributeLabels(): array
+    {
+        return [
+            'form.name' => 'admin.link_group.name',
+            'form.code' => 'admin.link_group.code',
         ];
     }
 

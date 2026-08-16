@@ -2,6 +2,7 @@
 
 namespace GP247\Front\Admin\Livewire;
 
+use GP247\Core\AdminShell\Infrastructure\HasValidationLabels;
 use GP247\Core\AdminShell\Infrastructure\ResourcePanel;
 use GP247\Front\Models\FrontLayoutBlock;
 use GP247\Front\Models\FrontPage;
@@ -18,6 +19,8 @@ use Illuminate\Contracts\View\View;
  */
 class LayoutBlockManager extends ResourcePanel
 {
+    use HasValidationLabels;
+
     protected ?string $permission = 'admin_layout_block';
 
     /**
@@ -106,6 +109,23 @@ class LayoutBlockManager extends ResourcePanel
             'form.text'     => ['required', 'string'],
             'form.type'     => ['required', 'in:html,view,page'],
             'form.sort'     => ['required', 'numeric', 'min:0'],
+        ];
+    }
+
+    /**
+     * Reuse the existing v1 layout-block label keys for validator attributes.
+     *
+     * @return array<string, string>
+     */
+    protected function attributeLabels(): array
+    {
+        return [
+            'form.name' => 'admin.layout_block.name',
+            'form.position' => 'admin.layout_block.position',
+            'form.page' => 'admin.layout_block.page',
+            'form.text' => 'admin.layout_block.text',
+            'form.type' => 'admin.layout_block.type',
+            'form.sort' => 'admin.sort',
         ];
     }
 

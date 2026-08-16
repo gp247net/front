@@ -3,6 +3,7 @@
 namespace GP247\Front\Admin\Livewire;
 
 use GP247\Core\AdminShell\Infrastructure\FormComponent;
+use GP247\Core\AdminShell\Infrastructure\HasValidationLabels;
 use GP247\Core\Models\AdminLanguage;
 use GP247\Front\Models\FrontPage;
 use GP247\Front\Models\FrontPageDescription;
@@ -22,6 +23,8 @@ use Illuminate\Contracts\View\View;
  */
 class PageForm extends FormComponent
 {
+    use HasValidationLabels;
+
     protected ?string $permission = 'admin_page';
 
     /** @var array<string, mixed> */
@@ -102,6 +105,23 @@ class PageForm extends FormComponent
             'descriptions.*.keyword' => ['nullable', 'string', 'max:200'],
             'descriptions.*.description' => ['nullable', 'string', 'max:500'],
             'descriptions.*.content' => ['nullable', 'string'],
+        ];
+    }
+
+    /**
+     * Reuse the existing v1 page label keys for validator attributes (the
+     * per-language title maps to admin.page.title_field, matching the form label).
+     *
+     * @return array<string, string>
+     */
+    protected function attributeLabels(): array
+    {
+        return [
+            'form.alias' => 'admin.page.alias',
+            'descriptions.*.name' => 'admin.page.title_field',
+            'descriptions.*.keyword' => 'admin.page.keyword',
+            'descriptions.*.description' => 'admin.page.description',
+            'descriptions.*.content' => 'admin.page.content',
         ];
     }
 

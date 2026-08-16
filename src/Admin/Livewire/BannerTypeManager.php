@@ -2,6 +2,7 @@
 
 namespace GP247\Front\Admin\Livewire;
 
+use GP247\Core\AdminShell\Infrastructure\HasValidationLabels;
 use GP247\Core\AdminShell\Infrastructure\ResourcePanel;
 use GP247\Front\Models\FrontBannerType;
 use Illuminate\Validation\Rule;
@@ -18,6 +19,8 @@ use Illuminate\Validation\Rule;
  */
 class BannerTypeManager extends ResourcePanel
 {
+    use HasValidationLabels;
+
     protected ?string $permission = 'admin_banner';
 
     /**
@@ -101,6 +104,19 @@ class BannerTypeManager extends ResourcePanel
                 'max:100',
                 Rule::unique((new FrontBannerType())->getTable(), 'code')->ignore($this->editingId),
             ],
+        ];
+    }
+
+    /**
+     * Reuse the existing v1 banner-type label keys for validator attributes.
+     *
+     * @return array<string, string>
+     */
+    protected function attributeLabels(): array
+    {
+        return [
+            'form.name' => 'admin.banner_type.name',
+            'form.code' => 'admin.banner_type.code',
         ];
     }
 

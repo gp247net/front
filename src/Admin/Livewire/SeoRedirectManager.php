@@ -2,6 +2,7 @@
 
 namespace GP247\Front\Admin\Livewire;
 
+use GP247\Core\AdminShell\Infrastructure\HasValidationLabels;
 use GP247\Core\AdminShell\Infrastructure\ResourcePanel;
 use GP247\Front\Models\FrontRedirect;
 use Illuminate\Validation\Rule;
@@ -22,6 +23,8 @@ use Illuminate\Validation\Rule;
  */
 class SeoRedirectManager extends ResourcePanel
 {
+    use HasValidationLabels;
+
     protected ?string $permission = 'admin_seo_redirect';
 
     /**
@@ -129,6 +132,20 @@ class SeoRedirectManager extends ResourcePanel
             ],
             'form.to'   => ['required', 'string', 'max:500'],
             'form.code' => ['required', 'integer', 'in:301,302'],
+        ];
+    }
+
+    /**
+     * Reuse the existing v1 SEO-redirect label keys for validator attributes.
+     *
+     * @return array<string, string>
+     */
+    protected function attributeLabels(): array
+    {
+        return [
+            'form.from' => 'admin.seo_redirect.from',
+            'form.to' => 'admin.seo_redirect.to',
+            'form.code' => 'admin.seo_redirect.code',
         ];
     }
 
