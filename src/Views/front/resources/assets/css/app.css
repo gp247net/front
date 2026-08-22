@@ -40,6 +40,11 @@
   .badge-accent { @apply badge bg-accent-50 text-accent-700; }
   .badge-warn { @apply badge bg-amber-100 text-amber-700; }
   .badge-verified { @apply badge bg-emerald-100 text-emerald-700; }
+  /* Product-kind ribbons (blocks/shop_product_home): solid, bold, shadowed so
+     they stand out over product images; distinct hues so shoppers tell bundle
+     (amber) from group (emerald) at a glance; single = no ribbon. */
+  .badge-bundle { @apply badge bg-amber-600 text-white font-bold px-2.5 py-1 shadow-md; }
+  .badge-group { @apply badge bg-emerald-600 text-white font-bold px-2.5 py-1 shadow-md; }
   .card { @apply bg-white rounded-xl border border-ink-100; }
   .card-hover { @apply transition hover:shadow-lg hover:-translate-y-0.5; }
   .product-card { @apply relative flex flex-col overflow-hidden rounded-xl bg-white border border-ink-100 transition hover:shadow-lg hover:border-ink-200; }
