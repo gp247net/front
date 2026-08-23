@@ -42,9 +42,9 @@ Khai báo thông tin cơ bản của template:
 - configCode: Mã cấu hình
 - configKey: Khóa cấu hình (duy nhất, trùng tên thư mục template)
 - version: Phiên bản
-- requireCore: Phiên bản Gp247/Core tương thích
-- requirePackages: Các package yêu cầu (mặc định `gp247/front`)
-- requireExtensions: Tên các extension (plugin, template) yêu cầu
+- requireCore: Phiên bản Gp247/Core tương thích (chuẩn hiện tại để ["2.1"])
+- requireComposerPackages: Các gói Composer yêu cầu (mặc định `gp247/front`). Đổi tên từ `requirePackages` ở gp247/core 2.1 (khóa cũ core vẫn đọc nhưng đã deprecated).
+- requireGp247Extensions: Tên các extension GP247 (plugin, template) yêu cầu. Đổi tên từ `requireExtensions` ở gp247/core 2.1 (khóa cũ core vẫn đọc nhưng đã deprecated).
 
 ### 2. AppConfig.php
 Chứa các phương thức vòng đời của template:

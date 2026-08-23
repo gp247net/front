@@ -42,9 +42,9 @@ Declare the basic information of the template:
 - configCode: Configuration code
 - configKey: Configuration key (unique, matches the template folder name)
 - version: Version
-- requireCore: Compatible Gp247/Core version
-- requirePackages: Required packages (default `gp247/front`)
-- requireExtensions: Names of required extensions (plugins, templates)
+- requireCore: Compatible Gp247/Core version (use ["2.1"] for the current standard)
+- requireComposerPackages: Required Composer packages (default `gp247/front`). Renamed from `requirePackages` in gp247/core 2.1 (old key still read by core but deprecated).
+- requireGp247Extensions: Names of required GP247 extensions (plugins, templates). Renamed from `requireExtensions` in gp247/core 2.1 (old key still read by core but deprecated).
 
 ### 2. AppConfig.php
 Contains the template lifecycle methods:
