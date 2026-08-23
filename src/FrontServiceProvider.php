@@ -176,6 +176,17 @@ class FrontServiceProvider extends ServiceProvider
 
             $this->eventRegister();
 
+            // Register the extension uninstall/disable guard for templates so both
+            // the admin UI and the CLI (gp247:ext-*) refuse to remove a template a
+            // store still uses or that is the default (ADR system-cli_service-extraction §5).
+            // Runtime config append (same idiom as seo_sitemap_providers) — safe with
+            // config:cache because it runs in boot() on every request/console call,
+            // and keeps core free of any dependency on front (NFR-MAINT-001).
+            config(['gp247-config.admin.extension.guards' => array_merge(
+                (array) config('gp247-config.admin.extension.guards', []),
+                [[\GP247\Front\Admin\ExtensionTemplateGuard::class, 'check']],
+            )]);
+
         }
     }
 
