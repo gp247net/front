@@ -23,6 +23,16 @@ class LinkManager extends ResourcePanel
 
     protected ?string $permission = 'admin_link';
 
+    /**
+     * Keep list state (page/keyword/sort) and the edited record on screen when
+     * editing/saving, instead of remounting via route navigation.
+     *
+     * @var bool
+     * @aidlc-story US-AUI-two-panel-state-preservation
+     * @aidlc-adr ADR-admin-shell-rbac-two-panel-state-preservation
+     */
+    protected bool $keepStateOnSave = true;
+
     /** @var array<int, int> Store ids assigned to the link (multistore). */
     public array $stores = [];
 

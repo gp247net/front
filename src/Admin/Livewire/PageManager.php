@@ -26,6 +26,16 @@ class PageManager extends ResourcePanel
     protected ?string $permission = 'admin_page';
 
     /**
+     * Keep list state (page/keyword/sort) and the edited record on screen when
+     * editing/saving, instead of remounting via route navigation.
+     *
+     * @var bool
+     * @aidlc-story US-AUI-two-panel-state-preservation
+     * @aidlc-adr ADR-admin-shell-rbac-two-panel-state-preservation
+     */
+    protected bool $keepStateOnSave = true;
+
+    /**
      * Per-language description rows keyed by language code, each with
      * title/keyword/description/content.
      *

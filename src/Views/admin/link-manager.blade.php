@@ -87,7 +87,7 @@
             <x-gp247::checkbox :label="gp247_language_render('admin.active')" wire:model="form.status" value="1" />
 
             <div class="flex items-center justify-between border-t border-gray-200 pt-4 dark:border-gray-700">
-                <x-gp247::button variant="secondary" href="{{ gp247_route_admin('admin_link.index') }}" wire:navigate>
+                <x-gp247::button variant="secondary" wire:click="cancelEdit" data-testid="admin-link-form-cancel">
                     {{ gp247_language_render($editingId ? 'admin.cancel' : 'admin.reset') }}
                 </x-gp247::button>
                 <x-gp247::button type="submit" wire:loading.attr="disabled">
@@ -130,7 +130,7 @@
             </x-slot:head>
 
             @foreach ($rows as $row)
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 {{ (string) $row->id === (string) $editingId ? 'bg-blue-50 dark:bg-blue-900/30' : '' }}"
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 {{ (string) $row->id === (string) $editingId ? 'bg-blue-100 border-l-4 border-blue-500 dark:bg-blue-900 dark:border-blue-500' : '' }}"
                     wire:key="link-{{ $row->id }}">
                     <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
                         @if ($row->type === 'collection')
@@ -148,7 +148,7 @@
                     </td>
                     <td class="px-4 py-3">
                         <div class="flex items-center justify-end gap-1">
-                            <x-gp247::button size="sm" variant="ghost" href="{{ gp247_route_admin('admin_link.edit', $row->id) }}" wire:navigate><i class="fas fa-edit"></i></x-gp247::button>
+                            <x-gp247::button size="sm" variant="ghost" wire:click="editRow('{{ $row->id }}')" data-testid="admin-link-list-edit"><i class="fas fa-edit"></i></x-gp247::button>
                             <x-gp247::button size="sm" variant="ghost" wire:click="delete('{{ $row->id }}')" wire:confirm="{{ gp247_language_render('action.delete_confirm') }}"><i class="fas fa-trash-alt text-red-600"></i></x-gp247::button>
                         </div>
                     </td>
