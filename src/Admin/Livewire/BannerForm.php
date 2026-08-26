@@ -164,7 +164,7 @@ class BannerForm extends FormComponent
         return view('gp247-front-admin::banner-form', [
             'types' => FrontBannerType::orderBy('name')->get(),
             'multiStore' => $multiStore,
-            'storeList' => $multiStore ? \GP247\Core\Models\AdminStore::pluck('name', 'id')->all() : [],
+            'storeList' => $multiStore ? \GP247\Core\Models\AdminStore::getListTitle() : [],
         ])->layout('gp247-admin::layouts.admin', [
             'title' => gp247_language_render($this->editingId !== null ? 'action.edit' : 'admin.banner.add_new'),
             'breadcrumb' => $this->listCrumb(),

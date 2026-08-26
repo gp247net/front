@@ -243,7 +243,7 @@ class LinkManager extends ResourcePanel
             'groups'      => FrontLinkGroup::orderBy('name')->get(),
             'collections' => FrontLink::where('type', 'collection')->orderBy('name')->get(),
             'multiStore'  => $multiStore,
-            'storeList'   => $multiStore ? \GP247\Core\Models\AdminStore::pluck('name', 'id')->all() : [],
+            'storeList'   => $multiStore ? \GP247\Core\Models\AdminStore::getListTitle() : [],
         ])->layout('gp247-admin::layouts.admin', ['title' => $this->pageTitle()]);
     }
 }

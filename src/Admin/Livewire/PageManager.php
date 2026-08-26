@@ -309,7 +309,7 @@ class PageManager extends ResourcePanel
             'rows'       => $this->rows(),
             'languages'  => AdminLanguage::getListActive(),
             'multiStore' => $multiStore,
-            'storeList'  => $multiStore ? \GP247\Core\Models\AdminStore::pluck('name', 'id')->all() : [],
+            'storeList'  => $multiStore ? \GP247\Core\Models\AdminStore::getListTitle() : [],
         ])->layout('gp247-admin::layouts.admin', ['title' => $this->pageTitle()]);
     }
 }
