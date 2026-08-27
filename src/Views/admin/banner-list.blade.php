@@ -46,7 +46,7 @@
                 <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
                     {{ $row->name }}
                     @if ($row->url)
-                        <a href="{{ $row->url }}" target="_blank" class="ml-1 text-xs text-blue-500"><i class="fas fa-external-link-alt"></i></a>
+                        <a href="{{ gp247_url_render($row->url) }}" target="_blank" class="ml-1 text-xs text-blue-500"><i class="fas fa-external-link-alt"></i></a>
                     @endif
                     @if (($multiStore ?? false) && $row->stores->isNotEmpty())
                         <div class="mt-1 flex flex-wrap items-center gap-1">

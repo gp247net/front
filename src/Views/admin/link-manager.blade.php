@@ -138,7 +138,7 @@
                         @endif
                         {{ $row->name }}
                         @if ($row->url && $row->type !== 'collection')
-                            <a href="{{ $row->url }}" target="_blank" class="ml-1 text-xs text-blue-500"><i class="fas fa-external-link-alt"></i></a>
+                            <a href="{{ gp247_url_render($row->url) }}" target="_blank" class="ml-1 text-xs text-blue-500"><i class="fas fa-external-link-alt"></i></a>
                         @endif
                         @if ($multiStore ?? false)
                             @php
