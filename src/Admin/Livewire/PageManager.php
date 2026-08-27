@@ -89,7 +89,7 @@ class PageManager extends ResourcePanel
      */
     protected function baseQuery()
     {
-        return FrontPage::with('descriptions');
+        return FrontPage::with(['descriptions', 'stores.descriptions']);
     }
 
     /**
@@ -144,7 +144,7 @@ class PageManager extends ResourcePanel
 
         $this->descriptions = $descriptions;
         $this->stores       = $model->stores()->pluck('store_id')
-            ->map(static fn ($v): int => (int) $v)
+            ->map(static fn ($v): string => (string) $v)
             ->all();
 
         return [

@@ -68,7 +68,7 @@ class BannerForm extends FormComponent
                 'sort' => (int) $banner->sort,
                 'status' => (int) $banner->status,
             ];
-            $this->stores = $banner->stores()->pluck('store_id')->map(static fn ($v): int => (int) $v)->all();
+            $this->stores = $banner->stores()->pluck('store_id')->map(static fn ($v): string => (string) $v)->all();
         }
     }
 

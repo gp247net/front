@@ -54,8 +54,8 @@
 
             @if ($multiStore)
                 <div class="space-y-1">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">{{ gp247_language_render('admin.store') }}</label>
-                    <div class="flex flex-wrap gap-3">
+                    <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"><i class="fas fa-store text-blue-500"></i>{{ gp247_language_render('admin.store') }}</label>
+                    <div class="flex flex-wrap gap-3 rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
                         @foreach ($storeList as $storeId => $storeName)
                             <x-gp247::checkbox :label="$storeName" wire:model="stores" value="{{ $storeId }}" id="banner-store-{{ $storeId }}" />
                         @endforeach

@@ -43,7 +43,7 @@ class LinkManager extends ResourcePanel
     {
         // Eager-load the parent collection so the list can show its name
         // without an N+1 query per row.
-        return FrontLink::query()->with('collection');
+        return FrontLink::query()->with(['collection', 'stores.descriptions']);
     }
 
     /**
@@ -94,7 +94,7 @@ class LinkManager extends ResourcePanel
     protected function fillForm($model): array
     {
         // WHY: also reset stores so the pivot reflects the current record on edit.
-        $this->stores = $model->stores()->pluck('store_id')->map(static fn($v): int => (int) $v)->all();
+        $this->stores = $model->stores()->pluck('store_id')->map(static fn($v): string => (string) $v)->all();
 
         return [
             'name'          => (string) $model->name,

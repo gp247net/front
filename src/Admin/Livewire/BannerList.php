@@ -30,6 +30,28 @@ class BannerList extends DataTableComponent
     }
 
     /**
+     * Eager-load stores to display per-row store badges without N+1.
+     *
+     * @return array<int, string>
+     */
+    protected function relations(): array
+    {
+        return ['stores.descriptions'];
+    }
+
+    /**
+     * Pass multi-store flag to the list view so store badges can be rendered.
+     *
+     * @return array<string, mixed>
+     */
+    protected function viewData(): array
+    {
+        return [
+            'multiStore' => gp247_store_check_multi_partner_installed() || gp247_store_check_multi_store_installed(),
+        ];
+    }
+
+    /**
      * Sortable columns; doubles as the sort whitelist.
      *
      * @return array<string, string>
