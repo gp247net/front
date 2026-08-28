@@ -4,7 +4,6 @@ namespace GP247\Front\Library;
 
 use GP247\Core\Models\AdminLanguage;
 use GP247\Front\Models\FrontPage;
-use GP247\Front\Models\FrontPageStore;
 
 /**
  * Builds the XML sitemap for a store: multilingual URLs, automatic
@@ -525,11 +524,10 @@ class SitemapBuilder
      */
     private function pageQuery()
     {
-        $tablePageStore = (new FrontPageStore)->getTable();
-        $tablePage      = (new FrontPage)->getTable();
+        // WHY: 1-1 ownership — filter pages by their own store_id column.
+        $tablePage = (new FrontPage)->getTable();
 
-        return FrontPage::leftJoin($tablePageStore, $tablePageStore . '.page_id', $tablePage . '.id')
-            ->where($tablePageStore . '.store_id', $this->storeId)
+        return FrontPage::where($tablePage . '.store_id', $this->storeId)
             ->where($tablePage . '.status', 1)
             ->orderBy($tablePage . '.id')
             ->select($tablePage . '.alias', $tablePage . '.updated_at');
@@ -604,14 +602,14 @@ class SitemapBuilder
             return null;
         }
 
-        $model      = new \GP247\Shop\Models\ShopProduct;
-        $storeModel = new \GP247\Shop\Models\ShopProductStore;
-        $storeAdm   = new \GP247\Core\Models\AdminStore;
+        // WHY: 1-1 ownership — a product owns a single store_id column; join
+        // admin_store to keep the active-store (status=1) guard.
+        $model    = new \GP247\Shop\Models\ShopProduct;
+        $storeAdm = new \GP247\Core\Models\AdminStore;
 
         return $model
-            ->join($storeModel->getTable(), $storeModel->getTable() . '.product_id', $model->getTable() . '.id')
-            ->join($storeAdm->getTable(), $storeAdm->getTable() . '.id', $storeModel->getTable() . '.store_id')
-            ->where($storeModel->getTable() . '.store_id', $this->storeId)
+            ->join($storeAdm->getTable(), $storeAdm->getTable() . '.id', $model->getTable() . '.store_id')
+            ->where($model->getTable() . '.store_id', $this->storeId)
             ->where($storeAdm->getTable() . '.status', 1)
             ->where($model->getTable() . '.status', 1)
             ->orderBy($model->getTable() . '.id')
@@ -666,12 +664,11 @@ class SitemapBuilder
             return null;
         }
 
-        $model      = new \GP247\Shop\Models\ShopCategory;
-        $storeModel = new \GP247\Shop\Models\ShopCategoryStore;
+        // WHY: 1-1 ownership — filter categories by their own store_id column.
+        $model = new \GP247\Shop\Models\ShopCategory;
 
         return $model
-            ->join($storeModel->getTable(), $storeModel->getTable() . '.category_id', $model->getTable() . '.id')
-            ->where($storeModel->getTable() . '.store_id', $this->storeId)
+            ->where($model->getTable() . '.store_id', $this->storeId)
             ->where($model->getTable() . '.status', 1)
             ->orderBy($model->getTable() . '.id')
             ->select($model->getTable() . '.alias', $model->getTable() . '.updated_at');

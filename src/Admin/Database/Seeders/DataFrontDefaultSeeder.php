@@ -117,6 +117,8 @@ class DataFrontDefaultSeeder extends Seeder
         $pageId = (string)\Illuminate\Support\Str::orderedUuid();
         $page = FrontPage::create([
             'id' => $pageId,
+            // WHY: 1-1 ownership — the page owns its store via the scalar store_id column.
+            'store_id' => GP247_STORE_ID_ROOT,
             'alias' => 'home',
             'image' => '',
             'status' => 0,
@@ -147,12 +149,13 @@ class DataFrontDefaultSeeder extends Seeder
                 'content' => $description['content']
             ]);
         }
-        $page->stores()->attach(GP247_STORE_ID_ROOT);
-        $page->save();
+        // Store ownership is set on the page row (store_id) above.
 
         $pageAboutId = (string)\Illuminate\Support\Str::orderedUuid();
         $pageAbout = FrontPage::create([
             'id' => $pageAboutId,
+            // WHY: 1-1 ownership — the page owns its store via the scalar store_id column.
+            'store_id' => GP247_STORE_ID_ROOT,
             'alias' => 'about',
             'image' => '',
             'status' => 1,
@@ -183,8 +186,7 @@ class DataFrontDefaultSeeder extends Seeder
                 'content' => $description['content']
             ]);
         }
-        $pageAbout->stores()->attach(GP247_STORE_ID_ROOT);
-        $pageAbout->save();
+        // Store ownership is set on the page row (store_id) above.
 
         $links = [
             // Menu links
@@ -226,6 +228,8 @@ class DataFrontDefaultSeeder extends Seeder
         foreach ($links as $link) {
             $frontLink = FrontLink::create([
                 'id' => (string)\Illuminate\Support\Str::orderedUuid(),
+                // WHY: 1-1 ownership — the link owns its store via the scalar store_id column.
+                'store_id' => GP247_STORE_ID_ROOT,
                 'name' => $link['name'],
                 'url' => $link['url'],
                 'target' => $link['target'],
@@ -234,8 +238,7 @@ class DataFrontDefaultSeeder extends Seeder
                 'status' => $link['status'],
             ]);
 
-            // Attach to store using model relationship
-            $frontLink->stores()->attach(GP247_STORE_ID_ROOT);
+            // Store ownership is set on the link row (store_id) above.
         }
 
         // Language rows are seeded by the dedicated DataFrontLanguageSeeder so

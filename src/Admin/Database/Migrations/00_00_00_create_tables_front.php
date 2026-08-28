@@ -31,6 +31,8 @@ return new class extends Migration
                 $table->integer('sort')->default(0);
                 $table->integer('click')->default(0);
                 $table->string('type', 20)->index();
+                // Store ownership: each banner belongs to exactly one store (1-1).
+                $table->uuid('store_id')->default(1)->index();
                 $table->timestamps();
             }
         );
@@ -40,8 +42,10 @@ return new class extends Migration
                 $table->increments('id');
                 $table->string('code', 100)->unique();
                 $table->string('name', 255);
+                // Store ownership: each banner type belongs to exactly one store (1-1).
+                $table->uuid('store_id')->default(1)->index();
                 $table->timestamps();
-                
+
             }
         );
 
@@ -76,6 +80,8 @@ return new class extends Migration
                 $table->string('collection_id', 100)->nullable()->comment("Collection\'s ID");
                 $table->tinyInteger('status')->default(0);
                 $table->integer('sort')->default(0);
+                // Store ownership: each link belongs to exactly one store (1-1).
+                $table->uuid('store_id')->default(1)->index();
                 $table->timestamps();
             }
         );
@@ -86,17 +92,10 @@ return new class extends Migration
                 $table->increments('id');
                 $table->string('code', 100)->unique();
                 $table->string('name', 255);
+                // Store ownership: each link group belongs to exactly one store (1-1).
+                $table->uuid('store_id')->default(1)->index();
                 $table->timestamps();
-                
-            }
-        );
 
-        $schema->create(
-            GP247_DB_PREFIX.'front_link_store',
-            function (Blueprint $table) {
-                $table->uuid('link_id');
-                $table->uuid('store_id');
-                $table->primary(['link_id', 'store_id']);
             }
         );
 
@@ -107,6 +106,8 @@ return new class extends Migration
                 $table->string('image', 255)->nullable();
                 $table->string('alias', 120)->index();
                 $table->integer('status')->default(0);
+                // Store ownership: each page belongs to exactly one store (1-1).
+                $table->uuid('store_id')->default(1)->index();
                 $table->timestamps();
             }
         );
@@ -146,26 +147,6 @@ return new class extends Migration
             }
         );
         
-        //Multi store
-
-        $schema->create(
-            GP247_DB_PREFIX.'front_banner_store',
-            function (Blueprint $table) {
-                $table->uuid('banner_id');
-                $table->uuid('store_id');
-                $table->primary(['banner_id', 'store_id']);
-            }
-        );
-
-        $schema->create(
-            GP247_DB_PREFIX.'front_page_store',
-            function (Blueprint $table) {
-                $table->uuid('page_id');
-                $table->uuid('store_id');
-                $table->primary(['page_id', 'store_id']);
-            }
-        );
-
         if (!$schema->hasTable(GP247_DB_PREFIX . 'front_redirects')) {
             $schema->create(
                 GP247_DB_PREFIX . 'front_redirects',
@@ -201,10 +182,6 @@ return new class extends Migration
         $schema->dropIfExists(GP247_DB_PREFIX.'front_page_description');
         $schema->dropIfExists(GP247_DB_PREFIX.'front_country');
         $schema->dropIfExists(GP247_DB_PREFIX.'front_subscribe');
-        //Multi store
-        $schema->dropIfExists(GP247_DB_PREFIX.'front_banner_store');
-        $schema->dropIfExists(GP247_DB_PREFIX.'front_page_store');
-        $schema->dropIfExists(GP247_DB_PREFIX.'front_link_store');
         $schema->dropIfExists(GP247_DB_PREFIX.'front_redirects');
 
     }

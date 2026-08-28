@@ -3,7 +3,6 @@
 namespace GP247\Front\Models;
 
 use GP247\Core\Models\AdminStore;
-use GP247\Front\Models\FrontLinkStore;
 use Illuminate\Database\Eloquent\Model;
 
 class FrontLink extends Model
@@ -17,9 +16,18 @@ class FrontLink extends Model
     protected static $getGroup = null;
     protected static $getLinksCollection = null;
 
-    public function stores()
+    /**
+     * The store that owns this link (1-1 ownership).
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     *
+     * @aidlc-unit compat-foundation
+     * @aidlc-story US-FADM-store-single-owner
+     * @aidlc-adr multi-store_one-to-one-store-ownership
+     */
+    public function store()
     {
-        return $this->belongsToMany(AdminStore::class, FrontLinkStore::class, 'link_id', 'store_id');
+        return $this->belongsTo(AdminStore::class, 'store_id', 'id');
     }
 
     /**
@@ -43,12 +51,12 @@ class FrontLink extends Model
                 ->where($tableLink.'.status', 1);
             $storeId = config('app.storeId');
             if (gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) {
-                $tableLinkStore = (new FrontLinkStore)->getTable();
+                // WHY: 1-1 ownership — filter by the link's own store_id column and
+                // still require the owning store to be active (join admin_store).
                 $tableStore = (new AdminStore)->getTable();
-                $links = $links->join($tableLinkStore, $tableLinkStore.'.link_id', $tableLink . '.id');
-                $links = $links->join($tableStore, $tableStore . '.id', $tableLinkStore.'.store_id');
+                $links = $links->join($tableStore, $tableStore . '.id', $tableLink . '.store_id');
                 $links = $links->where($tableStore . '.status', '1');
-                $links = $links->where($tableLinkStore.'.store_id', $storeId);
+                $links = $links->where($tableLink . '.store_id', $storeId);
             }
 
             $links = $links
@@ -71,12 +79,12 @@ class FrontLink extends Model
                 ->where($tableLink.'.status', 1);
             $storeId = config('app.storeId');
             if (gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) {
-                $tableLinkStore = (new FrontLinkStore)->getTable();
+                // WHY: 1-1 ownership — filter by the link's own store_id column and
+                // still require the owning store to be active (join admin_store).
                 $tableStore = (new AdminStore)->getTable();
-                $links = $links->join($tableLinkStore, $tableLinkStore.'.link_id', $tableLink . '.id');
-                $links = $links->join($tableStore, $tableStore . '.id', $tableLinkStore.'.store_id');
+                $links = $links->join($tableStore, $tableStore . '.id', $tableLink . '.store_id');
                 $links = $links->where($tableStore . '.status', '1');
-                $links = $links->where($tableLinkStore.'.store_id', $storeId);
+                $links = $links->where($tableLink . '.store_id', $storeId);
             }
 
             // Link not in collection
@@ -133,7 +141,7 @@ class FrontLink extends Model
         // before delete() method call this
         static::deleting(
             function ($link) {
-                $link->stores()->detach();
+                // Store ownership is a scalar column now; nothing to detach.
             }
         );
 
@@ -156,10 +164,8 @@ class FrontLink extends Model
     {
         $data = self::where('id', $id);
         if ($storeId) {
-            $tableLinkStore = (new FrontLinkStore)->getTable();
             $tableLink = (new FrontLink)->getTable();
-            $data = $data->leftJoin($tableLinkStore, $tableLinkStore . '.link_id', $tableLink . '.id');
-            $data = $data->where($tableLinkStore . '.store_id', $storeId);
+            $data = $data->where($tableLink . '.store_id', $storeId);
         }
         $data = $data->first();
         return $data;
@@ -177,9 +183,7 @@ class FrontLink extends Model
         $linkList = (new FrontLink);
         $tableLink = $linkList->getTable();
         if ($storeId) {
-            $tableLinkStore = (new FrontLinkStore)->getTable();
-            $linkList = $linkList->leftJoin($tableLinkStore, $tableLinkStore . '.link_id', $tableLink . '.id');
-            $linkList = $linkList->where($tableLinkStore . '.store_id', $storeId);
+            $linkList = $linkList->where($tableLink . '.store_id', $storeId);
         }
         $linkList = $linkList->orderBy($tableLink.'.created_at', 'desc');
 

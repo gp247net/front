@@ -5,11 +5,10 @@ namespace GP247\Front\Models;
 use Illuminate\Database\Eloquent\Model;
 use Cache;
 use GP247\Core\Models\AdminStore;
-use GP247\Front\Models\FrontBannerStore;
 
 class FrontBanner extends Model
 {
-    
+
     use \GP247\Core\Models\ModelTrait;
     use \GP247\Core\Models\UuidTrait;
 
@@ -17,9 +16,18 @@ class FrontBanner extends Model
     protected $connection  = GP247_DB_CONNECTION;
     protected $guarded     = [];
 
-    public function stores()
+    /**
+     * The store that owns this banner (1-1 ownership).
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     *
+     * @aidlc-unit compat-foundation
+     * @aidlc-story US-FADM-store-single-owner
+     * @aidlc-adr multi-store_one-to-one-store-ownership
+     */
+    public function store()
     {
-        return $this->belongsToMany(AdminStore::class, FrontBannerStore::class, 'banner_id', 'store_id');
+        return $this->belongsTo(AdminStore::class, 'store_id', 'id');
     }
 
 
@@ -62,12 +70,12 @@ class FrontBanner extends Model
             $data = $data->where($this->getTable() .'.status', 1);
         }
         if (gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) {
-            $tableBannerStore = (new FrontBannerStore)->getTable();
+            // WHY: 1-1 ownership — filter by the banner's own store_id column and
+            // still require the owning store to be active (join admin_store).
             $tableStore = (new AdminStore)->getTable();
-            $data = $data->join($tableBannerStore, $tableBannerStore.'.banner_id', $this->getTable() . '.id');
-            $data = $data->join($tableStore, $tableStore . '.id', $tableBannerStore.'.store_id');
+            $data = $data->join($tableStore, $tableStore . '.id', $this->getTable() . '.store_id');
             $data = $data->where($tableStore . '.status', '1');
-            $data = $data->where($tableBannerStore.'.store_id', $storeId);
+            $data = $data->where($this->getTable() . '.store_id', $storeId);
         }
         $data = $data->first();
         return $data;
@@ -78,8 +86,6 @@ class FrontBanner extends Model
         parent::boot();
         // before delete() method call this
         static::deleting(function ($banner) {
-            $banner->stores()->detach();
-
             //Delete custom field
             (new \GP247\Core\Models\AdminCustomFieldDetail)
             ->join(GP247_DB_PREFIX.'admin_custom_field', GP247_DB_PREFIX.'admin_custom_field.id', GP247_DB_PREFIX.'admin_custom_field_detail.custom_field_id')
@@ -202,12 +208,10 @@ class FrontBanner extends Model
                 //If sepcify store id
                 $storeId = $this->gp247_store;
             }
-            $tableBannerStore = (new FrontBannerStore)->getTable();
             $tableStore = (new AdminStore)->getTable();
-            $query = $query->join($tableBannerStore, $tableBannerStore.'.banner_id', $this->getTable() . '.id');
-            $query = $query->join($tableStore, $tableStore . '.id', $tableBannerStore.'.store_id');
+            $query = $query->join($tableStore, $tableStore . '.id', $this->getTable() . '.store_id');
             $query = $query->where($tableStore . '.status', '1');
-            $query = $query->where($tableBannerStore.'.store_id', $storeId);
+            $query = $query->where($this->getTable() . '.store_id', $storeId);
         }
 
         if ($this->gp247_type !== 'all') {
@@ -252,10 +256,8 @@ class FrontBanner extends Model
     {
         $data = self::where('id', $id);
         if ($storeId) {
-            $tableBannerStore = (new FrontBannerStore)->getTable();
             $tableBanner = (new FrontBanner)->getTable();
-            $data = $data->leftJoin($tableBannerStore, $tableBannerStore . '.banner_id', $tableBanner . '.id');
-            $data = $data->where($tableBannerStore . '.store_id', $storeId);
+            $data = $data->where($tableBanner . '.store_id', $storeId);
         }
         $data = $data->first();
         return $data;
@@ -276,9 +278,7 @@ class FrontBanner extends Model
         $bannerList = (new FrontBanner);
         $tableBanner = $bannerList->getTable();
         if ($storeId) {
-            $tableBannerStore = (new FrontBannerStore)->getTable();
-            $bannerList = $bannerList->leftJoin($tableBannerStore, $tableBannerStore . '.banner_id', $tableBanner . '.id');
-            $bannerList = $bannerList->where($tableBannerStore . '.store_id', $storeId);
+            $bannerList = $bannerList->where($tableBanner . '.store_id', $storeId);
         }
         if ($keyword) {
             $bannerList->where($tableBanner.'.name', 'like', '%'.$keyword.'%');

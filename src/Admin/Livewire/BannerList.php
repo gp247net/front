@@ -9,11 +9,12 @@ use GP247\Front\Models\FrontBanner;
  * Banner list (front-admin Unit) — modern Livewire/TailAdmin port of the legacy
  * AdminBannerController list: image thumb, title, url, type, sort and on/off
  * status, with Edit/Delete + bulk delete. Plugs into the core admin shell and
- * reuses the core DataTable base. Gated by `admin_banner`.
+ * reuses the core DataTable base. Store ownership is 1-1 (scalar store_id).
+ * Gated by `admin_banner`.
  *
  * @aidlc-unit front-admin
  * @aidlc-story US-FADM-001
- * @aidlc-adr ADR-001, ADR-006, ADR-007
+ * @aidlc-adr ADR-001, ADR-006, ADR-007, multi-store_one-to-one-store-ownership
  */
 class BannerList extends DataTableComponent
 {
@@ -27,28 +28,6 @@ class BannerList extends DataTableComponent
     protected function query()
     {
         return new FrontBanner();
-    }
-
-    /**
-     * Eager-load stores to display per-row store badges without N+1.
-     *
-     * @return array<int, string>
-     */
-    protected function relations(): array
-    {
-        return ['stores.descriptions'];
-    }
-
-    /**
-     * Pass multi-store flag to the list view so store badges can be rendered.
-     *
-     * @return array<string, mixed>
-     */
-    protected function viewData(): array
-    {
-        return [
-            'multiStore' => gp247_store_check_multi_partner_installed() || gp247_store_check_multi_store_installed(),
-        ];
     }
 
     /**

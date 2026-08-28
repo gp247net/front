@@ -11,11 +11,11 @@ use Illuminate\Contracts\View\View;
 /**
  * Link manager — two-panel screen (form left, list right) following the
  * ResourcePanel pattern (ADR-005, ADR-007, ui-tailadmin P1). Replaces the separate
- * LinkList + LinkForm pair. Multi-store pivot sync is preserved. Gated by `admin_link`.
+ * LinkList + LinkForm pair. Store ownership is 1-1 (scalar store_id). Gated by `admin_link`.
  *
  * @aidlc-unit front-admin
  * @aidlc-story US-FADM-003
- * @aidlc-adr ADR-001, ADR-005, ADR-006, ADR-007
+ * @aidlc-adr ADR-001, ADR-005, ADR-006, ADR-007, multi-store_one-to-one-store-ownership
  */
 class LinkManager extends ResourcePanel
 {
@@ -33,17 +33,15 @@ class LinkManager extends ResourcePanel
      */
     protected bool $keepStateOnSave = true;
 
-    /** @var array<int, int> Store ids assigned to the link (multistore). */
-    public array $stores = [];
-
     /**
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function baseQuery()
     {
         // Eager-load the parent collection so the list can show its name
-        // without an N+1 query per row.
-        return FrontLink::query()->with(['collection', 'stores.descriptions']);
+        // without an N+1 query per row. WHY: 1-1 ownership — eager-load the
+        // single owning store (store.descriptions).
+        return FrontLink::query()->with(['collection', 'store.descriptions']);
     }
 
     /**
@@ -93,9 +91,6 @@ class LinkManager extends ResourcePanel
      */
     protected function fillForm($model): array
     {
-        // WHY: also reset stores so the pivot reflects the current record on edit.
-        $this->stores = $model->stores()->pluck('store_id')->map(static fn($v): string => (string) $v)->all();
-
         return [
             'name'          => (string) $model->name,
             'url'           => (string) $model->url,
@@ -114,7 +109,6 @@ class LinkManager extends ResourcePanel
     public function resetForm(): void
     {
         parent::resetForm();
-        $this->stores = [];
     }
 
     /**
@@ -179,19 +173,62 @@ class LinkManager extends ResourcePanel
             $attributes['target']        = $data['target'] ?? '_self';
             $attributes['type']          = '';
             $attributes['collection_id'] = ($data['collection_id'] ?? '') !== '' ? $data['collection_id'] : null;
+
+            // WHY: 1-1 ownership — a link may only point at a collection owned by
+            // its own store. The dropdown is store-scoped, but a crafted payload
+            // could bind a foreign id, so reject it server-side
+            // (RISK-TECH-store-same-store-ref).
+            $this->assertSameStoreCollection($attributes['collection_id']);
         }
 
         if ($this->editingId !== null) {
             $link = FrontLink::findOrFail($this->editingId);
             $link->update($attributes);
         } else {
+            // WHY: 1-1 ownership — a new link is owned by the current admin store
+            // (pinned to root in admin); set its scalar store_id on create.
+            $attributes['store_id'] = $this->currentStoreId();
             $link = FrontLink::create($attributes);
         }
 
-        // WHY: sync store pivot only when multistore is active, preserving
-        // single-store install behaviour from the legacy controller.
-        if (gp247_store_check_multi_partner_installed() || gp247_store_check_multi_store_installed()) {
-            $link->stores()->sync($this->stores);
+        // Store ownership is set on the link row (store_id) above.
+    }
+
+    /**
+     * The current admin store id, falling back to the root store.
+     *
+     * @return int|string
+     */
+    private function currentStoreId()
+    {
+        return session('adminStoreId', defined('GP247_STORE_ID_ROOT') ? GP247_STORE_ID_ROOT : 1);
+    }
+
+    /**
+     * Reject a save whose collection_id points at a link owned by another store.
+     * A null/empty value passes (no collection selected); only a non-empty id
+     * that does not resolve to a link owned by the current store is rejected.
+     *
+     * @param int|string|null $collectionId Submitted collection link id.
+     * @return void
+     * @throws \Illuminate\Validation\ValidationException When the collection is cross-store.
+     *
+     * @aidlc-adr multi-store_one-to-one-store-ownership
+     */
+    private function assertSameStoreCollection($collectionId): void
+    {
+        if ($collectionId === null || $collectionId === '') {
+            return;
+        }
+
+        $exists = FrontLink::where('id', $collectionId)
+            ->where('store_id', $this->currentStoreId())
+            ->exists();
+
+        if (!$exists) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'form.collection_id' => gp247_language_render('admin.link.collection') . ': invalid store reference',
+            ]);
         }
     }
 
@@ -236,14 +273,16 @@ class LinkManager extends ResourcePanel
      */
     public function render(): View
     {
-        $multiStore = gp247_store_check_multi_partner_installed() || gp247_store_check_multi_store_installed();
+        // WHY: 1-1 ownership — a link has a single owning store (pinned to the
+        // current admin store), so no multi-store picker context is injected.
+        // WHY: 1-1 ownership — only offer this store's groups/collections so an
+        // admin cannot reference another store's row (RISK-TECH-store-same-store-ref).
+        $storeId = $this->currentStoreId();
 
         return view($this->panelView(), [
             'rows'        => $this->rows(),
-            'groups'      => FrontLinkGroup::orderBy('name')->get(),
-            'collections' => FrontLink::where('type', 'collection')->orderBy('name')->get(),
-            'multiStore'  => $multiStore,
-            'storeList'   => $multiStore ? \GP247\Core\Models\AdminStore::getListTitle() : [],
+            'groups'      => FrontLinkGroup::where('store_id', $storeId)->orderBy('name')->get(),
+            'collections' => FrontLink::where('store_id', $storeId)->where('type', 'collection')->orderBy('name')->get(),
         ])->layout('gp247-admin::layouts.admin', ['title' => $this->pageTitle()]);
     }
 }

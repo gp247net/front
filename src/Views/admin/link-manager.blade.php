@@ -1,15 +1,15 @@
 ﻿{{--
     Link manager — two-panel: form (left) + list (right) on the ResourcePanel base
-    (ADR-005, ADR-007, ui-tailadmin P1). Multi-store assignment when active. UI text
-    via gp247_language_render.
+    (ADR-005, ADR-007, ui-tailadmin P1). Store ownership is 1-1 (scalar store_id,
+    pinned to the current admin store). UI text via gp247_language_render.
 
     @aidlc-unit front-admin
     @aidlc-story US-FADM-003
     @aidlc-adr ADR-001, ADR-005, ADR-006, ADR-007
 
     Variables: $rows (FrontLink paginator), $groups (FrontLinkGroup[]),
-               $collections (FrontLink[]), $multiStore (bool), $storeList (array),
-               $editingId, $form, $stores, $sortField, $sortDir, $keyword.
+               $collections (FrontLink[]), $editingId, $form, $sortField,
+               $sortDir, $keyword.
 --}}
 <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
@@ -73,16 +73,7 @@
                     name="sort" wire:model="form.sort" :error="$errors->first('form.sort')" required />
             </div>
 
-            @if ($multiStore)
-                <div class="space-y-1">
-                    <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"><i class="fas fa-store text-blue-500"></i>{{ gp247_language_render('admin.store') }}</label>
-                    <div class="flex flex-wrap gap-3 rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
-                        @foreach ($storeList as $storeId => $storeName)
-                            <x-gp247::checkbox :label="$storeName" wire:model="stores" value="{{ $storeId }}" id="lnkm-store-{{ $storeId }}" />
-                        @endforeach
-                    </div>
-                </div>
-            @endif
+            {{-- Store ownership is 1-1 (scalar store_id) and pinned to the current admin store; no multi-store picker. --}}
 
             <x-gp247::checkbox :label="gp247_language_render('admin.active')" wire:model="form.status" value="1" />
 
@@ -139,21 +130,6 @@
                         {{ $row->name }}
                         @if ($row->url && $row->type !== 'collection')
                             <a href="{{ gp247_url_render($row->url) }}" target="_blank" class="ml-1 text-xs text-blue-500"><i class="fas fa-external-link-alt"></i></a>
-                        @endif
-                        @if ($multiStore ?? false)
-                            @php
-                                $visibleStores = ((string)$row->id === (string)$editingId)
-                                    ? $row->stores->filter(fn($s) => in_array((string)$s->id, array_map('strval', $stores ?? [])))
-                                    : $row->stores;
-                            @endphp
-                            @if ($visibleStores->isNotEmpty())
-                                <div class="mt-1 flex flex-wrap items-center gap-1">
-                                    <i class="fas fa-store text-xs text-blue-500"></i>
-                                    @foreach ($visibleStores as $store)
-                                        <span class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs text-blue-500 dark:bg-gray-700">{{ $store->descriptions->firstWhere('lang', gp247_get_locale())?->name ?? $store->code }}</span>
-                                    @endforeach
-                                </div>
-                            @endif
                         @endif
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $row->collection->name ?? '-' }}</td>

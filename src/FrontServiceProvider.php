@@ -12,6 +12,7 @@ use GP247\Front\Middleware\CheckDomain;
 use GP247\Front\Middleware\CheckActive;
 use GP247\Front\Middleware\FrontRedirectMiddleware;
 use GP247\Front\Commands\FrontInstall;
+use GP247\Front\Commands\FrontUpdate;
 use GP247\Front\Commands\FrontUninstall;
 use GP247\Front\Commands\MakeTemplate;
 use GP247\Front\Commands\TemplateSetup;
@@ -65,6 +66,7 @@ class FrontServiceProvider extends ServiceProvider
         try {
             $this->commands([
                 FrontInstall::class,
+                FrontUpdate::class,
                 FrontUninstall::class,
                 MakeTemplate::class,
                 TemplateSetup::class,

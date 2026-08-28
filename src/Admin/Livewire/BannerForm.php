@@ -11,13 +11,13 @@ use Illuminate\Contracts\View\View;
 /**
  * Banner create/edit form (front-admin Unit) — modern port of the legacy
  * AdminBannerController create/edit: image (LFM), url, title, html (rich text),
- * type (banner-type), target, sort and status, plus multi-store assignment when
- * multistore/partner is installed. Domain unchanged (FrontBanner). Gated by
- * `admin_banner`.
+ * type (banner-type), target, sort and status. Store ownership is 1-1 (scalar
+ * store_id, pinned to the current admin store). Domain unchanged (FrontBanner).
+ * Gated by `admin_banner`.
  *
  * @aidlc-unit front-admin
  * @aidlc-story US-FADM-001
- * @aidlc-adr ADR-001, ADR-006, ADR-007
+ * @aidlc-adr ADR-001, ADR-006, ADR-007, multi-store_one-to-one-store-ownership
  */
 class BannerForm extends FormComponent
 {
@@ -44,9 +44,6 @@ class BannerForm extends FormComponent
         'status' => 1,
     ];
 
-    /** @var array<int, int> Store ids assigned to the banner (multistore). */
-    public array $stores = [];
-
     /**
      * @param string|null $id Banner id to edit; null to create.
      * @return void
@@ -68,7 +65,6 @@ class BannerForm extends FormComponent
                 'sort' => (int) $banner->sort,
                 'status' => (int) $banner->status,
             ];
-            $this->stores = $banner->stores()->pluck('store_id')->map(static fn ($v): string => (string) $v)->all();
         }
     }
 
@@ -108,6 +104,11 @@ class BannerForm extends FormComponent
      */
     protected function persist(array $data): void
     {
+        // WHY: 1-1 ownership — the type dropdown is already store-scoped, but a
+        // crafted Livewire payload could still submit another store's type code,
+        // so reject a cross-store reference server-side (RISK-TECH-store-same-store-ref).
+        $this->assertSameStoreType($data);
+
         $attributes = [
             'image' => $data['image'] ?? '',
             'url' => $data['url'] ?? '',
@@ -123,13 +124,51 @@ class BannerForm extends FormComponent
             $banner = FrontBanner::findOrFail($this->editingId);
             $banner->update($attributes);
         } else {
+            // WHY: 1-1 ownership — a new banner is owned by the current admin store
+            // (pinned to root in admin); set its scalar store_id on create.
+            $attributes['store_id'] = $this->currentStoreId();
             $banner = FrontBanner::create($attributes);
         }
 
-        // WHY: only sync the store pivot when multistore/partner is active, so a
-        // single-store install behaves exactly like the legacy screen (no pivot).
-        if (gp247_store_check_multi_partner_installed() || gp247_store_check_multi_store_installed()) {
-            $banner->stores()->sync($this->stores);
+        // Store ownership is set on the banner row (store_id) above.
+    }
+
+    /**
+     * The current admin store id, falling back to the root store.
+     *
+     * @return int|string
+     */
+    private function currentStoreId()
+    {
+        return session('adminStoreId', defined('GP247_STORE_ID_ROOT') ? GP247_STORE_ID_ROOT : 1);
+    }
+
+    /**
+     * Reject a save whose banner-type code belongs to another store. An empty
+     * type passes (no type selected); only a non-empty code that does not resolve
+     * to a type owned by the current store is rejected.
+     *
+     * @param array<string, mixed> $data Sanitised form.
+     * @return void
+     * @throws \Illuminate\Validation\ValidationException When the type is cross-store.
+     *
+     * @aidlc-adr multi-store_one-to-one-store-ownership
+     */
+    private function assertSameStoreType(array $data): void
+    {
+        $code = (string) ($data['type'] ?? '');
+        if ($code === '') {
+            return;
+        }
+
+        $exists = FrontBannerType::where('code', $code)
+            ->where('store_id', $this->currentStoreId())
+            ->exists();
+
+        if (!$exists) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'form.type' => gp247_language_render('admin.banner.type') . ': invalid store reference',
+            ]);
         }
     }
 
@@ -159,12 +198,12 @@ class BannerForm extends FormComponent
      */
     public function render(): View
     {
-        $multiStore = gp247_store_check_multi_partner_installed() || gp247_store_check_multi_store_installed();
-
+        // WHY: 1-1 ownership — a banner has a single owning store (pinned to the
+        // current admin store), so no multi-store picker context is injected.
         return view('gp247-front-admin::banner-form', [
-            'types' => FrontBannerType::orderBy('name')->get(),
-            'multiStore' => $multiStore,
-            'storeList' => $multiStore ? \GP247\Core\Models\AdminStore::getListTitle() : [],
+            // WHY: 1-1 ownership — only offer banner types owned by the current store
+            // so an admin cannot pick another store's type (RISK-TECH-store-same-store-ref).
+            'types' => FrontBannerType::where('store_id', $this->currentStoreId())->orderBy('name')->get(),
         ])->layout('gp247-admin::layouts.admin', [
             'title' => gp247_language_render($this->editingId !== null ? 'action.edit' : 'admin.banner.add_new'),
             'breadcrumb' => $this->listCrumb(),

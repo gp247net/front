@@ -12,7 +12,7 @@ use Illuminate\Contracts\View\View;
 /**
  * Page (CMS) manager — two-panel screen (form left, list right) following the
  * ResourcePanel pattern (ADR-005, ADR-007, ui-tailadmin P1). Replaces the separate
- * PageList + PageForm pair. Multi-language descriptions and multi-store pivot sync
+ * PageList + PageForm pair. Multi-language descriptions and a scalar store_id owner (1-1)
  * are preserved. Gated by `admin_page`.
  *
  * @aidlc-unit front-admin
@@ -42,9 +42,6 @@ class PageManager extends ResourcePanel
      * @var array<string, array<string, string>>
      */
     public array $descriptions = [];
-
-    /** @var array<int, int> Store ids assigned to the page (multistore). */
-    public array $stores = [];
 
     /**
      * `content` holds admin-authored rich HTML (TinyMCE, via `<x-gp247::rich-editor>`)
@@ -89,7 +86,8 @@ class PageManager extends ResourcePanel
      */
     protected function baseQuery()
     {
-        return FrontPage::with(['descriptions', 'stores.descriptions']);
+        // WHY: 1-1 ownership — eager-load the single owning store (store.descriptions).
+        return FrontPage::with(['descriptions', 'store.descriptions']);
     }
 
     /**
@@ -121,8 +119,8 @@ class PageManager extends ResourcePanel
     }
 
     /**
-     * Hydrate $form from the model; also sets $descriptions and $stores as side
-     * effects so all three stay in sync whenever a row is loaded for editing.
+     * Hydrate $form from the model; also sets $descriptions as a side effect so
+     * both stay in sync whenever a row is loaded for editing.
      *
      * @param FrontPage $model
      * @return array<string, mixed>
@@ -143,9 +141,6 @@ class PageManager extends ResourcePanel
         }
 
         $this->descriptions = $descriptions;
-        $this->stores       = $model->stores()->pluck('store_id')
-            ->map(static fn ($v): string => (string) $v)
-            ->all();
 
         return [
             'image'  => (string) $model->image,
@@ -155,14 +150,13 @@ class PageManager extends ResourcePanel
     }
 
     /**
-     * Reset form back to create mode, clearing descriptions and stores too.
+     * Reset form back to create mode, clearing descriptions too.
      *
      * @return void
      */
     public function resetForm(): void
     {
         parent::resetForm();
-        $this->stores       = [];
         $this->descriptions = $this->emptyDescriptions();
     }
 
@@ -198,8 +192,9 @@ class PageManager extends ResourcePanel
     }
 
     /**
-     * Create/update the page, upsert per-language descriptions (delete then
-     * reinsert, like the legacy controller) and sync stores when multistore is on.
+     * Create/update the page and upsert per-language descriptions (delete then
+     * reinsert, like the legacy controller). Store ownership is a scalar store_id
+     * set on create (1-1).
      *
      * @param array<string, mixed> $data Sanitised form values.
      * @return void
@@ -225,6 +220,9 @@ class PageManager extends ResourcePanel
             $page = FrontPage::findOrFail($this->editingId);
             $page->update($attributes);
         } else {
+            // WHY: 1-1 ownership — a new page is owned by the current admin store
+            // (pinned to root in admin); set its scalar store_id on create.
+            $attributes['store_id'] = session('adminStoreId', defined('GP247_STORE_ID_ROOT') ? GP247_STORE_ID_ROOT : 1);
             $page = FrontPage::create($attributes);
         }
 
@@ -243,11 +241,7 @@ class PageManager extends ResourcePanel
         }
         FrontPageDescription::create($rows);
 
-        // WHY: only sync the store pivot when multistore/partner is active, so a
-        // single-store install behaves exactly like the legacy screen (no pivot).
-        if (gp247_store_check_multi_partner_installed() || gp247_store_check_multi_store_installed()) {
-            $page->stores()->sync($this->stores);
-        }
+        // Store ownership is set on the page row (store_id) above.
 
         // WHY: FrontPage::getListTitleAdmin() caches page-title lists per store x
         // locale; without this the admin dropdown would serve stale titles until the
@@ -303,13 +297,11 @@ class PageManager extends ResourcePanel
      */
     public function render(): View
     {
-        $multiStore = gp247_store_check_multi_partner_installed() || gp247_store_check_multi_store_installed();
-
+        // WHY: 1-1 ownership — a page has a single owning store (pinned to the
+        // current admin store), so no multi-store picker context is injected.
         return view($this->panelView(), [
-            'rows'       => $this->rows(),
-            'languages'  => AdminLanguage::getListActive(),
-            'multiStore' => $multiStore,
-            'storeList'  => $multiStore ? \GP247\Core\Models\AdminStore::getListTitle() : [],
+            'rows'      => $this->rows(),
+            'languages' => AdminLanguage::getListActive(),
         ])->layout('gp247-admin::layouts.admin', ['title' => $this->pageTitle()]);
     }
 }

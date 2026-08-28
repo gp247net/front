@@ -48,14 +48,6 @@
                     @if ($row->url)
                         <a href="{{ gp247_url_render($row->url) }}" target="_blank" class="ml-1 text-xs text-blue-500"><i class="fas fa-external-link-alt"></i></a>
                     @endif
-                    @if (($multiStore ?? false) && $row->stores->isNotEmpty())
-                        <div class="mt-1 flex flex-wrap items-center gap-1">
-                            <i class="fas fa-store text-xs text-blue-500"></i>
-                            @foreach ($row->stores as $store)
-                                <span class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs text-blue-500 dark:bg-gray-700">{{ $store->descriptions->firstWhere('lang', gp247_get_locale())?->name ?? $store->code }}</span>
-                            @endforeach
-                        </div>
-                    @endif
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $row->type }}</td>
                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{{ $row->sort }}</td>

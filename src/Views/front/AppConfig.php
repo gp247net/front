@@ -10,7 +10,6 @@ use GP247\Core\Models\AdminStore;
 use GP247\Core\Models\AdminHome;
 use GP247\Front\Models\FrontLayoutBlock;
 use GP247\Front\Models\FrontBanner;
-use GP247\Front\Models\FrontBannerStore;
 use GP247\Core\ExtensionConfigDefault;
 class AppConfig extends ExtensionConfigDefault
 {
@@ -166,17 +165,14 @@ class AppConfig extends ExtensionConfigDefault
             FrontLayoutBlock::where('template', $this->configKey)
                 ->where('store_id', $storeId)
                 ->delete();
+            // WHY: 1-1 ownership — filter banners by their own store_id column.
             $tableBanner = (new FrontBanner)->getTable();
-            $tableBannerStore = (new FrontBannerStore)->getTable();
             $idBanners = (new FrontBanner)
-                ->join($tableBannerStore, $tableBannerStore.'.banner_id', $tableBanner.'.id')
                 ->where($tableBanner.'.name', 'like', '%('.$this->configKey.')%')
-                ->where($tableBannerStore.'.store_id', $storeId)
+                ->where($tableBanner.'.store_id', $storeId)
                 ->pluck('id');
-    
+
             if ($idBanners) {
-                FrontBannerStore::whereIn('banner_id', $idBanners)
-                ->delete();
                 FrontBanner::whereIn('id', $idBanners)
                 ->delete();
             }
@@ -187,8 +183,6 @@ class AppConfig extends ExtensionConfigDefault
             $idBanners = FrontBanner::where('name', 'like', '%('.$this->configKey.')%')
                 ->pluck('id');
             if ($idBanners) {
-                FrontBannerStore::whereIn('banner_id', $idBanners)
-                ->delete();
                 FrontBanner::whereIn('id', $idBanners)
                 ->delete();
             }
@@ -304,17 +298,14 @@ class AppConfig extends ExtensionConfigDefault
 
             FrontLayoutBlock::insert($dataInsert);
         
+            // WHY: 1-1 ownership — each banner carries its own store_id column, so
+            // the owning store is set on the banner row itself (no pivot insert).
             $modelBanner = new FrontBanner;
-            $modelBannerStore = new FrontBannerStore; 
-        
-            $idBanner1 = $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner home 1 ('.$this->configKey.')', 'image' => 'https://picsum.photos/1000/400?random=1', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner']);
-            $modelBannerStore->create(['banner_id' => $idBanner1->id, 'store_id' => $storeId]);
-            $idBanner2 = $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner home 2 ('.$this->configKey.')', 'image' => 'https://picsum.photos/1000/400?random=2', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner']);
-            $modelBannerStore->create(['banner_id' => $idBanner2->id, 'store_id' => $storeId]);
-            $idBanner3 = $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner breadcrumb ('.$this->configKey.')', 'image' => 'https://picsum.photos/1000/400?random=3', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'breadcrumb']);
-            $modelBannerStore->create(['banner_id' => $idBanner3->id, 'store_id' => $storeId]);
-            $idBanner4 = $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner store ('.$this->configKey.')', 'image' => 'https://picsum.photos/1000/400?random=4', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner-store']);
-            $modelBannerStore->create(['banner_id' => $idBanner4->id, 'store_id' => $storeId]);
+
+            $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner home 1 ('.$this->configKey.')', 'image' => 'https://picsum.photos/1000/400?random=1', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner', 'store_id' => $storeId]);
+            $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner home 2 ('.$this->configKey.')', 'image' => 'https://picsum.photos/1000/400?random=2', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner', 'store_id' => $storeId]);
+            $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner breadcrumb ('.$this->configKey.')', 'image' => 'https://picsum.photos/1000/400?random=3', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'breadcrumb', 'store_id' => $storeId]);
+            $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner store ('.$this->configKey.')', 'image' => 'https://picsum.photos/1000/400?random=4', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner-store', 'store_id' => $storeId]);
         } else {
             return null;
         }

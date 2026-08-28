@@ -1,13 +1,13 @@
 ﻿{{--
     Banner create/edit form (front-admin Unit). UI text via gp247_language_render.
     Image via <x-gp247::media-input> (LFM), html via <x-gp247::rich-editor> (TinyMCE),
-    expiry-free. Multi-store assignment shown only when multistore/partner active.
+    expiry-free. Store ownership is 1-1 (scalar store_id, pinned to the current admin store).
 
     @aidlc-unit front-admin
     @aidlc-story US-FADM-001
     @aidlc-adr ADR-005, ADR-006, ADR-007
 
-    Variables: $types (FrontBannerType[]), $multiStore (bool), $storeList (array id=>name).
+    Variables: $types (FrontBannerType[]).
 --}}
 <div class="max-w-3xl">
     <x-gp247::card :title="gp247_language_render($editingId ? 'action.edit' : 'admin.banner.add_new')">
@@ -52,16 +52,7 @@
             {{-- HTML content (rich text) --}}
             <x-gp247::rich-editor model="form.html" type="banner" :label="gp247_language_render('admin.banner.html')" />
 
-            @if ($multiStore)
-                <div class="space-y-1">
-                    <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"><i class="fas fa-store text-blue-500"></i>{{ gp247_language_render('admin.store') }}</label>
-                    <div class="flex flex-wrap gap-3 rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
-                        @foreach ($storeList as $storeId => $storeName)
-                            <x-gp247::checkbox :label="$storeName" wire:model="stores" value="{{ $storeId }}" id="banner-store-{{ $storeId }}" />
-                        @endforeach
-                    </div>
-                </div>
-            @endif
+            {{-- Store ownership is 1-1 (scalar store_id) and pinned to the current admin store; no multi-store picker. --}}
 
             {{-- Status --}}
             <x-gp247::checkbox :label="gp247_language_render('admin.active')" wire:model="form.status" value="1" />

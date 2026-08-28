@@ -5,7 +5,6 @@ namespace GP247\Front\Models;
 use Illuminate\Database\Eloquent\Model;
 use Cache;
 use GP247\Core\Models\AdminStore;
-use GP247\Front\Models\FrontPageStore;
 
 class FrontPage extends Model
 {
@@ -20,9 +19,18 @@ class FrontPage extends Model
     protected static $getListTitleAdmin = null;
     protected static $getListPageGroupByParentAdmin = null;
 
-    public function stores()
+    /**
+     * The store that owns this page (1-1 ownership).
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     *
+     * @aidlc-unit compat-foundation
+     * @aidlc-story US-FADM-store-single-owner
+     * @aidlc-adr multi-store_one-to-one-store-ownership
+     */
+    public function store()
     {
-        return $this->belongsToMany(AdminStore::class, FrontPageStore::class, 'page_id', 'store_id');
+        return $this->belongsTo(AdminStore::class, 'store_id', 'id');
     }
 
     public function descriptions()
@@ -97,12 +105,12 @@ class FrontPage extends Model
 
         $storeId = config('app.storeId');
         if (gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) {
-            $tablePageStore = (new FrontPageStore)->getTable();
+            // WHY: 1-1 ownership — filter by the page's own store_id column and
+            // still require the owning store to be active (join admin_store).
             $tableStore = (new AdminStore)->getTable();
-            $page = $page->join($tablePageStore, $tablePageStore.'.page_id', $this->getTable() . '.id');
-            $page = $page->join($tableStore, $tableStore . '.id', $tablePageStore.'.store_id');
+            $page = $page->join($tableStore, $tableStore . '.id', $this->getTable() . '.store_id');
             $page = $page->where($tableStore . '.status', '1');
-            $page = $page->where($tablePageStore.'.store_id', $storeId);
+            $page = $page->where($this->getTable() . '.store_id', $storeId);
         }
 
         if ($type === null) {
@@ -124,7 +132,7 @@ class FrontPage extends Model
         static::deleting(
             function ($page) {
                 $page->descriptions()->delete();
-                $page->stores()->detach();
+                // Store ownership is a scalar column now; nothing to detach.
 
                 //Delete custom field
                 (new \GP247\Core\Models\AdminCustomFieldDetail)
@@ -167,12 +175,12 @@ class FrontPage extends Model
 
         $storeId = config('app.storeId');
         if (gp247_store_check_multi_partner_installed() ||  gp247_store_check_multi_store_installed()) {
-            $tablePageStore = (new FrontPageStore)->getTable();
+            // WHY: 1-1 ownership — filter by the page's own store_id column and
+            // still require the owning store to be active (join admin_store).
             $tableStore = (new AdminStore)->getTable();
-            $query = $query->join($tablePageStore, $tablePageStore.'.page_id', $this->getTable() . '.id');
-            $query = $query->join($tableStore, $tableStore . '.id', $tablePageStore.'.store_id');
+            $query = $query->join($tableStore, $tableStore . '.id', $this->getTable() . '.store_id');
             $query = $query->where($tableStore . '.status', '1');
-            $query = $query->where($tablePageStore.'.store_id', $storeId);
+            $query = $query->where($this->getTable() . '.store_id', $storeId);
         }
 
         //search keyword
@@ -218,9 +226,7 @@ class FrontPage extends Model
 
         $tablePage = (new FrontPage)->getTable();
         if ($storeId) {
-            $tablePageStore = (new FrontPageStore)->getTable();
-            $pageList = $pageList->leftJoin($tablePageStore, $tablePageStore . '.page_id', $tablePage . '.id');
-            $pageList = $pageList->where($tablePageStore . '.store_id', $storeId);
+            $pageList = $pageList->where($tablePage . '.store_id', $storeId);
         }
 
         if ($keyword) {
@@ -248,10 +254,8 @@ class FrontPage extends Model
     {
         $data = self::where('id', $id);
         if ($storeId) {
-            $tablePageStore = (new FrontPageStore)->getTable();
             $tablePage = (new FrontPage)->getTable();
-            $data = $data->leftJoin($tablePageStore, $tablePageStore . '.page_id', $tablePage . '.id');
-            $data = $data->where($tablePageStore . '.store_id', $storeId);
+            $data = $data->where($tablePage . '.store_id', $storeId);
         }
         $data = $data->first();
         return $data;
@@ -279,9 +283,7 @@ class FrontPage extends Model
                     $data = self::join($tableDescription, $tableDescription.'.page_id', $table.'.id')
                     ->where('lang', gp247_get_locale());
                     if ($storeId) {
-                        $tablePageStore = (new FrontPageStore)->getTable();
-                        $data = $data->leftJoin($tablePageStore, $tablePageStore . '.page_id', $table . '.id');
-                        $data = $data->where($tablePageStore . '.store_id', $storeId);
+                        $data = $data->where($table . '.store_id', $storeId);
                     }
                     $data = $data->pluck('name', 'id')->toArray();
                     self::$getListTitleAdmin = $data;
@@ -294,9 +296,7 @@ class FrontPage extends Model
                 $data = self::join($tableDescription, $tableDescription.'.page_id', $table.'.id')
                 ->where('lang', gp247_get_locale());
                 if ($storeId) {
-                    $tablePageStore = (new FrontPageStore)->getTable();
-                    $data = $data->leftJoin($tablePageStore, $tablePageStore . '.page_id', $table . '.id');
-                    $data = $data->where($tablePageStore . '.store_id', $storeId);
+                    $data = $data->where($table . '.store_id', $storeId);
                 }
                 $data = $data->pluck('name', 'id')->toArray();
                 self::$getListTitleAdmin = $data;
@@ -343,11 +343,9 @@ class FrontPage extends Model
         $storeId = $storeId ? $storeId : session('adminStoreId');
         $arrReturn = [];
         $tablePage = $this->getTable();
-        $tablePageStore = (new FrontPageStore)->getTable();
         $data = $this;
         if ($storeId) {
-            $data = $this->leftJoin($tablePageStore, $tablePageStore . '.page_id', $tablePage . '.id');
-            $data = $data->where($tablePageStore . '.store_id', $storeId);
+            $data = $this->where($tablePage . '.store_id', $storeId);
         }
         $arrReturn = $data->pluck('alias')->toArray();
         return $arrReturn;
