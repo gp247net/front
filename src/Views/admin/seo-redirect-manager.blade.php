@@ -16,6 +16,8 @@
     <x-gp247::card :title="gp247_language_render($editingId ? 'action.edit' : 'admin.seo_redirect.add_new')">
         <form wire:submit="save" class="space-y-4">
 
+            @include('gp247-admin::partials.store-scope-picker', ['testid' => 'seo-redirect-store-select'])
+
             <x-gp247::input
                 :label="gp247_language_render('admin.seo_redirect.from')"
                 name="from"
@@ -104,7 +106,10 @@
             @foreach ($rows as $row)
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 {{ (string) $row->id === (string) $editingId ? 'bg-blue-100 border-l-4 border-blue-500 dark:bg-blue-900 dark:border-blue-500' : '' }}"
                     wire:key="seo-redirect-{{ $row->id }}">
-                    <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-100"><code class="text-xs">{{ $row->from }}</code></td>
+                    <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-100">
+                        <code class="text-xs">{{ $row->from }}</code>
+                        @include('gp247-admin::partials.store-scope-line', ['storeId' => $row->store_id])
+                    </td>
                     <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-100"><code class="text-xs">{{ $row->to }}</code></td>
                     <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-100">{{ $row->code }}</td>
                     <td class="px-4 py-3">

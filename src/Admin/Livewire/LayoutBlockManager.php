@@ -43,11 +43,35 @@ class LayoutBlockManager extends ResourcePanel
     protected array $richFields = ['text'];
 
     /**
+     * Store-scoped: pick a store on create (root admin), show it in the list, lock
+     * it on edit. Changing the store on create resets `text`, whose view/page
+     * options (template blocks, CMS page aliases) are store-specific.
+     *
+     * @return array<string, mixed>|null
+     *
+     * @aidlc-unit front-admin
+     * @aidlc-story US-SADM-store-content-assignment
+     * @aidlc-adr admin-shell_store-scoped-resource-panel
+     */
+    protected function storeScoped(): ?array
+    {
+        return ['display' => 'name', 'reset' => ['text']];
+    }
+
+    /**
+     * Store-scoped layout-block query: root admin shows every store's blocks; a
+     * scoped context (store-admin/switcher) or single-store install filters to own.
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function baseQuery()
     {
-        return FrontLayoutBlock::query();
+        $query = FrontLayoutBlock::query();
+        if (!($this->storeScopeActive() && $this->isRootScope())) {
+            $query->where('store_id', $this->storeContext());
+        }
+
+        return $query;
     }
 
     /**
@@ -96,6 +120,10 @@ class LayoutBlockManager extends ResourcePanel
      */
     protected function fillForm($model): array
     {
+        // Store is immutable on edit — expose it for the read-only display + to scope
+        // the view/page option lists to the record's own store.
+        $this->formStoreId = (string) $model->store_id;
+
         return [
             'name'     => (string) $model->name,
             'position' => (string) $model->position,
@@ -153,15 +181,20 @@ class LayoutBlockManager extends ResourcePanel
             'type'      => $data['type'],
             'sort'      => (int) ($data['sort'] ?? 0),
             'status'    => empty($data['status']) ? 0 : 1,
-            // WHY: mirror legacy store binding — scope to active admin store or root.
-            'store_id'  => session('adminStoreId') ?? 0,
-            // WHY: NOT NULL with no default; bind the active store's template.
-            'template'  => function_exists('gp247_store_info') ? (string) gp247_store_info('template') : '',
         ];
 
         if ($this->editingId !== null) {
+            // Store (and the template bound to it) are immutable on edit (ADR 1-1).
             FrontLayoutBlock::findOrFail($this->editingId)->update($attributes);
         } else {
+            // WHY: 1-1 ownership — a new block is owned by the store picked on create
+            // (root admin) or the current scoped store (store-admin / switcher); bind
+            // that store's template (NOT NULL with no default).
+            $store = $this->resolveCreateStore();
+            $attributes['store_id'] = $store;
+            $attributes['template'] = function_exists('gp247_store_info')
+                ? (string) gp247_store_info(key: 'template', storeId: $store)
+                : '';
             FrontLayoutBlock::create($attributes);
         }
     }
@@ -219,7 +252,12 @@ class LayoutBlockManager extends ResourcePanel
      */
     protected function getListViewBlock(): array
     {
-        $storeId = session('adminStoreId');
+        // WHY: scope to the form's store (picked on create at root, own store on edit)
+        // so the block's view options come from that store's active template.
+        $storeId = $this->currentStore();
+        if ($this->storeScopeActive() && ($storeId === null || $storeId === '')) {
+            return [];
+        }
         $template = function_exists('gp247_store_info') ? (string) gp247_store_info(key: 'template', storeId: $storeId) : '';
         $arrView = [];
         foreach (glob(app_path() . '/GP247/Templates/' . $template . '/blocks/*.blade.php') ?: [] as $file) {
@@ -234,7 +272,14 @@ class LayoutBlockManager extends ResourcePanel
      */
     protected function getListPageBlock(): array
     {
-        return (new FrontPage)->getListPageAlias(session('adminStoreId'));
+        // WHY: scope to the form's store (picked on create at root, own store on edit)
+        // so only that store's CMS page aliases are offered.
+        $storeId = $this->currentStore();
+        if ($this->storeScopeActive() && ($storeId === null || $storeId === '')) {
+            return [];
+        }
+
+        return (new FrontPage)->getListPageAlias($storeId);
     }
 
     /**

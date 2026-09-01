@@ -38,25 +38,40 @@ class SeoRedirectManager extends ResourcePanel
     protected bool $keepStateOnSave = true;
 
     /**
-     * Scope to the store `FrontRedirectMiddleware`/`FrontRedirect::findActive()`
-     * resolve at request time (`config('app.storeId')`) — mirrors
-     * `SeoMetaSettings::storeId()`. Using a different key (e.g.
-     * `session('adminStoreId')`) would let an admin save a rule that never
-     * matches the live site.
+     * Store-scoped: pick a store on create (root admin), show it in the list, lock
+     * it on edit. Redirect is a leaf entity (from/to are path strings).
      *
-     * @return mixed Store UUID.
+     * WHY the store matters here: `FrontRedirectMiddleware`/`FrontRedirect::findActive()`
+     * match by the request-time store (`config('app.storeId')`), which equals the store
+     * whose domain is being served. Owning a redirect by the store picked on create
+     * (root admin) or the current scoped store therefore targets exactly that store's
+     * live domain.
+     *
+     * @return array<string, mixed>|null
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SADM-store-content-assignment
+     * @aidlc-adr admin-shell_store-scoped-resource-panel
      */
-    private function storeId()
+    protected function storeScoped(): ?array
     {
-        return config('app.storeId');
+        return ['display' => 'from', 'reset' => []];
     }
 
     /**
+     * Store-scoped redirect query: root admin shows every store's redirects; a scoped
+     * context (store-admin/switcher) or single-store install filters to the own store.
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function baseQuery()
     {
-        return FrontRedirect::query()->where('store_id', $this->storeId());
+        $query = FrontRedirect::query();
+        if (!($this->storeScopeActive() && $this->isRootScope())) {
+            $query->where('store_id', $this->storeContext());
+        }
+
+        return $query;
     }
 
     /**
@@ -113,6 +128,9 @@ class SeoRedirectManager extends ResourcePanel
      */
     protected function fillForm($model): array
     {
+        // Store is immutable on edit — expose it for the read-only display.
+        $this->formStoreId = (string) $model->store_id;
+
         return [
             'from'   => (string) $model->from,
             'to'     => (string) $model->to,
@@ -135,7 +153,7 @@ class SeoRedirectManager extends ResourcePanel
                 'max:500',
                 'regex:/^\//',
                 Rule::unique((new FrontRedirect())->getTable(), 'from')
-                    ->where('store_id', $this->storeId())
+                    ->where('store_id', $this->currentStore())
                     ->ignore($this->editingId),
                 // RISK-OPS-008: block direct self-redirect (from === to).
                 Rule::notIn([$this->form['to'] ?? '']),
@@ -170,12 +188,16 @@ class SeoRedirectManager extends ResourcePanel
             'to'       => $data['to'],
             'code'     => (int) $data['code'],
             'status'   => empty($data['status']) ? 0 : 1,
-            'store_id' => $this->storeId(),
         ];
 
         if ($this->editingId !== null) {
+            // Store is immutable on edit — do NOT touch store_id (ADR 1-1).
             FrontRedirect::where('id', $this->editingId)->update($attributes);
         } else {
+            // WHY: 1-1 ownership — a new redirect is owned by the store picked on
+            // create (root admin) or the current scoped store (store-admin/switcher),
+            // i.e. the store whose live domain the rule will match.
+            $attributes['store_id'] = $this->resolveCreateStore();
             FrontRedirect::create($attributes);
         }
     }

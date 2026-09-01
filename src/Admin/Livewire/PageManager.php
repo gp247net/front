@@ -82,12 +82,36 @@ class PageManager extends ResourcePanel
     }
 
     /**
+     * Store-scoped: pick a store on create (root admin), show it in the list, lock
+     * it on edit. Page is a leaf entity (only multilingual descriptions).
+     *
+     * @return array<string, mixed>|null
+     *
+     * @aidlc-unit front-admin
+     * @aidlc-story US-SADM-store-content-assignment
+     * @aidlc-adr admin-shell_store-scoped-resource-panel
+     */
+    protected function storeScoped(): ?array
+    {
+        return ['display' => 'name', 'reset' => []];
+    }
+
+    /**
+     * Store-scoped page query: root admin shows every store's pages (each row
+     * labelled by its store); a scoped context (store-admin/switcher) or a
+     * single-store install filters to the own store.
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function baseQuery()
     {
         // WHY: 1-1 ownership — eager-load the single owning store (store.descriptions).
-        return FrontPage::with(['descriptions', 'store.descriptions']);
+        $query = FrontPage::with(['descriptions', 'store.descriptions']);
+        if (!($this->storeScopeActive() && $this->isRootScope())) {
+            $query->where('store_id', $this->storeContext());
+        }
+
+        return $query;
     }
 
     /**
@@ -141,6 +165,9 @@ class PageManager extends ResourcePanel
         }
 
         $this->descriptions = $descriptions;
+
+        // Store is immutable on edit — expose it for the read-only display.
+        $this->formStoreId = (string) $model->store_id;
 
         return [
             'image'  => (string) $model->image,
@@ -217,12 +244,13 @@ class PageManager extends ResourcePanel
         ];
 
         if ($this->editingId !== null) {
+            // Store is immutable on edit — do NOT touch store_id (ADR 1-1).
             $page = FrontPage::findOrFail($this->editingId);
             $page->update($attributes);
         } else {
-            // WHY: 1-1 ownership — a new page is owned by the current admin store
-            // (pinned to root in admin); set its scalar store_id on create.
-            $attributes['store_id'] = session('adminStoreId', defined('GP247_STORE_ID_ROOT') ? GP247_STORE_ID_ROOT : 1);
+            // WHY: 1-1 ownership — a new page is owned by the store picked on create
+            // (root admin) or the current scoped store (store-admin / switcher).
+            $attributes['store_id'] = $this->resolveCreateStore();
             $page = FrontPage::create($attributes);
         }
 

@@ -48,6 +48,7 @@
                     @if ($row->url)
                         <a href="{{ gp247_url_render($row->url) }}" target="_blank" class="ml-1 text-xs text-blue-500"><i class="fas fa-external-link-alt"></i></a>
                     @endif
+                    @include('gp247-admin::partials.store-scope-line', ['storeId' => $row->store_id])
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $row->type }}</td>
                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{{ $row->sort }}</td>

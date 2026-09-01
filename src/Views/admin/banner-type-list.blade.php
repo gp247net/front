@@ -31,7 +31,10 @@
             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50" wire:key="banner-type-{{ $row->id }}">
                 <td class="px-4 py-3"><x-gp247::select-check :value="$row->id" /></td>
                 <td class="px-4 py-3"><code class="text-xs text-gray-700 dark:text-gray-300">{{ $row->code }}</code></td>
-                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">{{ $row->name }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
+                    {{ $row->name }}
+                    @include('gp247-admin::partials.store-scope-line', ['storeId' => $row->store_id])
+                </td>
                 <td class="px-4 py-3">
                     <x-gp247::row-actions
                         :edit="gp247_route_admin('admin_banner_type.edit', ['id' => $row->id])"

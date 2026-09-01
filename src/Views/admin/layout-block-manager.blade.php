@@ -17,6 +17,8 @@
     <x-gp247::card :title="gp247_language_render($editingId ? 'action.edit' : 'admin.layout_block.add_new')">
         <form wire:submit="save" class="space-y-4">
 
+            @include('gp247-admin::partials.store-scope-picker', ['testid' => 'layout-block-store-select'])
+
             <x-gp247::input :label="gp247_language_render('admin.layout_block.name')" name="name"
                 wire:model="form.name" :error="$errors->first('form.name')" required />
 
@@ -107,12 +109,17 @@
                     @error('form.text')<p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                 </div>
             @elseif ($form['type'] === 'page')
-                <x-gp247::searchable-select
-                    model="form.text"
-                    :label="gp247_language_render('admin.layout_block.text')"
-                    :options="$pageViewOptions"
-                    :error="$errors->first('form.text')"
-                    required />
+                {{-- wire:key on $formStoreId: the searchable-select is wire:ignore'd, so
+                     changing the store must REPLACE it to reload the store-scoped page
+                     aliases (ADR admin-shell_store-scoped-resource-panel). --}}
+                <div wire:key="lb-text-page-{{ $formStoreId }}">
+                    <x-gp247::searchable-select
+                        model="form.text"
+                        :label="gp247_language_render('admin.layout_block.text')"
+                        :options="$pageViewOptions"
+                        :error="$errors->first('form.text')"
+                        required />
+                </div>
             @else
                 <x-gp247::rich-editor model="form.text" :label="gp247_language_render('admin.layout_block.text')"
                     :error="$errors->first('form.text')"
@@ -162,7 +169,10 @@
             @foreach ($rows as $row)
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 {{ (string) $row->id === (string) $editingId ? 'bg-blue-100 border-l-4 border-blue-500 dark:bg-blue-900 dark:border-blue-500' : '' }}"
                     wire:key="layout-block-{{ $row->id }}">
-                    <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">{{ $row->name }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
+                        {{ $row->name }}
+                        @include('gp247-admin::partials.store-scope-line', ['storeId' => $row->store_id])
+                    </td>
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $row->type }}</td>
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $row->position }}</td>
                     <td class="px-4 py-3">

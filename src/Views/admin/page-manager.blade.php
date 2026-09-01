@@ -19,6 +19,8 @@
     <x-gp247::card :title="gp247_language_render($editingId ? 'action.edit' : 'admin.page.add_new')">
         <form wire:submit="save" class="space-y-4">
 
+            @include('gp247-admin::partials.store-scope-picker', ['testid' => 'page-store-select'])
+
             {{-- Per-language descriptions --}}
             @foreach ($languages as $code => $language)
                 <div class="space-y-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700" wire:key="page-lang-{{ $code }}">
@@ -51,8 +53,6 @@
 
             <x-gp247::input :label="gp247_language_render('admin.page.alias')" name="alias"
                 wire:model="form.alias" :error="$errors->first('form.alias')" required />
-
-            {{-- Store ownership is 1-1 (scalar store_id) and pinned to the current admin store; no multi-store picker. --}}
 
             <x-gp247::checkbox :label="gp247_language_render('admin.active')" wire:model="form.status" value="1" />
 
@@ -107,6 +107,7 @@
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
                         {{ $rowTitle }}
+                        @include('gp247-admin::partials.store-scope-line', ['storeId' => $row->store_id])
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $row->alias }}</td>
                     <td class="px-4 py-3">

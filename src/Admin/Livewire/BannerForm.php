@@ -3,6 +3,7 @@
 namespace GP247\Front\Admin\Livewire;
 
 use GP247\Core\AdminShell\Infrastructure\FormComponent;
+use GP247\Core\AdminShell\Infrastructure\HasStoreScopeUi;
 use GP247\Core\AdminShell\Infrastructure\HasValidationLabels;
 use GP247\Front\Models\FrontBanner;
 use GP247\Front\Models\FrontBannerType;
@@ -22,8 +23,23 @@ use Illuminate\Contracts\View\View;
 class BannerForm extends FormComponent
 {
     use HasValidationLabels;
+    use HasStoreScopeUi;
 
     protected ?string $permission = 'admin_banner';
+
+    /**
+     * Opt into store scoping (pick a store on create, lock on edit, scope the
+     * banner-type dropdown to that store).
+     *
+     * @return bool
+     *
+     * @aidlc-story US-SADM-store-content-assignment
+     * @aidlc-adr admin-shell_store-scoped-resource-panel
+     */
+    protected function storeScopeOptIn(): bool
+    {
+        return true;
+    }
 
     /**
      * @var array<int, string> `html` holds admin-authored HTML markup (the
@@ -55,6 +71,9 @@ class BannerForm extends FormComponent
         if ($id !== null) {
             $banner = FrontBanner::findOrFail($id);
             $this->editingId = (string) $banner->id;
+            // Store is immutable on edit — expose it for the read-only display + to
+            // scope the banner-type dropdown to the record's own store.
+            $this->formStoreId = (string) $banner->store_id;
             $this->form = [
                 'image' => (string) $banner->image,
                 'url' => (string) $banner->url,
@@ -66,6 +85,46 @@ class BannerForm extends FormComponent
                 'status' => (int) $banner->status,
             ];
         }
+    }
+
+    /**
+     * The store the form is bound to, for scoping the banner-type options + guard:
+     * on edit the record's own store (read from the DB, tamper-proof); on create at
+     * root the picked store (null until chosen); otherwise the current context.
+     *
+     * @return int|string|null
+     */
+    private function currentStore()
+    {
+        if (!$this->storeScopeActive()) {
+            return $this->storeContext();
+        }
+        if ($this->editingId !== null && $this->editingId !== '') {
+            $recStore = FrontBanner::whereKey($this->editingId)->value('store_id');
+
+            return $recStore !== null ? $recStore : $this->storeContext();
+        }
+        if (!$this->isRootScope()) {
+            return $this->storeContext();
+        }
+
+        return $this->formStoreId !== '' ? $this->formStoreId : null;
+    }
+
+    /**
+     * Livewire hook: when the create picker changes the store, clear the store-
+     * dependent banner type so a stale cross-store code cannot linger, and notify.
+     *
+     * @return void
+     */
+    public function updatedFormStoreId(): void
+    {
+        if (!$this->storeScopeActive() || $this->editingId !== null) {
+            return;
+        }
+        $this->form['type'] = '';
+        $this->resetValidation();
+        $this->notify('info', gp247_language_render('admin.store.store_changed_notice'));
     }
 
     /**
@@ -121,12 +180,13 @@ class BannerForm extends FormComponent
         ];
 
         if ($this->editingId !== null) {
+            // Store is immutable on edit — do NOT touch store_id (ADR 1-1).
             $banner = FrontBanner::findOrFail($this->editingId);
             $banner->update($attributes);
         } else {
-            // WHY: 1-1 ownership — a new banner is owned by the current admin store
-            // (pinned to root in admin); set its scalar store_id on create.
-            $attributes['store_id'] = $this->currentStoreId();
+            // WHY: 1-1 ownership — a new banner is owned by the store picked on create
+            // (root admin) or the current scoped store (store-admin / switcher).
+            $attributes['store_id'] = $this->resolveCreateStore();
             $banner = FrontBanner::create($attributes);
         }
 
@@ -134,19 +194,9 @@ class BannerForm extends FormComponent
     }
 
     /**
-     * The current admin store id, falling back to the root store.
-     *
-     * @return int|string
-     */
-    private function currentStoreId()
-    {
-        return session('adminStoreId', defined('GP247_STORE_ID_ROOT') ? GP247_STORE_ID_ROOT : 1);
-    }
-
-    /**
      * Reject a save whose banner-type code belongs to another store. An empty
      * type passes (no type selected); only a non-empty code that does not resolve
-     * to a type owned by the current store is rejected.
+     * to a type owned by the record's store is rejected.
      *
      * @param array<string, mixed> $data Sanitised form.
      * @return void
@@ -161,8 +211,9 @@ class BannerForm extends FormComponent
             return;
         }
 
+        // The record's store: picked store on create, own store on edit (immutable).
         $exists = FrontBannerType::where('code', $code)
-            ->where('store_id', $this->currentStoreId())
+            ->where('store_id', $this->currentStore())
             ->exists();
 
         if (!$exists) {
@@ -198,12 +249,15 @@ class BannerForm extends FormComponent
      */
     public function render(): View
     {
-        // WHY: 1-1 ownership — a banner has a single owning store (pinned to the
-        // current admin store), so no multi-store picker context is injected.
+        // WHY: 1-1 ownership — only offer the record's store banner types so an admin
+        // cannot pick another store's type (RISK-TECH-store-same-store-ref). On create
+        // at root before a store is picked, currentStore() is null → empty options
+        // (the store picker gates the rest of the form).
+        $store = $this->currentStore();
+        $noStore = $this->storeScopeActive() && ($store === null || $store === '');
+
         return view('gp247-front-admin::banner-form', [
-            // WHY: 1-1 ownership — only offer banner types owned by the current store
-            // so an admin cannot pick another store's type (RISK-TECH-store-same-store-ref).
-            'types' => FrontBannerType::where('store_id', $this->currentStoreId())->orderBy('name')->get(),
+            'types' => $noStore ? collect() : FrontBannerType::where('store_id', $store)->orderBy('name')->get(),
         ])->layout('gp247-admin::layouts.admin', [
             'title' => gp247_language_render($this->editingId !== null ? 'action.edit' : 'admin.banner.add_new'),
             'breadcrumb' => $this->listCrumb(),

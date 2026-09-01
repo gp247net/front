@@ -17,6 +17,8 @@
     <x-gp247::card :title="gp247_language_render($editingId ? 'action.edit' : 'admin.link.add_new')">
         <form wire:submit="save" class="space-y-4">
 
+            @include('gp247-admin::partials.store-scope-picker', ['testid' => 'link-store-select'])
+
             <x-gp247::input :label="gp247_language_render('admin.link.name')" name="name"
                 wire:model="form.name" :error="$errors->first('form.name')" required />
 
@@ -72,8 +74,6 @@
                 <x-gp247::input type="number" min="0" :label="gp247_language_render('admin.sort')"
                     name="sort" wire:model="form.sort" :error="$errors->first('form.sort')" required />
             </div>
-
-            {{-- Store ownership is 1-1 (scalar store_id) and pinned to the current admin store; no multi-store picker. --}}
 
             <x-gp247::checkbox :label="gp247_language_render('admin.active')" wire:model="form.status" value="1" />
 
@@ -131,6 +131,7 @@
                         @if ($row->url && $row->type !== 'collection')
                             <a href="{{ gp247_url_render($row->url) }}" target="_blank" class="ml-1 text-xs text-blue-500"><i class="fas fa-external-link-alt"></i></a>
                         @endif
+                        @include('gp247-admin::partials.store-scope-line', ['storeId' => $row->store_id])
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $row->collection->name ?? '-' }}</td>
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $row->group }}</td>

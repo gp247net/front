@@ -34,6 +34,26 @@ class LinkManager extends ResourcePanel
     protected bool $keepStateOnSave = true;
 
     /**
+     * Store-scoped: pick a store on create (root admin), show it in the list, lock
+     * it on edit. Changing the store on create resets the store-owned group and
+     * collection references so a stale cross-store id cannot linger.
+     *
+     * @return array<string, mixed>|null
+     *
+     * @aidlc-unit front-admin
+     * @aidlc-story US-SADM-store-content-assignment
+     * @aidlc-adr admin-shell_store-scoped-resource-panel
+     */
+    protected function storeScoped(): ?array
+    {
+        return ['display' => 'name', 'reset' => ['group', 'collection_id']];
+    }
+
+    /**
+     * Store-scoped link query: root admin shows every store's links (each row
+     * labelled by its store); a scoped context (store-admin/switcher) or a
+     * single-store install filters to the own store.
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function baseQuery()
@@ -41,7 +61,12 @@ class LinkManager extends ResourcePanel
         // Eager-load the parent collection so the list can show its name
         // without an N+1 query per row. WHY: 1-1 ownership — eager-load the
         // single owning store (store.descriptions).
-        return FrontLink::query()->with(['collection', 'store.descriptions']);
+        $query = FrontLink::query()->with(['collection', 'store.descriptions']);
+        if (!($this->storeScopeActive() && $this->isRootScope())) {
+            $query->where('store_id', $this->storeContext());
+        }
+
+        return $query;
     }
 
     /**
@@ -91,6 +116,10 @@ class LinkManager extends ResourcePanel
      */
     protected function fillForm($model): array
     {
+        // Store is immutable on edit — expose it for the read-only display + to
+        // scope the group/collection option lists to the record's own store.
+        $this->formStoreId = (string) $model->store_id;
+
         return [
             'name'          => (string) $model->name,
             'url'           => (string) $model->url,
@@ -182,12 +211,13 @@ class LinkManager extends ResourcePanel
         }
 
         if ($this->editingId !== null) {
+            // Store is immutable on edit — do NOT touch store_id (ADR 1-1).
             $link = FrontLink::findOrFail($this->editingId);
             $link->update($attributes);
         } else {
-            // WHY: 1-1 ownership — a new link is owned by the current admin store
-            // (pinned to root in admin); set its scalar store_id on create.
-            $attributes['store_id'] = $this->currentStoreId();
+            // WHY: 1-1 ownership — a new link is owned by the store picked on create
+            // (root admin) or the current scoped store (store-admin / switcher).
+            $attributes['store_id'] = $this->resolveCreateStore();
             $link = FrontLink::create($attributes);
         }
 
@@ -195,19 +225,9 @@ class LinkManager extends ResourcePanel
     }
 
     /**
-     * The current admin store id, falling back to the root store.
-     *
-     * @return int|string
-     */
-    private function currentStoreId()
-    {
-        return session('adminStoreId', defined('GP247_STORE_ID_ROOT') ? GP247_STORE_ID_ROOT : 1);
-    }
-
-    /**
      * Reject a save whose collection_id points at a link owned by another store.
      * A null/empty value passes (no collection selected); only a non-empty id
-     * that does not resolve to a link owned by the current store is rejected.
+     * that does not resolve to a link owned by the record's store is rejected.
      *
      * @param int|string|null $collectionId Submitted collection link id.
      * @return void
@@ -221,8 +241,9 @@ class LinkManager extends ResourcePanel
             return;
         }
 
+        // The record's store: picked store on create, own store on edit (immutable).
         $exists = FrontLink::where('id', $collectionId)
-            ->where('store_id', $this->currentStoreId())
+            ->where('store_id', $this->currentStore())
             ->exists();
 
         if (!$exists) {
@@ -273,16 +294,17 @@ class LinkManager extends ResourcePanel
      */
     public function render(): View
     {
-        // WHY: 1-1 ownership — a link has a single owning store (pinned to the
-        // current admin store), so no multi-store picker context is injected.
-        // WHY: 1-1 ownership — only offer this store's groups/collections so an
+        // WHY: 1-1 ownership — only offer the record's store groups/collections so an
         // admin cannot reference another store's row (RISK-TECH-store-same-store-ref).
-        $storeId = $this->currentStoreId();
+        // On create at root before a store is picked, currentStore() is null → empty
+        // option lists (the store picker gates the rest of the form).
+        $storeId = $this->currentStore();
+        $noStore = $this->storeScopeActive() && ($storeId === null || $storeId === '');
 
         return view($this->panelView(), [
             'rows'        => $this->rows(),
-            'groups'      => FrontLinkGroup::where('store_id', $storeId)->orderBy('name')->get(),
-            'collections' => FrontLink::where('store_id', $storeId)->where('type', 'collection')->orderBy('name')->get(),
+            'groups'      => $noStore ? collect() : FrontLinkGroup::where('store_id', $storeId)->orderBy('name')->get(),
+            'collections' => $noStore ? collect() : FrontLink::where('store_id', $storeId)->where('type', 'collection')->orderBy('name')->get(),
         ])->layout('gp247-admin::layouts.admin', ['title' => $this->pageTitle()]);
     }
 }

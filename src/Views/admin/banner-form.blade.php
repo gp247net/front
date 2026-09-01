@@ -13,6 +13,8 @@
     <x-gp247::card :title="gp247_language_render($editingId ? 'action.edit' : 'admin.banner.add_new')">
         <form wire:submit="save" class="space-y-4">
 
+            @include('gp247-admin::partials.store-scope-picker', ['testid' => 'banner-store-select'])
+
             <x-gp247::input :label="gp247_language_render('admin.banner.title')" name="title"
                 wire:model="form.name" :error="$errors->first('form.name')" required />
 
@@ -51,8 +53,6 @@
 
             {{-- HTML content (rich text) --}}
             <x-gp247::rich-editor model="form.html" type="banner" :label="gp247_language_render('admin.banner.html')" />
-
-            {{-- Store ownership is 1-1 (scalar store_id) and pinned to the current admin store; no multi-store picker. --}}
 
             {{-- Status --}}
             <x-gp247::checkbox :label="gp247_language_render('admin.active')" wire:model="form.status" value="1" />
