@@ -3,6 +3,7 @@
 namespace GP247\Front\Admin\Livewire;
 
 use GP247\Core\AdminShell\Infrastructure\FormComponent;
+use GP247\Core\AdminShell\Infrastructure\HasStoreScopeUi;
 use GP247\Core\AdminShell\Infrastructure\HasValidationLabels;
 use GP247\Front\Models\FrontLinkGroup;
 use Illuminate\Contracts\View\View;
@@ -20,6 +21,7 @@ use Illuminate\Validation\Rule;
 class LinkGroupForm extends FormComponent
 {
     use HasValidationLabels;
+    use HasStoreScopeUi;
 
     protected ?string $permission = 'admin_link';
 
@@ -30,6 +32,17 @@ class LinkGroupForm extends FormComponent
     ];
 
     /**
+     * Opt into store scoping (pick a store on create, lock on edit, scope the unique
+     * code check to that store).
+     *
+     * @return bool
+     */
+    protected function storeScopeOptIn(): bool
+    {
+        return true;
+    }
+
+    /**
      * @param string|null $id Link-group id to edit; null to create.
      * @return void
      */
@@ -37,14 +50,48 @@ class LinkGroupForm extends FormComponent
     {
         parent::mount();
 
-        if ($id !== null) {
-            $row = FrontLinkGroup::findOrFail($id);
-            $this->editingId = (string) $row->id;
-            $this->form = [
-                'code' => $row->code,
-                'name' => $row->name,
-            ];
+        if ($id === null) {
+            // Create: default the picker to the current context store (ROOT at root
+            // admin) — parity with ResourcePanel::resetForm().
+            if ($this->storeScopeActive()) {
+                $this->formStoreId = (string) $this->storeContext();
+            }
+
+            return;
         }
+
+        $row = FrontLinkGroup::findOrFail($id);
+        $this->editingId = (string) $row->id;
+        // Store is immutable on edit — expose it for the read-only display.
+        $this->formStoreId = (string) $row->store_id;
+        $this->form = [
+            'code' => $row->code,
+            'name' => $row->name,
+        ];
+    }
+
+    /**
+     * The store the form is bound to (for the per-store unique code check): on edit
+     * the record's own store (DB, tamper-proof); on create at root the picked store
+     * (null until chosen); otherwise the current context.
+     *
+     * @return int|string|null
+     */
+    private function currentStore()
+    {
+        if (!$this->storeScopeActive()) {
+            return $this->storeContext();
+        }
+        if ($this->editingId !== null && $this->editingId !== '') {
+            $recStore = FrontLinkGroup::whereKey($this->editingId)->value('store_id');
+
+            return $recStore !== null ? $recStore : $this->storeContext();
+        }
+        if (!$this->isRootScope()) {
+            return $this->storeContext();
+        }
+
+        return $this->formStoreId !== '' ? $this->formStoreId : null;
     }
 
     /**
@@ -52,15 +99,28 @@ class LinkGroupForm extends FormComponent
      */
     protected function rules(): array
     {
-        return [
+        return array_merge([
             'form.name' => ['required', 'string', 'max:255'],
             'form.code' => [
                 'required',
                 'string',
                 'max:100',
-                Rule::unique((new FrontLinkGroup())->getTable(), 'code')->ignore($this->editingId),
+                // Code is unique per store (a new group code may repeat across stores).
+                Rule::unique((new FrontLinkGroup())->getTable(), 'code')
+                    ->ignore($this->editingId)
+                    ->where('store_id', $this->currentStore()),
             ],
-        ];
+        ], $this->storeScopeCreateRules());
+    }
+
+    /**
+     * Localised validator messages (store-required on scoped create).
+     *
+     * @return array<string, string>
+     */
+    protected function messages(): array
+    {
+        return $this->storeScopeMessages();
     }
 
     /**
@@ -89,11 +149,15 @@ class LinkGroupForm extends FormComponent
         ];
 
         if ($this->editingId !== null) {
+            // Store is immutable on edit — do NOT touch store_id (ADR 1-1).
             FrontLinkGroup::where('id', $this->editingId)->update($attributes);
 
             return;
         }
 
+        // WHY: 1-1 ownership — a new group is owned by the store picked on create
+        // (root admin) or the current scoped store (store-admin / switcher).
+        $attributes['store_id'] = $this->resolveCreateStore();
         FrontLinkGroup::create($attributes);
     }
 

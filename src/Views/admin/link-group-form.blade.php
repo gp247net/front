@@ -8,6 +8,8 @@
 <div class="max-w-2xl">
     <x-gp247::card :title="gp247_language_render($editingId ? 'action.edit' : 'admin.link_group.add_new')">
         <form wire:submit="save" class="space-y-4">
+            @include('gp247-admin::partials.store-scope-picker', ['testid' => 'link-group-store-select'])
+
             <x-gp247::input :label="gp247_language_render('admin.link_group.name')" name="name"
                 wire:model="form.name" :error="$errors->first('form.name')" required />
 
