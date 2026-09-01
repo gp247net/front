@@ -50,16 +50,25 @@ class BannerTypeForm extends FormComponent
     {
         parent::mount();
 
-        if ($id !== null) {
-            $row = FrontBannerType::findOrFail($id);
-            $this->editingId = (string) $row->id;
-            // Store is immutable on edit — expose it for the read-only display.
-            $this->formStoreId = (string) $row->store_id;
-            $this->form = [
-                'code' => $row->code,
-                'name' => $row->name,
-            ];
+        if ($id === null) {
+            // Create: default the picker to the current context store (ROOT at root
+            // admin) — parity with ResourcePanel::resetForm() so a store is always
+            // set on create.
+            if ($this->storeScopeActive()) {
+                $this->formStoreId = (string) $this->storeContext();
+            }
+
+            return;
         }
+
+        $row = FrontBannerType::findOrFail($id);
+        $this->editingId = (string) $row->id;
+        // Store is immutable on edit — expose it for the read-only display.
+        $this->formStoreId = (string) $row->store_id;
+        $this->form = [
+            'code' => $row->code,
+            'name' => $row->name,
+        ];
     }
 
     /**
@@ -91,7 +100,7 @@ class BannerTypeForm extends FormComponent
      */
     protected function rules(): array
     {
-        return [
+        return array_merge([
             'form.name' => ['required', 'string', 'max:255'],
             'form.code' => [
                 'required',
@@ -102,7 +111,17 @@ class BannerTypeForm extends FormComponent
                     ->ignore($this->editingId)
                     ->where('store_id', $this->currentStore()),
             ],
-        ];
+        ], $this->storeScopeCreateRules());
+    }
+
+    /**
+     * Localised validator messages (store-required on scoped create).
+     *
+     * @return array<string, string>
+     */
+    protected function messages(): array
+    {
+        return $this->storeScopeMessages();
     }
 
     /**

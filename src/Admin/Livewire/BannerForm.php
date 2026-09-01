@@ -68,13 +68,23 @@ class BannerForm extends FormComponent
     {
         parent::mount();
 
-        if ($id !== null) {
-            $banner = FrontBanner::findOrFail($id);
-            $this->editingId = (string) $banner->id;
-            // Store is immutable on edit — expose it for the read-only display + to
-            // scope the banner-type dropdown to the record's own store.
-            $this->formStoreId = (string) $banner->store_id;
-            $this->form = [
+        if ($id === null) {
+            // Create: default the picker to the current context store (ROOT at root
+            // admin, the bound store in a scoped context) — parity with
+            // ResourcePanel::resetForm() so a store is always set on create.
+            if ($this->storeScopeActive()) {
+                $this->formStoreId = (string) $this->storeContext();
+            }
+
+            return;
+        }
+
+        $banner = FrontBanner::findOrFail($id);
+        $this->editingId = (string) $banner->id;
+        // Store is immutable on edit — expose it for the read-only display + to
+        // scope the banner-type dropdown to the record's own store.
+        $this->formStoreId = (string) $banner->store_id;
+        $this->form = [
                 'image' => (string) $banner->image,
                 'url' => (string) $banner->url,
                 'name' => (string) $banner->name,
@@ -83,8 +93,7 @@ class BannerForm extends FormComponent
                 'target' => $banner->target ?: '_self',
                 'sort' => (int) $banner->sort,
                 'status' => (int) $banner->status,
-            ];
-        }
+        ];
     }
 
     /**
@@ -132,13 +141,23 @@ class BannerForm extends FormComponent
      */
     protected function rules(): array
     {
-        return [
+        return array_merge([
             'form.name' => ['required', 'string', 'max:200'],
             'form.url' => ['nullable', 'string', 'max:255'],
             'form.type' => ['nullable', 'string', 'max:255'],
             'form.target' => ['required', 'in:_self,_blank'],
             'form.sort' => ['required', 'numeric', 'min:0'],
-        ];
+        ], $this->storeScopeCreateRules());
+    }
+
+    /**
+     * Localised validator messages (store-required on scoped create).
+     *
+     * @return array<string, string>
+     */
+    protected function messages(): array
+    {
+        return $this->storeScopeMessages();
     }
 
     /**
