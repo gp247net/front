@@ -16,7 +16,9 @@ class FrontPage extends Model
     protected $connection  = GP247_DB_CONNECTION;
     protected $guarded     = [];
 
-    protected static $getListTitleAdmin = null;
+    // WHY: keyed by store id (see getListTitleAdmin) so per-store title lists do not
+    // bleed within one request. ADR multi-store_admin-store-scope-seam (leak L3).
+    protected static $getListTitleAdmin = [];
     protected static $getListPageGroupByParentAdmin = null;
 
     /**
@@ -263,46 +265,52 @@ class FrontPage extends Model
 
     
     /**
-     * Get array title page
-     * user for admin
+     * Get array title page (id => name) for admin, scoped to the active store.
      *
-     * @return  [type]  [return description]
+     * WHY store scope: since 1-1 ownership every page carries its own store_id, so a
+     * sub-store admin must only see its own pages. Resolve the store from the explicit
+     * arg, else the session, else ROOT; ROOT = all (single-store unchanged, no extra
+     * where). The no-arg call previously read the session but never filtered — that was
+     * the L2 leak. The static memo is keyed by store so two stores in one request do not
+     * bleed (L3). ADR multi-store_admin-store-scope-seam.
+     *
+     * @param int|string|null $storeId Explicit store id; null = use the session context.
+     * @return array<int|string, string> Page id => localized name for the resolved store.
+     *
+     * @aidlc-unit multi-store-pro
+     * @aidlc-story US-multi-store-pro-admin-store-switcher
+     * @aidlc-adr multi-store_admin-store-scope-seam
      */
     public static function getListTitleAdmin($storeId = null)
     {
-        $storeCache = $storeId ? $storeId : session('adminStoreId');
+        $storeCache = $storeId ?: (session('adminStoreId') ?: GP247_STORE_ID_ROOT);
         $tableDescription = (new FrontPageDescription)->getTable();
-        $table = (new AdminPage)->getTable();
+        // WHY: (new self) — this model IS the front_page table; the former (new AdminPage)
+        // referenced a class that does not exist (a latent fatal on any call).
+        $table = (new self)->getTable();
+        $buildForStore = function () use ($tableDescription, $table, $storeCache) {
+            if (!isset(self::$getListTitleAdmin[$storeCache])) {
+                $query = self::join($tableDescription, $tableDescription.'.page_id', $table.'.id')
+                    ->where('lang', gp247_get_locale());
+                // WHY: ROOT = all (single-store unchanged); sub-store filters to its own rows.
+                if ($storeCache != GP247_STORE_ID_ROOT) {
+                    $query = $query->where($table.'.store_id', $storeCache);
+                }
+                self::$getListTitleAdmin[$storeCache] = $query->pluck('name', 'id')->toArray();
+            }
+            return self::$getListTitleAdmin[$storeCache];
+        };
         if (gp247_config_global('cache_status') && gp247_config_global('cache_page')) {
             // Embed the group version so gp247_cache_clear('cache_page') (a version
             // bump) invalidates every store x locale variant at once — the `database`
             // cache driver cannot wildcard-forget the old per-store/locale keys.
             $cacheKey = $storeCache.'_cache_page_'.gp247_get_locale().'_v'.gp247_cache_version('page');
             if (!Cache::has($cacheKey)) {
-                if (self::$getListTitleAdmin === null) {
-                    $data = self::join($tableDescription, $tableDescription.'.page_id', $table.'.id')
-                    ->where('lang', gp247_get_locale());
-                    if ($storeId) {
-                        $data = $data->where($table . '.store_id', $storeId);
-                    }
-                    $data = $data->pluck('name', 'id')->toArray();
-                    self::$getListTitleAdmin = $data;
-                }
-                gp247_cache_set($cacheKey, self::$getListTitleAdmin);
+                gp247_cache_set($cacheKey, $buildForStore());
             }
             return Cache::get($cacheKey);
-        } else {
-            if (self::$getListTitleAdmin === null) {
-                $data = self::join($tableDescription, $tableDescription.'.page_id', $table.'.id')
-                ->where('lang', gp247_get_locale());
-                if ($storeId) {
-                    $data = $data->where($table . '.store_id', $storeId);
-                }
-                $data = $data->pluck('name', 'id')->toArray();
-                self::$getListTitleAdmin = $data;
-            }
-            return self::$getListTitleAdmin;
         }
+        return $buildForStore();
     }
 
 
