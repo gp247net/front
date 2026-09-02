@@ -1,7 +1,7 @@
 {{--
     Page (CMS) manager — two-panel: form (left) + list (right) on the ResourcePanel base
     (ADR-005, ADR-007, ui-tailadmin P1). Per-language descriptions with rich-text content
-    via <x-gp247::rich-editor>. Image via <x-gp247::media-input> (LFM). Store
+    via <x-gp247::rich-editor>. Image via <x-gp247::media-input :working-store="$formStoreId ?? ''"> (LFM). Store
     ownership is 1-1 (scalar store_id, pinned to the current admin store).
     UI text via gp247_language_render.
 
@@ -48,7 +48,7 @@
                 </div>
             @endforeach
 
-            <x-gp247::media-input :label="gp247_language_render('admin.page.image')" name="image"
+            <x-gp247::media-input :working-store="$formStoreId ?? ''" :label="gp247_language_render('admin.page.image')" name="image"
                 wire:model="form.image" :value="$form['image'] ?? ''" type="page" />
 
             <x-gp247::input :label="gp247_language_render('admin.page.alias')" name="alias"

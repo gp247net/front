@@ -1,6 +1,6 @@
 ﻿{{--
     Banner create/edit form (front-admin Unit). UI text via gp247_language_render.
-    Image via <x-gp247::media-input> (LFM), html via <x-gp247::rich-editor> (TinyMCE),
+    Image via <x-gp247::media-input :working-store="$formStoreId ?? ''"> (LFM), html via <x-gp247::rich-editor> (TinyMCE),
     expiry-free. Store ownership is 1-1 (scalar store_id, pinned to the current admin store).
 
     @aidlc-unit front-admin
@@ -18,7 +18,7 @@
             <x-gp247::input :label="gp247_language_render('admin.banner.title')" name="title"
                 wire:model="form.name" :error="$errors->first('form.name')" required />
 
-            <x-gp247::media-input :label="gp247_language_render('admin.banner.image')" name="image"
+            <x-gp247::media-input :working-store="$formStoreId ?? ''" :label="gp247_language_render('admin.banner.image')" name="image"
                 wire:model="form.image" :value="$form['image'] ?? ''" type="banner" />
 
             <x-gp247::input :label="gp247_language_render('admin.banner.url')" name="url"
