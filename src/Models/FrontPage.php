@@ -118,7 +118,10 @@ class FrontPage extends Model
         if ($type === null) {
             $page = $page->where($this->getTable() .'.id', $key);
         } else {
-            $page = $page->where($type, $key);
+            // WHY: qualify with the base table. This query left-joins the
+            // description table (and admin_store when multi-store is installed),
+            // so a bare column name would be ambiguous (SQL 1052).
+            $page = $page->where($this->getTable() . '.' . $type, $key);
         }
         if ($checkActive) {
             $page = $page->where($this->getTable() .'.status', 1);

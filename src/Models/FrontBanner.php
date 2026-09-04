@@ -65,7 +65,10 @@ class FrontBanner extends Model
         $storeId = config('app.storeId');
         $dataSelect = $this->getTable().'.*';
         $data =  $this->selectRaw($dataSelect)
-            ->where('id', $id);
+            // WHY: qualify with the base table. When multi-store/multi-partner is
+            // installed this query joins admin_store, so a bare 'id' is ambiguous
+            // across gp247_front_banner and gp247_admin_store (SQL 1052).
+            ->where($this->getTable() . '.id', $id);
         if ($checkActive) {
             $data = $data->where($this->getTable() .'.status', 1);
         }
