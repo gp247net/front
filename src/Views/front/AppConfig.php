@@ -282,18 +282,12 @@ class AppConfig extends ExtensionConfigDefault
                     'store_id' => $storeId,
                 ];
 
-                $dataInsert[] = [
-                    'id'       => $this->uuid(),
-                    'name'     => 'Product last view ('.$this->configKey.')',
-                    'position' => 'left',
-                    'page'     => 'shop_product_list',
-                    'text'     => 'shop_product_last_view',
-                    'type'     => 'view',
-                    'sort'     => 5,
-                    'status'   => 1,
-                    'template' => $this->configKey,
-                    'store_id' => $storeId,
-                ];
+                // WHY: the "Product last view" left block is already seeded by
+                // gp247/shop (DataShopDefaultSeeder) for shop_product_detail,
+                // shop_product_list and shop_search. Inserting it again here
+                // duplicated the block on the product-list/category page (both
+                // rows match layout_page=shop_product_list). Rely on the shop
+                // seeder as the single source instead.
             }
 
             FrontLayoutBlock::insert($dataInsert);
