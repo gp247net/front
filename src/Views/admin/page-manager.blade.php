@@ -71,7 +71,7 @@
     <x-gp247::card :title="gp247_language_render('admin.page.title')">
         <div class="mb-3">
             <input type="search" wire:model.live.debounce.300ms="keyword"
-                placeholder="{{ gp247_clean(gp247_language_render('admin.page.search')) }}"
+                placeholder="{{ gp247_clean(gp247_language_render('admin.page.search_place')) }}"
                 class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
         </div>
 
