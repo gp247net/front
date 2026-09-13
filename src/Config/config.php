@@ -38,6 +38,19 @@ return [
         // gp247_extension_check_active() check. SeoController::collectUrls()
         // reads this list — front never hardcodes a plugin's name.
         'seo_sitemap_providers' => [],
+        // Storefront extension points a plugin can render into WITHOUT editing a
+        // template (ADR front_storefront-plugin-hooks). Shape:
+        //   ['<hook-name>' => [ ['key' => 'PluginKey', 'callback' => [Class, 'method']], ... ]]
+        // A screen calls gp247_render_plugin_hook('<hook-name>', [...data]); each
+        // registered callback receives that data and returns HTML. Plugins append
+        // from their own Provider.php, gated by gp247_extension_check_active() —
+        // the same runtime-append idiom as layout_page and seo_sitemap_providers
+        // above, so front never hardcodes a plugin's name.
+        //
+        // WHY this exists: a storefront screen is template-owned Blade, so before
+        // this registry every plugin that wanted to show something on a product
+        // page had to have each site edit its template by hand.
+        'plugin_hooks' => [],
         'layout_position' => [
             'top_site' => 'admin.layout_block_position.top_site',
             'top' => 'admin.layout_block_position.top',

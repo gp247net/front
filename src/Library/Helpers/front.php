@@ -100,6 +100,57 @@ if (!function_exists('gp247_front_layout_block') && !in_array('gp247_front_layou
 }
 
 /**
+ * Render every plugin registered against a storefront extension point.
+ *
+ * A storefront screen is Blade owned by the active template, so a plugin cannot
+ * inject markup into it on its own. A screen calls this helper at the places it
+ * is willing to host plugin output; plugins append a renderer to
+ * config('gp247-config.front.plugin_hooks') from their Provider.php.
+ *
+ * @param string $hook Extension point name, e.g. "shop_product_detail_bottom".
+ * @param array<string, mixed> $data Context the screen hands to the renderers (e.g. ['product' => $product]).
+ * @return string Concatenated HTML; empty when nothing is registered.
+ *
+ * @aidlc-unit frontend-template-dev
+ * @aidlc-story US-TPL-storefront-plugin-hooks
+ * @aidlc-adr front_storefront-plugin-hooks
+ */
+if (!function_exists('gp247_render_plugin_hook') && !in_array('gp247_render_plugin_hook', config('gp247_functions_except', []))) {
+    function gp247_render_plugin_hook(string $hook, array $data = []): string
+    {
+        $renderers = config('gp247-config.front.plugin_hooks.' . $hook, []);
+
+        if (!is_array($renderers) || $renderers === []) {
+            return '';
+        }
+
+        $output = '';
+
+        foreach ($renderers as $renderer) {
+            $callback = is_array($renderer) ? ($renderer['callback'] ?? null) : $renderer;
+
+            if (!is_callable($callback)) {
+                continue;
+            }
+
+            // WHY each renderer is isolated: these run inside a product page a
+            // shopper is looking at. One plugin throwing must cost its own block,
+            // never the whole page — the same failure budget gp247_render_block
+            // gives a template block.
+            try {
+                $output .= (string) call_user_func($callback, $data);
+            } catch (\Throwable $e) {
+                gp247_report('[gp247 plugin hook] "' . $hook . '" renderer '
+                    . (is_array($renderer) ? ($renderer['key'] ?? '?') : '?')
+                    . ' failed: ' . $e->getMessage());
+            }
+        }
+
+        return $output;
+    }
+}
+
+/**
  * Render block function
  * @param string $positionBlock Position of block
  * @param string|null $layout_page Current layout page
