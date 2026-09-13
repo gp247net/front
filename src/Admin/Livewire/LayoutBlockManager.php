@@ -259,11 +259,25 @@ class LayoutBlockManager extends ResourcePanel
             return [];
         }
         $template = function_exists('gp247_store_info') ? (string) gp247_store_info(key: 'template', storeId: $storeId) : '';
+
+        // WHY not glob(app_path()) any more (modification 20260913T200309): a
+        // template's blocks now come from several source roots — the site's
+        // published overrides under app/, plus each package's own copy served
+        // through the GP247TemplatePath hints. Rendering already walks those
+        // hints (gp247_render_block -> view()->exists), so listing must walk the
+        // same ones in the same order, or the picker would offer a different set
+        // of blocks than the storefront can actually render. A plugin that drops
+        // a block into app/GP247/Templates/<tpl>/blocks still shows up here.
+        if (!function_exists('gp247_template_files')) {
+            return [];
+        }
+
         $arrView = [];
-        foreach (glob(app_path() . '/GP247/Templates/' . $template . '/blocks/*.blade.php') ?: [] as $file) {
-            $name = substr(basename($file), 0, -10);
+        foreach (array_keys(gp247_template_files($template, 'blocks', '*.blade.php')) as $fileName) {
+            $name = substr($fileName, 0, -10);
             $arrView[$name] = $name;
         }
+
         return $arrView;
     }
 

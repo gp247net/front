@@ -16,9 +16,27 @@ use GP247\Front\Commands\FrontUpdate;
 use GP247\Front\Commands\FrontUninstall;
 use GP247\Front\Commands\MakeTemplate;
 use GP247\Front\Commands\TemplateSetup;
+use GP247\Front\Commands\TemplatePublish;
+use GP247\Front\Commands\TemplatePrune;
 
 class FrontServiceProvider extends ServiceProvider
 {
+    /**
+     * Entries (files/directories, relative to a template root) that make up a
+     * template's extension SHELL: the part core needs on disk under app/ to
+     * discover, activate and boot the template. Everything else in a template
+     * is presentation and is served from the owning package unless the site
+     * publishes it to override.
+     *
+     * Defined once in gp247/core (it is core's extension format) and mirrored
+     * here so the publish map, the never-delete allowlist of
+     * gp247:template-prune and gp247:doctor can never disagree — removing
+     * AppConfig.php would make the template vanish from
+     * gp247_extension_get_all_local() and take the live storefront with it.
+     *
+     * @var array<int, string>
+     */
+    public const TEMPLATE_SHELL_ENTRIES = \GP247\Core\Support\TemplateSourceAudit::SHELL_ENTRIES;
 
     protected function initial()
     {
@@ -54,6 +72,19 @@ class FrontServiceProvider extends ServiceProvider
             exit;
         }
 
+        // The default template's Blade is served straight from this package, but
+        // a browser cannot read vendor/ — its compiled CSS/JS must exist under
+        // public/. Self-heal it, gated on the template actually being installed
+        // (modification 20260913T200309).
+        try {
+            $this->ensureTemplateAssetsPublished();
+        } catch (\Throwable $e) {
+            // WHY swallowed (unlike the block above): a read-only public/ on a
+            // locked-down shared host must not take the whole site down — the
+            // storefront still renders, only unstyled, and gp247:doctor reports it.
+            gp247_report('#GP247-FRONT::template_assets:: '.$e->getMessage());
+        }
+
         //Load publish
         try {
             $this->registerPublishing();
@@ -70,6 +101,8 @@ class FrontServiceProvider extends ServiceProvider
                 FrontUninstall::class,
                 MakeTemplate::class,
                 TemplateSetup::class,
+                TemplatePublish::class,
+                TemplatePrune::class,
             ]);
         } catch (\Throwable $e) {
             $msg = '#GP247-FRONT:: '.$e->getMessage().' - Line: '.$e->getLine().' - File: '.$e->getFile();
@@ -113,21 +146,36 @@ class FrontServiceProvider extends ServiceProvider
                 exit;
             }
 
+            // Template view resolution (US-TPL-template-vendor-resident, ADR
+            // frontend-template-dev_template-vendor-resident-views): the namespace
+            // carries SEVERAL hint paths and Laravel's FileViewFinder returns the
+            // first file that exists, so resolution falls back PER FILE:
+            //   app/GP247/Templates          -> published overrides + site templates
+            //   <front>/Views/templates      -> this package's default template
+            //   <shop>/Views/templates       -> appended by ShopServiceProvider
+            // WHY the app path is registered first: a file the site published (to
+            // edit it) must win over the package's copy.
+            // WHY this is safe for other templates: the template name is a PATH
+            // SEGMENT ("GP247TemplatePath::MyTheme.screen.home"), and the vendor
+            // roots only contain a "GP247Front" directory — so a custom template can
+            // never silently inherit (or be overwritten by) GP247Front's views.
             $this->loadViewsFrom(app_path().'/GP247/Templates', 'GP247TemplatePath');
+            $this->loadViewsFrom(__DIR__.'/Views/templates', 'GP247TemplatePath');
 
             // Shared cross-cutting view components (US-TPL-008, ADR-013):
             // <x-gp247-front::language-switcher /> etc. resolve to a class in
             // TemplateComponents, whose default view lives under the
             // 'gp247-front' namespace registered here — same namespace, one
             // registration covers both the component tag and its fallback view.
-            // Fallback view source is Views/front (the same tree published to
-            // GP247Front via gp247:front-view) — merged 2026-07-02 from the
-            // former Views/front to keep one canonical source instead of two drifting
-            // copies (see modification 20260702T123000). Renamed from
-            // Views/template/view 2026-07-05 (modification 20260705T124936) to
-            // match gp247/shop's Views/front naming.
+            // Fallback view source is the package's own copy of the default
+            // template — the same tree the GP247TemplatePath hint above serves and
+            // that gp247:front-view publishes. Renamed Views/template/view ->
+            // Views/front 2026-07-05 (modification 20260705T124936), then ->
+            // Views/templates/GP247Front 2026-09-14 (modification 20260913T200309)
+            // so the directory name IS the template name, which is what lets the
+            // namespace hint above resolve "GP247Front.<view>" straight from vendor.
             Blade::componentNamespace('GP247\\Front\\TemplateComponents', 'gp247-front');
-            $this->loadViewsFrom(__DIR__.'/Views/front', 'gp247-front');
+            $this->loadViewsFrom(__DIR__.'/Views/templates/GP247Front', 'gp247-front');
 
             // Modern admin (front-admin Unit, ADR-006/007): register the TailAdmin
             // Livewire screens that plug into the core admin shell. Additive and
@@ -310,15 +358,51 @@ class FrontServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             // WHY: 'Default' was removed entirely (modification 20260705T124936,
             // ADR-014 Amend #1) — GP247Front is now the sole/default template,
-            // so this scaffold publishes to that folder name instead. Source
-            // paths renamed from Views/template/{view,public} to Views/front
-            // and public 2026-07-05 (same modification) to match gp247/shop's
-            // Views/front naming.
+            // so this scaffold publishes to that folder name instead.
             $this->publishes([__DIR__.'/public' => public_path('GP247/Templates/GP247Front')], 'gp247:front-public');
-            $this->publishes([__DIR__.'/Views/front' => app_path('GP247/Templates/GP247Front')], 'gp247:front-view');
+
+            // Two tags instead of one (modification 20260913T200309):
+            //   gp247:front-template -> the extension SHELL only. It must live under
+            //     app/ because core discovers templates with glob(app_path()) +
+            //     file_exists(.../AppConfig.php) and the class is PSR-4 under
+            //     App\GP247\Templates\. This is what an install publishes.
+            //   gp247:front-view     -> the Blade tree. OPT-IN: a site publishes it
+            //     (or single files via gp247:template-publish) only to override.
+            //     Anything not published keeps being served from this package, so
+            //     composer update can finally deliver template fixes.
+            $this->publishes($this->templateShellPublishMap(), 'gp247:front-template');
+            $this->publishes([__DIR__.'/Views/templates/GP247Front' => app_path('GP247/Templates/GP247Front')], 'gp247:front-view');
+
             $this->publishes([__DIR__.'/Views/admin' => resource_path('views/vendor/gp247-front-admin')], 'gp247:front-admin');
             $this->publishes([__DIR__.'/public/js/sweetalert2.all.min.js' => public_path('GP247/Core/js/sweetalert2.all.min.js')], 'gp247:front-assets');
         }
+    }
+
+    /**
+     * Build the publish map for the default template's extension shell — the
+     * files that must physically exist under app/GP247/Templates/<Template>/ for
+     * core to see the template at all (discovery globs app_path() and requires
+     * AppConfig.php; the class is autoloaded as App\GP247\Templates\...).
+     *
+     * Everything NOT listed here (the Blade tree) is served from this package.
+     *
+     * @return array<string, string> Source path => published destination path.
+     *
+     * @aidlc-unit frontend-template-dev
+     * @aidlc-story US-TPL-template-vendor-resident
+     * @aidlc-adr frontend-template-dev_template-vendor-resident-views
+     */
+    protected function templateShellPublishMap(): array
+    {
+        $source = __DIR__.'/Views/templates/GP247Front';
+        $target = app_path('GP247/Templates/GP247Front');
+
+        $map = [];
+        foreach (self::TEMPLATE_SHELL_ENTRIES as $entry) {
+            $map[$source.'/'.$entry] = $target.'/'.$entry;
+        }
+
+        return $map;
     }
 
     /**
@@ -345,6 +429,77 @@ class FrontServiceProvider extends ServiceProvider
                 mkdir($directory, 0777, true);
             }
             copy(__DIR__.'/public/js/sweetalert2.all.min.js', $target);
+        }
+    }
+
+    /**
+     * Copy this package's compiled storefront assets into public/ when they are
+     * missing, so the default template works without a manual vendor:publish.
+     *
+     * Gated on app/GP247/Templates/GP247Front existing — that directory holds the
+     * template's extension shell, so its presence means the site actually has the
+     * template installed. A site that removed it (using another template) never
+     * gets these files re-created, which is the whole point of
+     * RISK-OPS-template-resurrection.
+     *
+     * WHY a filesystem marker instead of reading the store's active template:
+     * this runs on every boot, including before install and on CLI, where the
+     * database may not be reachable at all.
+     *
+     * @return void
+     *
+     * @aidlc-unit frontend-template-dev
+     * @aidlc-story US-TPL-template-vendor-resident
+     * @aidlc-adr frontend-template-dev_template-vendor-resident-views
+     */
+    protected function ensureTemplateAssetsPublished()
+    {
+        if (!is_dir(app_path('GP247/Templates/GP247Front'))) {
+            return;
+        }
+
+        $target = public_path('GP247/Templates/GP247Front');
+        if (file_exists($target.'/css/app.css')) {
+            return;
+        }
+
+        $this->copyDirectory(__DIR__.'/public', $target);
+    }
+
+    /**
+     * Recursively copy a directory, creating missing parents and never
+     * overwriting a file that already exists at the destination.
+     *
+     * @param string $source Absolute source directory.
+     * @param string $target Absolute destination directory.
+     * @return void
+     *
+     * @aidlc-unit frontend-template-dev
+     * @aidlc-story US-TPL-template-vendor-resident
+     */
+    protected function copyDirectory(string $source, string $target)
+    {
+        if (!is_dir($source)) {
+            return;
+        }
+
+        if (!is_dir($target)) {
+            mkdir($target, 0777, true);
+        }
+
+        foreach (scandir($source) ?: [] as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+
+            $from = $source.'/'.$entry;
+            $to = $target.'/'.$entry;
+
+            if (is_dir($from)) {
+                $this->copyDirectory($from, $to);
+            } elseif (!file_exists($to)) {
+                copy($from, $to);
+            }
         }
     }
 

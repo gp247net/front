@@ -250,3 +250,75 @@ if (! function_exists('gp247_front_is_rtl')) {
         return (bool) ($language->rtl ?? false);
     }
 }
+
+if (!function_exists('gp247_template_source_roots') && !in_array('gp247_template_source_roots', config('gp247_functions_except', []))) {
+    /**
+     * Root directories a template's files are resolved from, in priority order.
+     *
+     * These are the hint paths Laravel registered for the GP247TemplatePath view
+     * namespace: app/GP247/Templates first (published overrides and site-owned
+     * templates), then each package's own copy of the template it ships.
+     *
+     * WHY read them from the finder instead of listing paths here: the view
+     * finder is the single source of truth for where a template view comes from.
+     * Anything that LISTS template files (the layout-block picker, the
+     * template-publish/prune commands) must agree with what RENDER will pick, and
+     * must keep agreeing when a package or a template adds a new source.
+     *
+     * @param bool $includeApp Keep the app/ override root (false = package defaults only).
+     * @return array<int, string> Absolute directory paths, highest priority first.
+     *
+     * @aidlc-unit frontend-template-dev
+     * @aidlc-story US-TPL-template-vendor-resident
+     * @aidlc-adr frontend-template-dev_template-vendor-resident-views
+     */
+    function gp247_template_source_roots(bool $includeApp = true): array
+    {
+        // WHY delegate: gp247/core owns the one implementation so that
+        // gp247:doctor (bootstrap tier, no helpers available) and this helper can
+        // never disagree about where a template's files come from.
+        return \GP247\Core\Support\TemplateSourceAudit::roots($includeApp);
+    }
+}
+
+if (!function_exists('gp247_template_files') && !in_array('gp247_template_files', config('gp247_functions_except', []))) {
+    /**
+     * List a template's files across every source root, merged by relative path.
+     *
+     * The first root that provides a given relative path wins — the same rule the
+     * view finder applies — so the result is exactly the set of files that would
+     * render, with the winning copy's absolute path.
+     *
+     * @param string $template Template name (directory segment), e.g. "GP247Front".
+     * @param string $subPath  Sub-directory inside the template, e.g. "blocks" ("" = template root).
+     * @param string $pattern  glob pattern applied inside $subPath, e.g. "*.blade.php".
+     * @return array<string, string> Relative path (inside $subPath) => absolute path of the winning file.
+     *
+     * @aidlc-unit frontend-template-dev
+     * @aidlc-story US-TPL-template-vendor-resident
+     * @aidlc-adr frontend-template-dev_template-vendor-resident-views
+     */
+    function gp247_template_files(string $template, string $subPath = '', string $pattern = '*.blade.php'): array
+    {
+        if ($template === '') {
+            return [];
+        }
+
+        $files = [];
+        foreach (gp247_template_source_roots() as $root) {
+            $dir = $root.'/'.$template.($subPath === '' ? '' : '/'.$subPath);
+            foreach (glob($dir.'/'.$pattern) ?: [] as $file) {
+                $name = basename($file);
+                // WHY array_key_exists and not overwrite: earlier roots have higher
+                // priority, so the first copy found must survive.
+                if (!array_key_exists($name, $files)) {
+                    $files[$name] = $file;
+                }
+            }
+        }
+
+        ksort($files);
+
+        return $files;
+    }
+}

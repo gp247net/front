@@ -29,11 +29,15 @@ trait ResolvesTemplateView
      */
     protected function activeTemplateName(): string
     {
-        // WHY: explicit default here — NOT the same fallback as
-        // GP247_TEMPLATE_FRONT_DEFAULT (see Config/config.php) — must be kept
-        // in sync manually (modification 20260705T124936, ADR-014 Amend #1:
-        // 'Default' removed entirely, GP247Front is now the sole template).
-        return (string) gp247_store_info('template', 'GP247Front');
+        // WHY the constant instead of a literal (modification 20260913T200309):
+        // the previous hard-coded 'GP247Front' had to be kept in sync by hand
+        // with GP247_TEMPLATE_FRONT_DEFAULT (see Config/config.php), which a site
+        // can point at its own template via the env var of the same name. A site
+        // that did so got its components resolved against a template it no longer
+        // has. Falling back to the configured default keeps one source of truth.
+        $default = defined('GP247_TEMPLATE_FRONT_DEFAULT') ? GP247_TEMPLATE_FRONT_DEFAULT : 'GP247Front';
+
+        return (string) gp247_store_info('template', $default);
     }
 
     /**

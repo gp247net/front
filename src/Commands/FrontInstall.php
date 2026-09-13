@@ -16,6 +16,20 @@ use GP247\Core\Console\GP247Command;
 class FrontInstall extends GP247Command
 {
     /**
+     * Publish tags an install runs, in order. Deliberately does NOT include
+     * gp247:front-view (the Blade tree): copying it would freeze the site's
+     * storefront at the installed version, which is exactly what
+     * US-TPL-template-vendor-resident removes. Exposed as a constant so the
+     * contract is assertable without executing a real publish.
+     *
+     * @var array<int, string>
+     */
+    public const PUBLISH_TAGS = [
+        'gp247:front-public',
+        'gp247:front-template',
+    ];
+
+    /**
      * The name and signature of the console command.
      *
      * @var string
@@ -48,9 +62,16 @@ class FrontInstall extends GP247Command
         $this->info('---------------> Seeding database Front default done!');
 
         //== Begin setup template default
-        // Copy template default
-        $this->runArtisan('vendor:publish', ['--tag' => 'gp247:front-public','--force' => true]);
-        $this->runArtisan('vendor:publish', ['--tag' => 'gp247:front-view','--force' => true]);
+        // Install the default template. Since modification 20260913T200309 this
+        // publishes only its extension SHELL (AppConfig/Provider/Route/config/
+        // function/gp247.json/Lang) plus the compiled public assets — the Blade
+        // tree stays in the package and is served through the GP247TemplatePath
+        // hint paths, so composer update keeps delivering template fixes. A site
+        // that wants to edit a screen publishes that one file:
+        //   php artisan gp247:template-publish GP247Front --file=screen/home.blade.php
+        foreach (self::PUBLISH_TAGS as $tag) {
+            $this->runArtisan('vendor:publish', ['--tag' => $tag, '--force' => true]);
+        }
 
         //Setup template default for Root store
         // This command can only be run after the above default template copy command is successful.

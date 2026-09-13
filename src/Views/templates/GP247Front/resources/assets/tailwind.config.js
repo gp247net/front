@@ -13,6 +13,17 @@
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
+        // Source of truth since modification 20260913T200309: the template's Blade
+        // lives in the packages and is served from there, so the build must scan
+        // the packages. Scanning app/ too is NOT redundant — that is where a site's
+        // published overrides land, and their classes must be generated as well.
+        // WHY this matters: when the globs pointed only at app/ and the tree was no
+        // longer published, they matched nothing and the bundle silently lost almost
+        // every class (RISK-TECH-template-build-glob-stale) — a broken storefront
+        // with no error anywhere.
+        'vendor/gp247/front/src/Views/templates/GP247Front/**/*.blade.php',
+        'vendor/gp247/shop/src/Views/templates/GP247Front/**/*.blade.php',
+        'vendor/gp247/front/src/Views/templates/GP247Front/resources/assets/js/**/*.js',
         'app/GP247/Templates/GP247Front/**/*.blade.php',
         'app/GP247/Templates/GP247Front/resources/assets/js/**/*.js',
         // Pagination is rendered through these vendor views (Livewire's `WithPagination`
