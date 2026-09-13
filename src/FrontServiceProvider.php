@@ -162,7 +162,10 @@ class FrontServiceProvider extends ServiceProvider
             //Load Template
             try {
                 foreach (glob(app_path().'/GP247/Templates/*/Provider.php') as $filename) {
-                    require_once $filename;
+                    // WHY `require`: same reason as core's plugin loader — a template
+                    // Provider.php is a top-level script and must run on EVERY application
+                    // boot of the process (PHPUnit, Octane), not only the first one.
+                    require $filename;
                 }
                 foreach (glob(app_path().'/GP247/Templates/*/Route.php') as $filename) {
                     $this->loadRoutesFrom($filename);
