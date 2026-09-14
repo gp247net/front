@@ -458,26 +458,73 @@ class FrontServiceProvider extends ServiceProvider
             return;
         }
 
-        $target = public_path('GP247/Templates/GP247Front');
-        if (file_exists($target.'/css/app.css')) {
-            return;
-        }
-
-        $this->copyDirectory(__DIR__.'/public', $target);
+        $this->syncTemplateAssets(__DIR__.'/public', public_path('GP247/Templates/GP247Front'));
     }
 
     /**
-     * Recursively copy a directory, creating missing parents and never
-     * overwriting a file that already exists at the destination.
+     * Mirror a package's compiled asset folder into public/, refreshing it when
+     * the package ships a new build.
      *
-     * @param string $source Absolute source directory.
-     * @param string $target Absolute destination directory.
+     * WHY refresh and not just "copy when missing" (modification 20260913T200309,
+     * follow-up): the Blade of the template now arrives with `composer update`,
+     * but a browser cannot read vendor/, so the stylesheet has to be copied out.
+     * Copying only when absent left every existing site on its old CSS — new
+     * markup shipped by the package, no matching rules in the bundle, elements
+     * silently falling back to default styling. Delivery of the two halves has to
+     * be symmetric or the asymmetry itself becomes the bug.
+     *
+     * WHY a stamp file instead of hashing on every boot: this runs on every
+     * request. The signature is the size+mtime of the built stylesheet — two
+     * stat() calls and a tiny read in the steady state, which a shared host can
+     * afford (NFR-AVAIL-cli-shared-host). Composer rewrites mtime when it updates
+     * the package, which is exactly the event we need to notice.
+     *
+     * @param string $source Absolute path of the package's public/ folder.
+     * @param string $target Absolute path under the app's public/ folder.
+     * @return bool True when files were (re)copied.
+     *
+     * @aidlc-unit frontend-template-dev
+     * @aidlc-story US-TPL-template-vendor-resident
+     * @aidlc-adr frontend-template-dev_template-vendor-resident-views
+     */
+    protected function syncTemplateAssets(string $source, string $target): bool
+    {
+        $built = $source.'/css/app.css';
+        if (!is_file($built)) {
+            return false;
+        }
+
+        $signature = filesize($built).'-'.filemtime($built);
+        $stamp = $target.'/.gp247-assets';
+
+        if (is_file($stamp) && trim((string) file_get_contents($stamp)) === $signature) {
+            return false;
+        }
+
+        $this->copyDirectory($source, $target, true);
+
+        if (is_dir($target)) {
+            // WHY the write may fail silently: on a read-only public/ the copies
+            // above failed too, and the site still renders (unstyled) — that is a
+            // gp247:doctor finding, not a reason to abort the boot.
+            @file_put_contents($stamp, $signature);
+        }
+
+        return true;
+    }
+
+    /**
+     * Recursively copy a directory, creating missing parents.
+     *
+     * @param string $source    Absolute source directory.
+     * @param string $target    Absolute destination directory.
+     * @param bool   $overwrite Replace files that already exist (default: keep them).
      * @return void
      *
      * @aidlc-unit frontend-template-dev
      * @aidlc-story US-TPL-template-vendor-resident
      */
-    protected function copyDirectory(string $source, string $target)
+    protected function copyDirectory(string $source, string $target, bool $overwrite = false)
     {
         if (!is_dir($source)) {
             return;
@@ -496,9 +543,9 @@ class FrontServiceProvider extends ServiceProvider
             $to = $target.'/'.$entry;
 
             if (is_dir($from)) {
-                $this->copyDirectory($from, $to);
-            } elseif (!file_exists($to)) {
-                copy($from, $to);
+                $this->copyDirectory($from, $to, $overwrite);
+            } elseif ($overwrite || !file_exists($to)) {
+                @copy($from, $to);
             }
         }
     }
