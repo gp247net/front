@@ -258,14 +258,15 @@ class AppConfig extends ExtensionConfigDefault
             if (class_exists(\GP247\Shop\Models\ShopProduct::class)) {
                 $dataInsert[] = [
                     'id'       => $this->uuid(),
-                    // Block key stays `shop_flash_sale` (it is the blade file name and is
-                    // stored in front_layout_block.text on every installed site); the name
-                    // says what it actually lists — active price promotions, not the
-                    // time-boxed ProductFlashSale plugin. Modification 20260921T231520.
+                    // Name and key both say what this lists — active price promotions, not
+                    // the time-boxed ProductFlashSale plugin. The key is the blade file name
+                    // AND what the Layout Block screen offers the site owner, so it could not
+                    // stay `shop_flash_sale` next to the plugin's `product_flash_sale`.
+                    // Modifications 20260921T231520 (name) and 20260922T062944 (key).
                     'name'     => 'Promotion products ('.$this->configKey.')',
                     'position' => 'bottom',
                     'page'     => 'front_home',
-                    'text'     => 'shop_flash_sale',
+                    'text'     => 'shop_product_promotion',
                     'type'     => 'view',
                     'sort'     => 15,
                     'status'   => 1,

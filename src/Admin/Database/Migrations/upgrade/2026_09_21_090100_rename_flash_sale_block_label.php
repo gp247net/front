@@ -15,10 +15,11 @@ use Illuminate\Support\Facades\DB;
  * site owner looking for flash-sale settings that do not exist here. The storefront
  * heading and its dropped countdown are handled in gp247/shop, which owns the blade.
  *
- * Only `name` (the label in the admin Layout Block screen) is touched. The block key
- * `text` = 'shop_flash_sale' is deliberately left alone: it is how the row resolves to
- * the blade file, and rewriting it would make the block disappear from every home page
- * built before this upgrade.
+ * Only `name` (the label in the admin Layout Block screen) is touched here; the block
+ * key `text` was still 'shop_flash_sale' at this point. The key is renamed to
+ * 'shop_product_promotion' by the later migration 2026_09_22_060000, which moves the
+ * blade file with it — this one must keep matching on the OLD key so the two run in
+ * order on a site upgrading across both.
  *
  * Idempotent: a second run finds no "Flash sale (" prefix left to replace. The
  * template name inside the parentheses is preserved, so a site whose template is not
