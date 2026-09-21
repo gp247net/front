@@ -130,10 +130,15 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
-     * Flash-sale countdown (blocks/shop_flash_sale.blade.php): ticks down
-     * to a server-computed target (the soonest `date_end` among the active
-     * promotions, in epoch ms) so the displayed h/m/s reflect a real
-     * promotion deadline rather than a decorative mock timer.
+     * Generic countdown: ticks down to a server-computed target (epoch ms) and
+     * exposes padded h/m/s, so a template renders a real deadline rather than a
+     * decorative mock timer.
+     *
+     * NOTE: no core block uses it any more. The home promotion strip
+     * (blocks/shop_flash_sale.blade.php) dropped its timer in modification
+     * 20260921T231520 — its promotions run for weeks, so the countdown read as
+     * fake urgency. Kept as part of the template's JS surface for site-written
+     * templates and for genuinely time-boxed selling (ProductFlashSale plugin).
      *
      * @aidlc-unit frontend-template-dev
      * @aidlc-story US-TPL-009
