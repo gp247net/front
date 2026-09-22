@@ -52,7 +52,14 @@ return [
         // page had to have each site edit its template by hand.
         'plugin_hooks' => [],
         'layout_position' => [
-            'top_site' => 'admin.layout_block_position.top_site',
+            // WHY 'header' and not 'top_site': this key is matched at render against
+            // the position each template emits, and the only call that reaches the
+            // document <head> is gp247_render_block('header') in GP247Front's
+            // layout.blade.php. 'top_site' was offered here but rendered nowhere, so a
+            // block an admin filed under it silently never appeared (modification
+            // 20260922T*). Installed sites are carried over by the upgrade migration
+            // 2026_09_22_090000_rename_top_site_position_to_header.
+            'header' => 'admin.layout_block_position.header',
             'top' => 'admin.layout_block_position.top',
             'left' => 'admin.layout_block_position.left',
             'center' => 'admin.layout_block_position.center',
