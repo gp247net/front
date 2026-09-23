@@ -1,4 +1,4 @@
-﻿{{--
+{{--
     Banner create/edit form (front-admin Unit). UI text via gp247_language_render.
     Image via <x-gp247::media-input :working-store="$formStoreId ?? ''"> (LFM), html via <x-gp247::rich-editor> (TinyMCE),
     expiry-free. Store ownership is 1-1 (scalar store_id, pinned to the current admin store).

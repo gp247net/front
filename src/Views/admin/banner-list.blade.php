@@ -1,4 +1,4 @@
-﻿{{--
+{{--
     Banner list (front-admin Unit). UI text via gp247_language_render.
 
     @aidlc-unit front-admin

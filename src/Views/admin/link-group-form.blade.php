@@ -1,4 +1,4 @@
-﻿{{--
+{{--
     Link-group create/edit form (front-admin Unit). UI text via gp247_language_render.
 
     @aidlc-unit front-admin

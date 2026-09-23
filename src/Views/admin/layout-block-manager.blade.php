@@ -1,4 +1,4 @@
-﻿{{--
+{{--
     Layout block manager — two-panel: form (left) + list (right) on the
     ResourcePanel base (ADR-005, ADR-007, ui-tailadmin P1). UI text via
     gp247_language_render.

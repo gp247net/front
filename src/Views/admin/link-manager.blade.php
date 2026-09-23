@@ -1,4 +1,4 @@
-﻿{{--
+{{--
     Link manager — two-panel: form (left) + list (right) on the ResourcePanel base
     (ADR-005, ADR-007, ui-tailadmin P1). Store ownership is 1-1 (scalar store_id,
     pinned to the current admin store). UI text via gp247_language_render.
