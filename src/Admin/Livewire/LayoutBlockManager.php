@@ -266,19 +266,17 @@ class LayoutBlockManager extends ResourcePanel
         // through the GP247TemplatePath hints. Rendering already walks those
         // hints (gp247_render_block -> view()->exists), so listing must walk the
         // same ones in the same order, or the picker would offer a different set
-        // of blocks than the storefront can actually render. A plugin that drops
-        // a block into app/GP247/Templates/<tpl>/blocks still shows up here.
-        if (!function_exists('gp247_template_files')) {
+        // of blocks than the storefront can actually render.
+        //
+        // Since modification 20260922T205500 a second source joins them: blocks a
+        // plugin registered in config('gp247-config.front.layout_block_views'),
+        // which is how a plugin offers a block without owning a template. The merge
+        // (and its precedence) lives in the helper so render and list cannot drift.
+        if (!function_exists('gp247_layout_block_options')) {
             return [];
         }
 
-        $arrView = [];
-        foreach (array_keys(gp247_template_files($template, 'blocks', '*.blade.php')) as $fileName) {
-            $name = substr($fileName, 0, -10);
-            $arrView[$name] = $name;
-        }
-
-        return $arrView;
+        return gp247_layout_block_options($template);
     }
 
     /**

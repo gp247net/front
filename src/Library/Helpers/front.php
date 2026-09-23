@@ -175,9 +175,24 @@ if (!function_exists('gp247_render_block') && !in_array('gp247_render_block', co
                     } elseif ($layout->type == 'view') {
                         //check view exist
                         $viewPath = $GP247TemplatePath.'.blocks.'.$layout->text;
-                        if (view()->exists($viewPath)) {
-                            $view = view($viewPath)->render();
-                            $output .= $view;
+                        if (!view()->exists($viewPath)) {
+                            // Not a file of the active template: fall back to a block a
+                            // plugin registered. The order matters and is the whole reason
+                            // this is safe — a site that published the block to edit it, or
+                            // that still carries a copy an old plugin installer dropped into
+                            // app/GP247/Templates, keeps winning.
+                            // @aidlc-adr frontend-template-dev_plugin-layout-block-views
+                            $viewPath = config('gp247-config.front.layout_block_views', [])[$layout->text] ?? null;
+                        }
+                        if ($viewPath && view()->exists($viewPath)) {
+                            try {
+                                $output .= view($viewPath)->render();
+                            } catch (\Throwable $e) {
+                                // This renders inside a page a shopper is looking at, so one
+                                // broken block costs its own markup and nothing more — the
+                                // same error budget gp247_render_plugin_hook() works to.
+                                gp247_report('[gp247 layout block] "' . $layout->text . '" failed: ' . $e->getMessage());
+                            }
                         }
                     } elseif ($layout->type == 'page') {
                         //Check class exist
@@ -320,5 +335,45 @@ if (!function_exists('gp247_template_files') && !in_array('gp247_template_files'
         ksort($files);
 
         return $files;
+    }
+}
+
+/**
+ * Every block name the LayoutBlock screen may offer for a template, merged from
+ * both sources in the order gp247_render_block() resolves them.
+ *
+ * The invariant this screen lives by is that the picker must never offer
+ * something other than what renders. So the order here is not cosmetic: the
+ * template's own files come first, then the blocks plugins registered, and a
+ * name already taken by a file is NOT overwritten.
+ *
+ * @param string $template Template name, e.g. "GP247Front".
+ * @return array<string, string> Block name => block name (ready for a select).
+ *
+ * @aidlc-unit frontend-template-dev
+ * @aidlc-story US-TPL-plugin-layout-block-views
+ * @aidlc-adr frontend-template-dev_plugin-layout-block-views
+ */
+if (!function_exists('gp247_layout_block_options') && !in_array('gp247_layout_block_options', config('gp247_functions_except', []))) {
+    function gp247_layout_block_options(string $template): array
+    {
+        $options = [];
+
+        foreach (array_keys(gp247_template_files($template, 'blocks', '*.blade.php')) as $fileName) {
+            $name = substr($fileName, 0, -10); // strip ".blade.php"
+            $options[$name] = $name;
+        }
+
+        foreach (array_keys((array) config('gp247-config.front.layout_block_views', [])) as $name) {
+            // WHY not overwrite: a template shipping its own file for this name wins
+            // at render time, so the list must resolve to the same one copy.
+            if (!array_key_exists($name, $options)) {
+                $options[$name] = $name;
+            }
+        }
+
+        ksort($options);
+
+        return $options;
     }
 }

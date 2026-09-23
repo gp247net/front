@@ -51,6 +51,25 @@ return [
         // this registry every plugin that wanted to show something on a product
         // page had to have each site edit its template by hand.
         'plugin_hooks' => [],
+        // Storefront blocks contributed by a plugin, for the LayoutBlock screen.
+        // Shape: ['<block name>' => '<view key>'], e.g.
+        //   ['product_flash_sale' => 'Plugins/ProductFlashSale::blocks.product_flash_sale']
+        // Plugins append from their own Provider.php inside the existing
+        // gp247_extension_check_active() block — the same runtime-append idiom as
+        // layout_page, seo_sitemap_providers and plugin_hooks above.
+        //
+        // WHY this exists (ADR frontend-template-dev_plugin-layout-block-views): a
+        // block is resolved as GP247TemplatePath::<template>.blocks.<name>, and the
+        // template name is a PATH SEGMENT — so before this registry, a plugin could
+        // only offer a block by shipping a directory named after somebody else's
+        // template, or by copying a file into app/GP247/Templates at install time.
+        // The first hardcodes a template it does not own (and pollutes
+        // TemplateSourceAudit::roots()); the second needs a writable directory,
+        // misses every other template, and orphans the file when the plugin goes.
+        //
+        // The template's own file is always looked up FIRST (gp247_render_block),
+        // so a site that published a block to edit it keeps winning.
+        'layout_block_views' => [],
         'layout_position' => [
             // WHY 'header' and not 'top_site': this key is matched at render against
             // the position each template emits, and the only call that reaches the
