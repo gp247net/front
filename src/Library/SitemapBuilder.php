@@ -711,7 +711,7 @@ class SitemapBuilder
      * Collect plugin-contributed sitemap entries from the
      * `front.seo_sitemap_providers` registry (US-PLG-007, ADR
      * seo_plugin-sitemap-extension). Each callable is invoked in isolation so
-     * one buggy plugin cannot break the whole sitemap (RISK-OPS-006). Results
+     * one buggy plugin cannot break the whole sitemap (RISK-OPS-sitemap-plugin-callback-failure). Results
      * are memoised for the lifetime of this builder.
      *
      * @return array<int, array> Entries with an absolute `loc`.
