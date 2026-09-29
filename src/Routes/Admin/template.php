@@ -19,6 +19,8 @@ Route::group(['prefix' => 'template'], function () use ($templateController) {
     Route::post('uninstall', $templateController.'@uninstall')->name('admin_template.uninstall');
     Route::post('enable', $templateController.'@enable')->name('admin_template.enable');
     Route::post('disable', $templateController.'@disable')->name('admin_template.disable');
+    // Run the data hook of a template whose files were updated outside the marketplace.
+    Route::post('apply-data', $templateController.'@applyData')->name('admin_template.apply_data');
 
     if (config('gp247-config.admin.api_templates')) {
         $templateOnlineController = gp247_namespace(AdminTemplateOnlineController::class);

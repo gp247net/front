@@ -27,6 +27,7 @@ class AdminTemplateController extends RootAdminController
             'uninstall' => gp247_route_admin('admin_template.uninstall'),
             'enable' => gp247_route_admin('admin_template.enable'),
             'disable' => gp247_route_admin('admin_template.disable'),
+            'applyData' => gp247_route_admin('admin_template.apply_data'),
             // WHY: the TailAdmin-ported extension_upload view links back to the
             // local list via listUrlAction['urlLocal']; omitting it 500s the import tab.
             'urlLocal' => gp247_route_admin('admin_template.index'),
