@@ -44,6 +44,7 @@
                         :error="$errors->first('descriptions.'.$code.'.description')" />
 
                     <x-gp247::rich-editor model="descriptions.{{ $code }}.content" type="page"
+                        data-testid="admin-page-content-{{ $code }}"
                         :label="gp247_language_render('admin.page.content')" />
                 </div>
             @endforeach
@@ -116,7 +117,7 @@
                     <td class="px-4 py-3">
                         <div class="flex items-center justify-end gap-1">
                             <x-gp247::button size="sm" variant="ghost" wire:click="editRow('{{ $row->id }}')" data-testid="admin-page-list-edit"><i class="fas fa-edit"></i></x-gp247::button>
-                            <x-gp247::button size="sm" variant="ghost" wire:click="delete('{{ $row->id }}')" wire:confirm="{{ gp247_language_render('action.delete_confirm') }}"><i class="fas fa-trash-alt text-red-600"></i></x-gp247::button>
+                            <x-gp247::button size="sm" variant="ghost" wire:click="delete('{{ $row->id }}')" data-testid="admin-page-list-delete" wire:confirm="{{ gp247_language_render('action.delete_confirm') }}"><i class="fas fa-trash-alt text-red-600"></i></x-gp247::button>
                         </div>
                     </td>
                 </tr>
