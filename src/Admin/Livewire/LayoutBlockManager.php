@@ -195,7 +195,9 @@ class LayoutBlockManager extends ResourcePanel
             $attributes['template'] = function_exists('gp247_store_info')
                 ? (string) gp247_store_info(key: 'template', storeId: $store)
                 : '';
-            FrontLayoutBlock::create($attributes);
+            $created = FrontLayoutBlock::create($attributes);
+            // ResourcePanel create contract: expose the new id so save() edits it in place.
+            $this->editingId = (string) $created->id;
         }
     }
 

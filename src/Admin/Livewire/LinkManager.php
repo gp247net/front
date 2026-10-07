@@ -219,6 +219,8 @@ class LinkManager extends ResourcePanel
             // (root admin) or the current scoped store (store-admin / switcher).
             $attributes['store_id'] = $this->resolveCreateStore();
             $link = FrontLink::create($attributes);
+            // ResourcePanel create contract: expose the new id so save() edits it in place.
+            $this->editingId = (string) $link->id;
         }
 
         // Store ownership is set on the link row (store_id) above.

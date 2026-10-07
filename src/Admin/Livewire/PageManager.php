@@ -252,6 +252,8 @@ class PageManager extends ResourcePanel
             // (root admin) or the current scoped store (store-admin / switcher).
             $attributes['store_id'] = $this->resolveCreateStore();
             $page = FrontPage::create($attributes);
+            // ResourcePanel create contract: expose the new id so save() edits it in place.
+            $this->editingId = (string) $page->id;
         }
 
         // WHY: delete + reinsert the whole description set per language (legacy

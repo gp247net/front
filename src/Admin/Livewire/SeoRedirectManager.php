@@ -198,7 +198,9 @@ class SeoRedirectManager extends ResourcePanel
             // create (root admin) or the current scoped store (store-admin/switcher),
             // i.e. the store whose live domain the rule will match.
             $attributes['store_id'] = $this->resolveCreateStore();
-            FrontRedirect::create($attributes);
+            $created = FrontRedirect::create($attributes);
+            // ResourcePanel create contract: expose the new id so save() edits it in place.
+            $this->editingId = (string) $created->id;
         }
     }
 
