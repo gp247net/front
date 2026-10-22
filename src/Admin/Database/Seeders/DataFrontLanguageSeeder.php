@@ -3,6 +3,7 @@
 namespace GP247\Front\Admin\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use GP247\Core\Database\Seeders\LocaleRows;
 use GP247\Core\Models\Languages;
 
 /**
@@ -26,6 +27,13 @@ class DataFrontLanguageSeeder extends Seeder
     protected $useUpsert = false;
 
     /**
+     * Rows gathered by writeLang() while dataLang() walks the inline groups.
+     *
+     * @var array
+     */
+    protected $buffer = [];
+
+    /**
      * Enable upsert mode so existing (code, location) rows are overwritten with
      * the package defaults instead of being skipped. Off by default to protect
      * translations a site owner may have edited via the admin Language manager.
@@ -40,31 +48,74 @@ class DataFrontLanguageSeeder extends Seeder
     }
 
     /**
-     * Persist language rows using the active write strategy.
-     *
-     * insertOrIgnore (default) keeps rows already present; upsert overwrites
-     * text/position with the package defaults, matching on the (code, location)
-     * unique key.
+     * Collect one inline group of language rows; run() persists them with the
+     * active write strategy — insertOrIgnore (default) keeps rows already
+     * present, upsert overwrites text/position on the (code, location) key.
      *
      * @param array $rows
      * @return void
      */
     protected function writeLang(array $rows)
     {
-        if ($this->useUpsert) {
-            Languages::upsert($rows, ['code', 'location'], ['text', 'position']);
-        } else {
-            Languages::insertOrIgnore($rows);
+        // WHY buffer: the inline groups below are collected by dataLang() so the
+        // extra default locales (Locales/<code>.php) can borrow their positions and
+        // the upgrade path can reuse the exact same rows.
+        array_push($this->buffer, ...$rows);
+    }
+
+    /**
+     * Insert (or upsert) rows in chunks that stay inside driver placeholder limits.
+     *
+     * @param array $rows
+     * @return void
+     */
+    protected function persist(array $rows)
+    {
+        foreach (array_chunk($rows, 500) as $chunk) {
+            if ($this->useUpsert) {
+                Languages::upsert($chunk, ['code', 'location'], ['text', 'position']);
+            } else {
+                Languages::insertOrIgnore($chunk);
+            }
         }
     }
 
     /**
-     * Seed front language rows. Skips existing (code, location) by default;
-     * overwrites them when upsert mode is enabled via useUpsert().
+     * Seed front language rows (en, vi and every Locales/<code>.php locale). Skips
+     * existing (code, location) by default; overwrites them when upsert mode is
+     * enabled via useUpsert().
      *
      * @return void
      */
     public function run()
+    {
+        $this->persist($this->dataLang());
+    }
+
+    /**
+     * All default language rows of the package, without touching the database.
+     *
+     * @return array
+     *
+     * @aidlc-story US-CMP-japanese-default-locale
+     * @aidlc-adr compat-foundation_locale-data-files
+     */
+    public function dataLang()
+    {
+        $this->buffer = [];
+        $this->collectDefaultRows();
+        $rows = $this->buffer;
+        $this->buffer = [];
+
+        return array_merge($rows, LocaleRows::fromFile(__DIR__.'/Locales/ja.php', 'ja', $rows));
+    }
+
+    /**
+     * Inline en/vi groups, each handed to writeLang().
+     *
+     * @return void
+     */
+    protected function collectDefaultRows()
     {
         // SEO settings screen labels (US-SEO-004, modification 20260711T114155).
         $this->writeLang(
@@ -247,12 +298,16 @@ class DataFrontLanguageSeeder extends Seeder
                 ['code' => 'admin.layout_block.page','text' => 'Trang','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block.type','text' => 'Loại','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block.text','text' => 'Nội dung','position' => 'admin.layout_block','location' => 'vi'],
+                ['code' => 'admin.layout_block.text_help','text' => 'Nội dung HTML hiển thị tại vị trí đã chọn.','position' => 'admin.layout_block','location' => 'vi'],
+                ['code' => 'admin.layout_block.view_empty','text' => 'Template đang dùng và các plugin chưa cung cấp khối giao diện nào.','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block.status','text' => 'Trạng thái','position' => 'admin.layout_block','location' => 'vi'],
                 ['code' => 'admin.layout_block.name','text' => 'Name','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block.position','text' => 'Position','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block.page','text' => 'Page','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block.type','text' => 'Type','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block.text','text' => 'Text','position' => 'admin.layout_block','location' => 'en'],
+                ['code' => 'admin.layout_block.text_help','text' => 'HTML content shown at the selected position.','position' => 'admin.layout_block','location' => 'en'],
+                ['code' => 'admin.layout_block.view_empty','text' => 'The active template and plugins provide no view blocks yet.','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block.status','text' => 'Status','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block.sort','text' => 'Sort','position' => 'admin.layout_block','location' => 'en'],
                 ['code' => 'admin.layout_block.sort','text' => 'Sắp xếp','position' => 'admin.layout_block','location' => 'vi'],

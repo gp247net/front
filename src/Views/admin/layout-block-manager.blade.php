@@ -104,7 +104,7 @@
                             @endforeach
                         </div>
                     @else
-                        <p class="text-sm text-gray-400 dark:text-gray-500">{{ gp247_language_render('admin.layout_block.text_help') }}</p>
+                        <p class="text-sm text-gray-400 dark:text-gray-500">{{ gp247_language_render('admin.layout_block.view_empty') }}</p>
                     @endif
                     @error('form.text')<p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                 </div>

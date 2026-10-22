@@ -136,6 +136,12 @@ class DataFrontDefaultSeeder extends Seeder
                 'keyword' => 'home page',
                 'description' => 'Website homepage',
                 'content' => '<h3>Welcome to CMS created by GP247 system</h3>'
+            ],
+            'ja' => [
+                'name' => 'ホーム',
+                'keyword' => 'ホーム, トップページ',
+                'description' => 'ウェブサイトのトップページ',
+                'content' => '<h3>GP247 システムで作成された CMS へようこそ</h3>'
             ]
         ];
 
@@ -172,6 +178,12 @@ class DataFrontDefaultSeeder extends Seeder
                 'name' => 'About GP247',
                 'keyword' => 'about GP247, free website solutions, business',
                 'description' => 'GP247 - Free website solutions for businesses',
+                'content' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+            ],
+            'ja' => [
+                'name' => 'GP247 について',
+                'keyword' => 'GP247 について, 無料ウェブサイトソリューション, ビジネス',
+                'description' => 'GP247 - 企業向けの無料ウェブサイトソリューション',
                 'content' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
             ]
         ];
