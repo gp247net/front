@@ -253,6 +253,13 @@ class DataFrontDefaultSeeder extends Seeder
             // Store ownership is set on the link row (store_id) above.
         }
 
+        // Contact form (front-contact): settings on ROOT (taking over shop's legacy
+        // mail toggles if present), menu entry under ADMIN_CONTENT re-created above,
+        // and its two permissions — the same steps the upgrade migration runs.
+        \GP247\Front\Support\ContactInstaller::moveLegacyMailToggles();
+        \GP247\Front\Support\ContactInstaller::seedConfig();
+        \GP247\Front\Support\ContactInstaller::seedAdmin();
+
         // Language rows are seeded by the dedicated DataFrontLanguageSeeder so
         // they can be refreshed independently of menu/banner/page/link data.
         $this->call(DataFrontLanguageSeeder::class);

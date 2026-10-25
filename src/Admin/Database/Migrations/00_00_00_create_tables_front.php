@@ -138,6 +138,9 @@ return new class extends Migration
             }
         );
 
+        // Contact form messages (front-contact): one definition shared with the upgrade migration.
+        \GP247\Front\Support\ContactInstaller::createTable();
+
         $schema->create(
             GP247_DB_PREFIX.'front_country',
             function (Blueprint $table) {
@@ -183,6 +186,9 @@ return new class extends Migration
         $schema->dropIfExists(GP247_DB_PREFIX.'front_country');
         $schema->dropIfExists(GP247_DB_PREFIX.'front_subscribe');
         $schema->dropIfExists(GP247_DB_PREFIX.'front_redirects');
+        // WARNING: front_contact holds messages visitors sent — dropping it loses them
+        // (export first). Only reached by a fresh front install/uninstall.
+        $schema->dropIfExists(GP247_DB_PREFIX.'front_contact');
 
     }
 };

@@ -59,6 +59,38 @@ class FooterLinks extends BaseFrontViewComponent
                 'target' => $url['data']['target'] ?? '_self',
             ];
         }
+
+        $this->appendContactLink();
+    }
+
+    /**
+     * Add "Contact" while the contact form is on, unless the owner already put a
+     * footer link to the same address.
+     *
+     * @return void
+     *
+     * @aidlc-unit front-contact
+     * @aidlc-story US-front-contact-toggle
+     */
+    private function appendContactLink(): void
+    {
+        if (!\GP247\Front\Support\ContactSettings::enabled()) {
+            return;
+        }
+
+        $url = gp247_route_front('front.contact');
+        foreach ($this->links as $link) {
+            if (($link['url'] ?? null) === $url) {
+                return;
+            }
+        }
+
+        $this->links[] = [
+            'type' => 'link',
+            'name' => gp247_language_render('contact.page_title'),
+            'url' => $url,
+            'target' => '_self',
+        ];
     }
 
     protected function templateViewKey(): string

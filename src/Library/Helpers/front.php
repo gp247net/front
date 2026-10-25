@@ -377,3 +377,27 @@ if (!function_exists('gp247_layout_block_options') && !in_array('gp247_layout_bl
         return $options;
     }
 }
+
+/**
+ * Resolve a storefront view of the active template, falling back to the copy that
+ * ships with gp247/front. WHY: the template name is a path segment of the view key,
+ * so a template other than GP247Front (MKP, a site's own theme) never sees the
+ * package's file — a screen added after that template was written would otherwise
+ * fail with "view not found" (RISK-TECH-contact-template-view-missing).
+ *
+ * @param string      $subPath  View path inside the template, e.g. "screen.front_contact".
+ * @param string|null $template Template name; null = the current store's template.
+ * @return string View name to pass to view().
+ *
+ * @aidlc-unit front-contact
+ * @aidlc-story US-front-contact-toggle, US-front-contact-notify-mail
+ * @aidlc-adr front-contact_contact-form-in-front
+ */
+if (!function_exists('gp247_front_view') && !in_array('gp247_front_view', config('gp247_functions_except', []))) {
+    function gp247_front_view(string $subPath, ?string $template = null): string
+    {
+        $view = 'GP247TemplatePath::' . ($template ?? gp247_store_info('template')) . '.' . $subPath;
+
+        return view()->exists($view) ? $view : 'gp247-front::' . $subPath;
+    }
+}

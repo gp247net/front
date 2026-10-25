@@ -295,6 +295,49 @@ class FrontServiceProvider extends ServiceProvider
             'front-admin',
             [],
         );
+
+        $this->registerContactConfigTab();
+    }
+
+    /**
+     * Contribute the "Contact" tab to the core Configuration hub (front-contact),
+     * gated by its own URI. Only once the contact table exists — the operational
+     * truth of "installed", not "the package is in vendor/" (RISK-TECH-guard-package-vs-db);
+     * any DB error means "not installed" so boot is never blocked.
+     *
+     * @return void
+     *
+     * @aidlc-unit front-contact
+     * @aidlc-story US-front-contact-config-tab
+     * @aidlc-adr admin-shell_config-hub-tab-registry
+     */
+    protected function registerContactConfigTab()
+    {
+        if (!class_exists(\GP247\Core\AdminShell\Support\SettingsHubTabRegistry::class)) {
+            return;
+        }
+        $prefix = defined('GP247_ADMIN_PREFIX') ? GP247_ADMIN_PREFIX : 'gp247_admin';
+        // WHY: the hub only exists in the admin (and CLI/tests); skip the schema
+        // lookup on every storefront request.
+        if (!$this->app->runningInConsole() && !request()->is($prefix, $prefix.'/*', 'livewire*')) {
+            return;
+        }
+        try {
+            if (!\Illuminate\Support\Facades\Schema::connection(GP247_DB_CONNECTION)->hasTable(GP247_DB_PREFIX.'front_contact')) {
+                return;
+            }
+        } catch (\Throwable $e) {
+            gp247_report('#GP247-FRONT::contact-tab:: '.$e->getMessage());
+            return;
+        }
+
+        \GP247\Core\AdminShell\Support\SettingsHubTabRegistry::register(
+            key: 'contact',
+            label: 'admin.menu_titles.contact_config',
+            component: 'gp247-front-admin::contact-config-form',
+            authUri: $prefix.'/contact_config',
+            order: 20,
+        );
     }
 
     /**

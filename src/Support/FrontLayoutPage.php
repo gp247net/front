@@ -20,6 +20,7 @@ enum FrontLayoutPage: string
     case Home = 'front_home';
     case PageDetail = 'front_page_detail';
     case Search = 'front_search';
+    case Contact = 'front_contact';
 
     /**
      * i18n label code (seeded in DataFrontDefaultSeeder, group admin.layout_block).
@@ -36,6 +37,7 @@ enum FrontLayoutPage: string
             self::Home => 'admin.layout_block_page.home',
             self::PageDetail => 'admin.layout_block_page.page_detail',
             self::Search => 'admin.layout_block_page.search',
+            self::Contact => 'admin.layout_block_page.contact',
         };
     }
 

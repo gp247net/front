@@ -1,5 +1,6 @@
 <?php
 
+use GP247\Front\Controllers\ContactController;
 use GP247\Front\Controllers\HomeController;
 use GP247\Front\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +36,17 @@ Route::get('/banner/{id}', $homeController.'@clickBanner')
 //Subscribe
 Route::post('/subscribe', $homeController.'@emailSubscribe')
     ->name('front.subscribe');
+
+// Contact form (US-front-contact-*): registered before core's {alias} catch-all;
+// the controller hands GET to the CMS page "contact" while the form is off.
+// WHY the "front-contact" limiter prefix: keeps this budget separate from other
+// throttled routes of the same visitor (5 messages a minute per IP).
+$contactController = gp247_namespace(ContactController::class);
+Route::get($langUrl.'contact'.$suffix, $contactController.'@showProcessFront')
+    ->name('front.contact');
+Route::post($langUrl.'contact'.$suffix, $contactController.'@submitProcessFront')
+    ->middleware('throttle:5,1,front-contact')
+    ->name('front.contact.submit');
 
 
 Route::get('/', $homeController.'@index')->name('front.home');
