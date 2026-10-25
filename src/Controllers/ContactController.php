@@ -44,7 +44,8 @@ class ContactController extends RootFrontController
 
         if (!ContactSettings::enabled()) {
             // WHY delegate: a site may already have a CMS page with alias "contact".
-            return (new HomeController())->pageDetailProcessFront(...(GP247_SEO_LANG ? [$lang, 'contact'] : ['contact']));
+            $homeController = gp247_namespace(HomeController::class);
+            return (new $homeController)->pageDetailProcessFront(...(GP247_SEO_LANG ? [$lang, 'contact'] : ['contact']));
         }
 
         $title = gp247_language_render('contact.page_title');

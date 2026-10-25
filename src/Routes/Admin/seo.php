@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Route;
 // (see vendor/gp247/core src/Library/Helpers/other.php) — it does not
 // consult Laravel's route name/URI at all. The menu path and the route
 // path must therefore match literally, or the sidebar link 404s.
-Route::get('seo_meta', SeoMetaSettings::class)->name('admin_seo_meta.index');
-Route::get('seo_sitemap', SeoSitemapSettings::class)->name('admin_seo_sitemap.index');
+Route::get('seo_meta', gp247_namespace(SeoMetaSettings::class))->name('admin_seo_meta.index');
+Route::get('seo_sitemap', gp247_namespace(SeoSitemapSettings::class))->name('admin_seo_sitemap.index');
 
 // Redirect 301 (US-SEO-006, modification 20260712T011152): 3rd screen under the
 // same "SEO" menu group, own RBAC permission `admin_seo_redirect`. Unlike the
@@ -25,7 +25,7 @@ Route::get('seo_sitemap', SeoSitemapSettings::class)->name('admin_seo_sitemap.in
 // needs create/edit route variants like admin_link/admin_layout_block — all 3
 // map to the same Manager class (edit state lives in the {id} segment).
 Route::group(['prefix' => 'seo_redirect'], function () {
-    Route::get('/', SeoRedirectManager::class)->name('admin_seo_redirect.index');
-    Route::get('create', SeoRedirectManager::class)->name('admin_seo_redirect.create');
-    Route::get('/edit/{id}', SeoRedirectManager::class)->name('admin_seo_redirect.edit');
+    Route::get('/', gp247_namespace(SeoRedirectManager::class))->name('admin_seo_redirect.index');
+    Route::get('create', gp247_namespace(SeoRedirectManager::class))->name('admin_seo_redirect.create');
+    Route::get('/edit/{id}', gp247_namespace(SeoRedirectManager::class))->name('admin_seo_redirect.edit');
 });

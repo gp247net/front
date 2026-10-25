@@ -108,7 +108,8 @@ class HomeController extends RootFrontController
 
         if (strtoupper($searchMode) === 'PRODUCT' && class_exists('\GP247\Shop\Controllers\ShopProductController')) {
             if ($keyword) {
-                $itemsList = (new \GP247\Shop\Controllers\ShopProductController)->dataFilter();
+                $productController = gp247_namespace('GP247\Shop\Controllers\ShopProductController');
+                $itemsList = (new $productController)->dataFilter();
             } else {
                 $itemsList = collect([]);
             }

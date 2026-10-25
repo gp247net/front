@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 // LayoutBlockManager (ResourcePanel). Route names kept for back-compat;
 // create route maps to the same manager (form is always visible on the left panel).
 Route::group(['prefix' => 'layout_block'], function () {
-    Route::get('/', LayoutBlockManager::class)->name('admin_layout_block.index');
-    Route::get('create', LayoutBlockManager::class)->name('admin_layout_block.create');
-    Route::get('/edit/{id}', LayoutBlockManager::class)->name('admin_layout_block.edit');
+    Route::get('/', gp247_namespace(LayoutBlockManager::class))->name('admin_layout_block.index');
+    Route::get('create', gp247_namespace(LayoutBlockManager::class))->name('admin_layout_block.create');
+    Route::get('/edit/{id}', gp247_namespace(LayoutBlockManager::class))->name('admin_layout_block.edit');
 });
