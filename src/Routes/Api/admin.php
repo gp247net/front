@@ -3,17 +3,12 @@
 use GP247\Front\Api\AdminController;
 use Illuminate\Support\Facades\Route;
 
-$listAbility = [
-    config('gp247-config.api.auth.api_scope_admin'),
-    config('gp247-config.api.auth.api_scope_admin_supper')
-];
-
 
 
 Route::group([
     'middleware' => [
         'auth:admin-api',
-        'ability:'.implode(',', $listAbility)
+        \GP247\Core\Api\Support\ApiAbilities::admin(),
     ],
     'prefix' => GP247_API_CORE_PREFIX,
 ], function (){

@@ -215,6 +215,11 @@ class FrontServiceProvider extends ServiceProvider
                     // boot of the process (PHPUnit, Octane), not only the first one.
                     require $filename;
                 }
+                // REST API (v1 + v2) through the core seam, only once front tables exist
+                // (US-CMP-api-package-route-registration).
+                foreach (array_merge(glob(__DIR__.'/Routes/Api/*.php'), glob(__DIR__.'/Routes/Api/v2/*.php')) as $apiRouteFile) {
+                    \GP247\Core\Api\Support\ApiRouteRegistrar::register($apiRouteFile, '00_00_00_create_tables_front');
+                }
                 foreach (glob(app_path().'/GP247/Templates/*/Route.php') as $filename) {
                     $this->loadRoutesFrom($filename);
                 }
