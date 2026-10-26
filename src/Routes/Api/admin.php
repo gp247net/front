@@ -9,6 +9,7 @@ $listAbility = [
 ];
 
 
+
 Route::group([
     'middleware' => [
         'auth:admin-api',
@@ -19,6 +20,7 @@ Route::group([
         $adminController = gp247_namespace(AdminController::class);
         Route::group([
             'prefix' => 'banner',
+            'middleware' => 'api.admin:admin_banner.index',
         ], function () use($adminController) {
             Route::get('list', $adminController.'@getBannerList');
             Route::get('detail/{id}', $adminController.'@getBannerDetail');
@@ -26,6 +28,7 @@ Route::group([
 
         Route::group([
             'prefix' => 'page',
+            'middleware' => 'api.admin:admin_page.index',
         ], function () use($adminController) {
             Route::get('list', $adminController.'@getPageList');
             Route::get('detail/{id}', $adminController.'@getPageDetail');
