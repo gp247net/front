@@ -111,7 +111,7 @@ class ContentController extends RootFrontController
      */
     public function adminPageList(Request $request)
     {
-        return $this->pages($request, ApiStoreScope::apply(FrontPage::query()));
+        return $this->pages($request, ApiStoreScope::apply(FrontPage::query()), true);
     }
 
     /**
@@ -140,22 +140,23 @@ class ContentController extends RootFrontController
         return ApiQuery::page($query, $request, fn ($b) => self::banner($b, $admin),
             ['type' => fn (Builder $q, string $v) => $q->where($t . '.type', $v)],
             ['sort' => $t . '.sort', 'created_at' => $t . '.created_at'],
-            fn (Builder $q, string $term) => $q->where($t . '.name', 'like', ApiQuery::like($term)));
+            fn (Builder $q, string $term) => $q->where($t . '.name', 'like', ApiQuery::like($term)), changedSince: $admin);
     }
 
     /**
      * @param Request $request
      * @param Builder $query
+     * @param bool    $admin Admin list: accepts `updated_since` (US-api-sync-changed-since-filter).
      * @return \Illuminate\Http\JsonResponse
      */
-    private function pages(Request $request, Builder $query)
+    private function pages(Request $request, Builder $query, bool $admin = false)
     {
         $lang = ApiQuery::lang($request);
         $t = (new FrontPage)->getTable();
 
         return ApiQuery::page($query->with('descriptions'), $request, fn ($p) => self::page($p, $lang, false), [],
             ['created_at' => $t . '.created_at'],
-            fn (Builder $q, string $term) => $q->whereHas('descriptions', fn ($d) => $d->where('name', 'like', ApiQuery::like($term))));
+            fn (Builder $q, string $term) => $q->whereHas('descriptions', fn ($d) => $d->where('name', 'like', ApiQuery::like($term))), changedSince: $admin);
     }
 
     /**
