@@ -11,7 +11,7 @@
       }
   ],
   "require": {
-    "gp247/core": "^3.3"
+    "gp247/core": "^3.7"
   },
 
   "autoload": {
