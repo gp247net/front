@@ -5,6 +5,7 @@ namespace GP247\Front\Api\V2;
 use GP247\Core\Api\Support\ApiStoreScope;
 use GP247\Core\Api\Support\ApiVisibility;
 use GP247\Core\Api\V2\ApiQuery;
+use GP247\Core\Api\V2\ApiShape;
 use GP247\Front\Controllers\RootFrontController;
 use GP247\Front\Models\FrontBanner;
 use GP247\Front\Models\FrontPage;
@@ -17,8 +18,8 @@ use Illuminate\Http\Request;
  * endpoints sit behind `api.admin:<screen>` and are narrowed by ApiStoreScope.
  *
  * @aidlc-unit compat-foundation
- * @aidlc-story US-CMP-api-v2-contract, US-CMP-api-v2-query-parameters
- * @aidlc-adr compat-foundation_rest-api-hardening
+ * @aidlc-story US-CMP-api-v2-contract, US-CMP-api-v2-query-parameters, US-CMP-api-sparse-fieldsets
+ * @aidlc-adr compat-foundation_rest-api-hardening, compat-foundation_api-http-caching-and-shaping
  */
 class ContentController extends RootFrontController
 {
@@ -60,7 +61,7 @@ class ContentController extends RootFrontController
         $banner = ApiVisibility::visible((new FrontBanner)->setType('all')->buildQuery())
             ->where((new FrontBanner)->getTable() . '.id', $id)->first();
 
-        return ApiQuery::one($banner, fn ($b) => self::banner($b, false));
+        return ApiQuery::one($banner, fn ($b) => self::banner($b, false), self::bannerShape(false)->resolve($request));
     }
 
     /**
@@ -83,7 +84,7 @@ class ContentController extends RootFrontController
         $page = ApiVisibility::visible((new FrontPage)->buildQuery())->with('descriptions')
             ->where((new FrontPage)->getTable() . '.id', $id)->first();
 
-        return ApiQuery::one($page, fn ($p) => self::page($p, $lang, true));
+        return ApiQuery::one($page, fn ($p) => self::page($p, $lang, true), self::pageShape(true)->resolve($request));
     }
 
     /**
@@ -102,7 +103,8 @@ class ContentController extends RootFrontController
      */
     public function adminBannerDetail(Request $request, $id)
     {
-        return ApiQuery::one(ApiStoreScope::apply(FrontBanner::query())->where('id', $id)->first(), fn ($b) => self::banner($b, true));
+        return ApiQuery::one(ApiStoreScope::apply(FrontBanner::query())->where('id', $id)->first(), fn ($b) => self::banner($b, true),
+            self::bannerShape(true)->resolve($request));
     }
 
     /**
@@ -124,7 +126,7 @@ class ContentController extends RootFrontController
         $lang = ApiQuery::lang($request);
 
         return ApiQuery::one(ApiStoreScope::apply(FrontPage::query())->with('descriptions')->where('id', $id)->first(),
-            fn ($p) => self::page($p, $lang, true));
+            fn ($p) => self::page($p, $lang, true), self::pageShape(true)->resolve($request));
     }
 
     /**
@@ -136,11 +138,12 @@ class ContentController extends RootFrontController
     private function banners(Request $request, Builder $query, bool $admin)
     {
         $t = (new FrontBanner)->getTable();
+        $shape = self::bannerShape($admin)->resolve($request);
 
         return ApiQuery::page($query, $request, fn ($b) => self::banner($b, $admin),
             ['type' => fn (Builder $q, string $v) => $q->where($t . '.type', $v)],
             ['sort' => $t . '.sort', 'created_at' => $t . '.created_at'],
-            fn (Builder $q, string $term) => $q->where($t . '.name', 'like', ApiQuery::like($term)), changedSince: $admin);
+            fn (Builder $q, string $term) => $q->where($t . '.name', 'like', ApiQuery::like($term)), changedSince: $admin, shape: $shape);
     }
 
     /**
@@ -153,10 +156,37 @@ class ContentController extends RootFrontController
     {
         $lang = ApiQuery::lang($request);
         $t = (new FrontPage)->getTable();
+        $shape = self::pageShape(false)->resolve($request);
 
         return ApiQuery::page($query->with('descriptions'), $request, fn ($p) => self::page($p, $lang, false), [],
             ['created_at' => $t . '.created_at'],
-            fn (Builder $q, string $term) => $q->whereHas('descriptions', fn ($d) => $d->where('name', 'like', ApiQuery::like($term))), changedSince: $admin);
+            fn (Builder $q, string $term) => $q->whereHas('descriptions', fn ($d) => $d->where('name', 'like', ApiQuery::like($term))), changedSince: $admin, shape: $shape);
+    }
+
+    /**
+     * Declared fields of a banner for fields[banner] (the click counter only for admins).
+     *
+     * @param bool $admin
+     * @return ApiShape
+     */
+    private static function bannerShape(bool $admin): ApiShape
+    {
+        $fields = ['id', 'name', 'image', 'url', 'target', 'html', 'type', 'sort', 'status', 'store_id', 'created_at', 'updated_at'];
+
+        return new ApiShape('banner', $admin ? array_merge($fields, ['click']) : $fields);
+    }
+
+    /**
+     * Declared fields of a CMS page for fields[page] (the body only on detail).
+     *
+     * @param bool $withContent
+     * @return ApiShape
+     */
+    private static function pageShape(bool $withContent): ApiShape
+    {
+        $text = $withContent ? ['name', 'keyword', 'description', 'content'] : ['name', 'keyword', 'description'];
+
+        return new ApiShape('page', array_merge(['id', 'alias', 'image'], $text, ['status', 'store_id', 'created_at', 'updated_at']));
     }
 
     /**

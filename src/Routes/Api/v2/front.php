@@ -9,8 +9,11 @@ Route::group([
 ], function () {
     $content = gp247_namespace(ContentController::class);
     Route::get('meta', $content.'@meta');
-    Route::get('banner/list', $content.'@bannerList');
-    Route::get('banner/detail/{id}', $content.'@bannerDetail');
-    Route::get('page/list', $content.'@pageList');
-    Route::get('page/detail/{id}', $content.'@pageDetail');
+    // Public content: browsers / a CDN may keep it (US-CMP-api-public-cache-control).
+    Route::group(['middleware' => ['api.cache.public']], function () use ($content) {
+        Route::get('banner/list', $content.'@bannerList');
+        Route::get('banner/detail/{id}', $content.'@bannerDetail');
+        Route::get('page/list', $content.'@pageList');
+        Route::get('page/detail/{id}', $content.'@pageDetail');
+    });
 });
