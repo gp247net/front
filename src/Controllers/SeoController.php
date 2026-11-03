@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Cache;
  * multilingual URLs and auto-paginates into a `<sitemapindex>` + child
  * sitemaps once the store exceeds the 50k-URL protocol limit (US-SEO-003,
  * US-SEO-004, ADR seo_multilingual-sitemap). Responses are generated
- * on-demand and cached (keyed by store_id and a rebuildable version counter)
- * to avoid repeated DB queries on shared hosts without a cron job (MC-007).
+ * on-demand and cached (keyed by store_id, the builder's document format
+ * version and a rebuildable version counter) to avoid repeated DB queries on shared hosts without a cron job (MC-007).
  *
  * `robots.txt` content is admin-managed from "Meta & JSON-LD"
  * (`GP247\Front\Admin\Livewire\SeoMetaSettings`); the sitemap inclusion
@@ -48,7 +48,7 @@ class SeoController extends RootFrontController
     public function sitemap(): Response
     {
         $storeId  = config('app.storeId');
-        $cacheKey = 'gp247_sitemap_' . $storeId . '_v' . self::cacheVersion($storeId);
+        $cacheKey = 'gp247_sitemap_' . $storeId . self::formatSuffix() . '_v' . self::cacheVersion($storeId);
 
         $xml = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($storeId) {
             return (new SitemapBuilder($storeId))->renderRoot();
@@ -69,7 +69,8 @@ class SeoController extends RootFrontController
     public function sitemapSegment(string $segment): Response
     {
         $storeId  = config('app.storeId');
-        $cacheKey = 'gp247_sitemap_seg_' . $storeId . '_' . $segment . '_v' . self::cacheVersion($storeId);
+        $cacheKey = 'gp247_sitemap_seg_' . $storeId . '_' . $segment . self::formatSuffix()
+            . '_v' . self::cacheVersion($storeId);
 
         $xml = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($storeId, $segment) {
             return (new SitemapBuilder($storeId))->renderSegment($segment);
@@ -85,10 +86,10 @@ class SeoController extends RootFrontController
     }
 
     /**
-     * Serve the human-readable XSL stylesheet referenced by the sitemaps'
+     * Serve the human-readable CSS stylesheet referenced by the sitemaps'
      * `<?xml-stylesheet?>` processing instruction. Static asset shipped with
-     * the package; purely cosmetic (browsers render sitemaps as an HTML table,
-     * crawlers ignore it).
+     * the package and styled straight onto the XML (no XSLT, which browsers
+     * are removing); purely cosmetic, crawlers ignore it.
      *
      * @return \Illuminate\Http\Response
      *
@@ -98,11 +99,11 @@ class SeoController extends RootFrontController
      */
     public function sitemapStylesheet(): Response
     {
-        $path = dirname(__DIR__) . '/Resources/sitemap.xsl';
-        $xsl  = is_file($path) ? (string) file_get_contents($path) : '';
+        $path = dirname(__DIR__) . '/Resources/sitemap.css';
+        $css  = is_file($path) ? (string) file_get_contents($path) : '';
 
-        return response($xsl, 200, [
-            'Content-Type'  => 'text/xsl; charset=UTF-8',
+        return response($css, 200, [
+            'Content-Type'  => 'text/css; charset=UTF-8',
             'Cache-Control' => 'public, max-age=86400',
         ]);
     }
@@ -191,6 +192,18 @@ class SeoController extends RootFrontController
     public static function bumpCacheVersion($storeId): void
     {
         Cache::forever(self::VERSION_KEY_PREFIX . $storeId, self::cacheVersion($storeId) + 1);
+    }
+
+    /**
+     * Cache-key fragment naming the generated document format, so a package
+     * update that changes the output frame (e.g. the stylesheet PI) is served
+     * at once instead of after the cached copies expire.
+     *
+     * @return string
+     */
+    private static function formatSuffix(): string
+    {
+        return '_f' . SitemapBuilder::FORMAT_VERSION;
     }
 
     /**

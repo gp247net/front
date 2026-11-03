@@ -1,0 +1,118 @@
+/*
+  Human-readable stylesheet for GP247 sitemaps (US-SEO-004). Referenced from
+  sitemap.xml and child segments via an <?xml-stylesheet type="text/css"?>
+  processing instruction and applied straight onto the XML — no XSLT, which
+  browsers are removing. Purely cosmetic: crawlers ignore the PI and read the
+  raw XML. Handles both <urlset> (flat + child segments) and <sitemapindex>.
+  CSS cannot turn <loc> into a link, so URLs are selectable text.
+*/
+@namespace s url("http://www.sitemaps.org/schemas/sitemap/0.9");
+@namespace xhtml url("http://www.w3.org/1999/xhtml");
+
+:root {
+  --bg: #f8fafc; --fg: #0f172a; --muted: #64748b; --card: #ffffff;
+  --border: #e2e8f0; --link: #2563eb; --tag: #eef2ff; --tag-fg: #4338ca;
+  --hover: rgba(99, 102, 241, .06);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1120; --fg: #e2e8f0; --muted: #94a3b8; --card: #111827;
+    --border: #1f2937; --link: #60a5fa; --tag: #1e1b4b; --tag-fg: #c7d2fe;
+    --hover: rgba(129, 140, 248, .08);
+  }
+}
+
+s|urlset, s|sitemapindex {
+  display: block;
+  counter-reset: entry;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: 24px 16px;
+  background: var(--bg);
+  color: var(--fg);
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Title block: the XML has no element to hang a heading on. */
+s|urlset::before, s|sitemapindex::before {
+  display: block;
+  margin-block-end: 16px;
+  white-space: pre-line;
+  color: var(--muted);
+  font-size: 13px;
+}
+s|urlset::before {
+  content: "XML Sitemap\A This page lists the URLs this site offers to search engines.";
+}
+s|sitemapindex::before {
+  content: "XML Sitemap Index\A This index lists the sitemap files of this site.";
+}
+s|urlset::first-line, s|sitemapindex::first-line {
+  color: var(--fg);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Counter read after the last entry, so it holds the total. */
+s|urlset::after, s|sitemapindex::after {
+  content: "Total: " counter(entry);
+  display: block;
+  margin-block-start: 16px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* One block per entry: a fixed-column table would misalign because an entry
+   may lack lastmod or alternates (e.g. the home page). */
+s|url, s|sitemap {
+  display: block;
+  counter-increment: entry;
+  margin-block-end: 8px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+s|url:hover, s|sitemap:hover {
+  background: var(--hover);
+}
+
+s|loc {
+  display: block;
+  color: var(--link);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+s|loc::before {
+  content: counter(entry) ". ";
+  color: var(--muted);
+  font-weight: 400;
+}
+
+s|lastmod, s|changefreq, s|priority {
+  display: inline-block;
+  margin-block-start: 4px;
+  margin-inline-end: 14px;
+  color: var(--muted);
+  font-size: 12px;
+}
+s|lastmod::before { content: "Last modified: "; }
+s|changefreq::before { content: "Frequency: "; }
+s|priority::before { content: "Priority: "; }
+
+/* hreflang alternates are HTML <link> elements, hidden by the browser's
+   default style; show each as a language badge. */
+xhtml|link {
+  display: inline-block;
+  margin-block-start: 4px;
+  margin-inline-end: 4px;
+  padding: 1px 7px;
+  background: var(--tag);
+  color: var(--tag-fg);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+xhtml|link::before {
+  content: attr(hreflang);
+}

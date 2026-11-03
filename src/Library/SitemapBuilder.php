@@ -32,11 +32,20 @@ class SitemapBuilder
     private const LANG_TYPES = ['pages', 'products', 'categories'];
 
     /**
-     * Processing instruction attaching the human-readable XSL stylesheet.
+     * Version of the generated document shape (stylesheet PI, namespaces).
+     * Part of every sitemap cache key so a package update never serves a
+     * document cached in an older shape. Bump on any change to the output
+     * frame. 1 = XSLT stylesheet, 2 = CSS stylesheet.
+     */
+    public const FORMAT_VERSION = 2;
+
+    /**
+     * Processing instruction attaching the human-readable CSS stylesheet.
+     * CSS rather than XSLT because browsers are removing XSLT support.
      * Root-relative so it resolves from any sitemap URL and stays correct
      * across stores/domains (crawlers ignore this PI, US-SEO-004).
      */
-    private const STYLESHEET_PI = '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>' . "\n";
+    private const STYLESHEET_PI = '<?xml-stylesheet type="text/css" href="/sitemap.css"?>' . "\n";
 
     /** @var mixed Store UUID this builder renders for. */
     private $storeId;

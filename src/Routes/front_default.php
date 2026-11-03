@@ -19,8 +19,8 @@ Route::get('/sitemap.xml', $seoController . '@sitemap')->name('front.sitemap');
 Route::get('/sitemap-{segment}.xml', $seoController . '@sitemapSegment')
     ->where('segment', '[A-Za-z0-9\-]+')
     ->name('front.sitemap.segment');
-// Human-readable stylesheet referenced by the sitemaps' xml-stylesheet PI.
-Route::get('/sitemap.xsl', $seoController . '@sitemapStylesheet')->name('front.sitemap.xsl');
+// Human-readable CSS stylesheet referenced by the sitemaps' xml-stylesheet PI.
+Route::get('/sitemap.css', $seoController . '@sitemapStylesheet')->name('front.sitemap.css');
 Route::get('/robots.txt',  $seoController . '@robots')->name('front.robots');
 
 $homeController = gp247_namespace(HomeController::class);
