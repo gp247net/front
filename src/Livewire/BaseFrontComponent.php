@@ -63,8 +63,7 @@ abstract class BaseFrontComponent extends Component
      * WHY this thin wrapper stays: activeTemplateName() and the resolution
      * algorithm itself now live in the ResolvesTemplateView trait (ADR-013,
      * shared with BaseFrontViewComponent) — this no-arg overload is kept so
-     * existing callers/tests (e.g. StubFrontComponent::resolvedViewForTest())
-     * are unaffected by the extraction.
+     * existing callers and subclasses are unaffected by the extraction.
      *
      * @return string
      */
