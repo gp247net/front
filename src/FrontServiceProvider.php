@@ -245,7 +245,31 @@ class FrontServiceProvider extends ServiceProvider
                 [[\GP247\Front\Admin\ExtensionTemplateGuard::class, 'check']],
             )]);
 
+            $this->registerBackupDataGroups();
+
         }
+    }
+
+    /**
+     * Declare the front tables in the backup data groups of the core. Skipped on a core
+     * without the backup registry, so front keeps working with an older core (NFR-MAINT-001).
+     *
+     * @return void
+     *
+     * @aidlc-unit backup-engine
+     * @aidlc-story US-backup-engine-data-groups
+     * @aidlc-adr backup-engine_data-group-registry
+     */
+    protected function registerBackupDataGroups(): void
+    {
+        if (!class_exists(\GP247\Core\Backup\Application\DataGroupRegistry::class)) {
+            return;
+        }
+        \GP247\Core\Backup\Application\DataGroupRegistry::declare('content', [
+            'front_banner', 'front_banner_type', 'front_layout_block', 'front_link', 'front_link_group',
+            'front_page', 'front_page_description', 'front_redirects', 'front_country',
+        ]);
+        \GP247\Core\Backup\Application\DataGroupRegistry::declare('customers', ['front_contact', 'front_subscribe']);
     }
 
     /**
