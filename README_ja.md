@@ -33,6 +33,8 @@ GP247/Front は、GP247 の**フロントエンド層全体の基盤となるパ
 
 ## インストール
 
+> 📘 **インストールの詳しいガイド** — インストール構成の選び方（S-Cart、GP247 CMS、core のみ）、コマンドラインのないホスティング、既存サイトへの front/shop 追加、トラブルシューティング：[GP247 と S-Cart のインストール](https://github.com/gp247net/gp247-docs/blob/main/install-upgrade/install_ja.md)。
+
 1. パッケージをインストールします
 
     >`composer require gp247/front`

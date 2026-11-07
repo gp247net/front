@@ -34,6 +34,8 @@ Key features:
 
 ## Installation
 
+> 📘 **Full installation guide** — choosing a package set (S-Cart, GP247 CMS, core only), hosting without a command line, adding front/shop to an existing site, troubleshooting: [Installing GP247 and S-Cart](https://github.com/gp247net/gp247-docs/blob/main/install-upgrade/install.md).
+
 1. Install package
 
     >`composer require gp247/front`

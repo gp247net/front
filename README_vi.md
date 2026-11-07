@@ -33,6 +33,8 @@ Các tính năng chính:
 
 ## Cài đặt
 
+> 📘 **Hướng dẫn cài đặt đầy đủ** — chọn bộ cài (S-Cart, GP247 CMS, chỉ core), hosting không có dòng lệnh, thêm front/shop vào site đang có, xử lý sự cố: [Cài đặt GP247 và S-Cart](https://github.com/gp247net/gp247-docs/blob/main/install-upgrade/install_vi.md).
+
 1. Cài đặt gói
 
     >`composer require gp247/front`
