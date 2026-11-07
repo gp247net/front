@@ -83,6 +83,21 @@ class SeoRedirectManager extends ResourcePanel
     }
 
     /**
+     * Language keys naming the searched columns (shown in the search box).
+     *
+     * @return array<string, string>
+     *
+     * @aidlc-story US-admin-shell-list-search-scope-hint
+     */
+    protected function searchLabels(): array
+    {
+        return [
+            'from' => 'admin.seo_redirect.from',
+            'to' => 'admin.seo_redirect.to',
+        ];
+    }
+
+    /**
      * @return array<int, string>
      */
     protected function sortableColumns(): array

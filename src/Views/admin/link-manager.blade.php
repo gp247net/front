@@ -90,10 +90,8 @@
 
     {{-- Right: list --}}
     <x-gp247::card :title="gp247_language_render('admin.link.title')">
-        <div class="mb-3 flex items-center gap-2">
-            <input type="search" wire:model.live.debounce.300ms="keyword"
-                placeholder="{{ gp247_language_render('admin.link.name') }}"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+        <div class="mb-3 flex items-start gap-2">
+            <x-gp247::search-box :placeholder="$this->searchPlaceholder()" :hint="$this->searchHint()" />
             @if (Route::has('admin_link_group.index'))
                 <x-gp247::button href="{{ gp247_route_admin('admin_link_group.index') }}" variant="secondary" wire:navigate size="sm" class="shrink-0">
                     <i class="fas fa-indent"></i>
@@ -101,7 +99,7 @@
             @endif
         </div>
 
-        <x-gp247::table :empty="$rows->isEmpty() ? gp247_language_render('admin.no_records') : null">
+        <x-gp247::table :empty="$rows->isEmpty() ? $this->searchEmptyMessage() : null">
             <x-slot:head>
                 <tr>
                     <th class="cursor-pointer px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400" wire:click="setSort('name')">

@@ -45,7 +45,7 @@
         </x-gp247::card>
     @endif
 
-    <x-gp247::list-toolbar :placeholder="gp247_language_render('admin.contact.search')"
+    <x-gp247::list-toolbar :placeholder="$this->searchPlaceholder()" :hint="$this->searchHint()"
         :selected-count="count($selected)" :bulk-confirm="gp247_language_render('action.delete_confirm')">
         <x-slot:filters>
             <select wire:model.live="statusFilter" data-testid="front-contact-inbox-status-filter"
@@ -58,7 +58,7 @@
         </x-slot:filters>
     </x-gp247::list-toolbar>
 
-    <x-gp247::table :empty="$rows->isEmpty() ? gp247_language_render('admin.no_records') : null">
+    <x-gp247::table :empty="$rows->isEmpty() ? $this->searchEmptyMessage() : null">
         <x-slot:head>
             <tr>
                 <th class="w-10 px-4 py-3"></th>

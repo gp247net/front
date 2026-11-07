@@ -86,6 +86,21 @@ class LinkGroupList extends DataTableComponent
     }
 
     /**
+     * Language keys naming the searched columns (shown in the search box).
+     *
+     * @return array<string, string>
+     *
+     * @aidlc-story US-admin-shell-list-search-scope-hint
+     */
+    protected function searchLabels(): array
+    {
+        return [
+            'code' => 'admin.link_group.code',
+            'name' => 'admin.link_group.name',
+        ];
+    }
+
+    /**
      * @return string
      */
     protected function listView(): string
