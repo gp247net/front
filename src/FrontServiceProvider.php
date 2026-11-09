@@ -265,11 +265,13 @@ class FrontServiceProvider extends ServiceProvider
         if (!class_exists(\GP247\Core\Backup\Application\DataGroupRegistry::class)) {
             return;
         }
+        // WHY positional arguments: a core without the description parameter ignores the extra one.
+        $help = \GP247\Front\Support\BackupGroupHelp::class;
         \GP247\Core\Backup\Application\DataGroupRegistry::declare('content', [
             'front_banner', 'front_banner_type', 'front_layout_block', 'front_link', 'front_link_group',
             'front_page', 'front_page_description', 'front_redirects', 'front_country',
-        ]);
-        \GP247\Core\Backup\Application\DataGroupRegistry::declare('customers', ['front_contact', 'front_subscribe']);
+        ], [], $help::key('content'));
+        \GP247\Core\Backup\Application\DataGroupRegistry::declare('customers', ['front_contact', 'front_subscribe'], [], $help::key('customers'));
     }
 
     /**
