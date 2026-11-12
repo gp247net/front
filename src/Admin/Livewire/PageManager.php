@@ -279,7 +279,7 @@ class PageManager extends ResourcePanel
             foreach ($fields as $field => $default) {
                 $value = (string) ($row[$field] ?? $default);
                 // WHY: rich HTML fields keep their markup (raw); plain-text fields are XSS-cleaned.
-                $fields[$field] = in_array($field, self::RICH_DESCRIPTION_FIELDS, true) ? $value : gp247_clean($value);
+                $fields[$field] = in_array($field, self::RICH_DESCRIPTION_FIELDS, true) ? $value : gp247_text_plain($value);
             }
             $rows[] = array_merge(['page_id' => $page->id, 'lang' => $code], $fields);
         }

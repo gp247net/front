@@ -201,7 +201,7 @@ class FrontLink extends Model
      */
     public static function createLinkAdmin(array $dataCreate)
     {
-        $dataCreate = gp247_clean($dataCreate);
+        $dataCreate = gp247_text_plain($dataCreate);
         return self::create($dataCreate);
     }
 

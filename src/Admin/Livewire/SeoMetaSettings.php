@@ -107,7 +107,7 @@ class SeoMetaSettings extends GP247AdminComponent
     {
         $this->authorizeAction('update');
 
-        $clean = gp247_clean((string) $value, hight: true);
+        $clean = gp247_text_plain((string) $value, stripTags: true);
 
         if (mb_strlen($clean) > self::CONFIG_VALUE_MAX_LENGTH) {
             $this->notify('error', gp247_language_render('admin.seo.robots_txt_too_long'));
