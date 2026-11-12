@@ -47,10 +47,26 @@ class FrontBanner extends Model
         return gp247_image_get_path($this->image);
     }
     
+    /**
+     * Order by a column of this model; an unknown column is ignored and the direction is
+     * asc unless 'desc', so request input handed in by a plugin/template cannot reach
+     * ORDER BY (US-CMP-dynamic-sql-guard).
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|null $sortBy
+     * @param string $sortOrder
+     * @return \Illuminate\Database\Eloquent\Builder
+     *
+     * @aidlc-unit compat-foundation
+     * @aidlc-story US-CMP-dynamic-sql-guard
+     */
     public function scopeSort($query, $sortBy = null, $sortOrder = 'asc')
     {
-        $sortBy = $sortBy ?? 'sort';
-        return $query->orderBy($sortBy, $sortOrder);
+        $column = $this->gp247SortColumn($sortBy ?? 'sort');
+        if ($column === null) {
+            return $query;
+        }
+        return $query->orderBy($column, self::gp247SortDirection($sortOrder));
     }
 
     /**

@@ -39,18 +39,18 @@
 
 @if (session('success'))
 <script type="text/javascript">
-    alertJs('success', '{!! session('success') !!}');
+    alertJs('success', @js(e((string) session('success'), false)));
 </script>
 @endif
 
 @if (session('error'))
 <script type="text/javascript">
-    alertJs('error', '{!! session('error') !!}');
+    alertJs('error', @js(e((string) session('error'), false)));
 </script>
 @endif
 
 @if (session('warning'))
 <script type="text/javascript">
-    alertJs('warning', '{!! session('warning') !!}');
+    alertJs('warning', @js(e((string) session('warning'), false)));
 </script>
 @endif

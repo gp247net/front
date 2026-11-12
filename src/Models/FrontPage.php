@@ -167,6 +167,41 @@ class FrontPage extends Model
     }
 
     /**
+     * Order by a column of the page (or its description); an unknown column is ignored and
+     * the direction is asc unless 'desc'. buildQuery() applies setSort() through this scope,
+     * which was missing before (every setSort() on a page list failed).
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|null $sortBy
+     * @param string $sortOrder
+     * @return \Illuminate\Database\Eloquent\Builder
+     *
+     * @aidlc-unit compat-foundation
+     * @aidlc-story US-CMP-dynamic-sql-guard
+     */
+    public function scopeSort($query, $sortBy = null, $sortOrder = 'asc')
+    {
+        $column = $this->gp247SortColumn($sortBy ?? 'sort');
+        if ($column === null) {
+            return $query;
+        }
+        return $query->orderBy($column, self::gp247SortDirection($sortOrder));
+    }
+
+    /**
+     * Sortable tables: the page and its description (joined by buildQuery()).
+     *
+     * @return array<int, string>
+     *
+     * @aidlc-unit compat-foundation
+     * @aidlc-story US-CMP-dynamic-sql-guard
+     */
+    public function gp247SortTables(): array
+    {
+        return [$this->getTable(), (new FrontPageDescription)->getTable()];
+    }
+
+    /**
      * build Query
      */
     public function buildQuery()

@@ -30,7 +30,7 @@
                 <img src="{{ gp247_file(gp247_store_info(key: 'logo', default: null)) }}" alt="{{ gp247_store_info(key: 'name', default: null) }}" class="h-9 w-auto" />
                 <span class="text-xl font-extrabold text-white">{{ gp247_store_info(key: 'name', default: null) }}</span>
             </a>
-            <p class="text-sm max-w-xs">{!! gp247_store_info(key: 'time_active', default: null) !!}</p>
+            <p class="text-sm max-w-xs">{!! nl2br(e((string) gp247_store_info(key: 'time_active', default: null), false)) !!}</p>
             {{-- WHY: icons are inline SVG (same convention as layout/block_menu.blade.php)
                  because this template loads neither MDI nor FontAwesome — the previous
                  <i class="mdi mdi-facebook"> etc. rendered as empty grey circles. --}}
