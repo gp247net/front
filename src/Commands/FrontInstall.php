@@ -60,6 +60,9 @@ class FrontInstall extends GP247Command
 
         $this->runArtisan('db:seed', ['--class' => '\GP247\Front\Admin\Database\Seeders\DataFrontDefaultSeeder', '--force' => true]);
         $this->info('---------------> Seeding database Front default done!');
+        // WHY: front tables are new here, so their text is already stored as typed; without the
+        // flag the first gp247:update would decode "&amp;" a user typed on purpose.
+        \GP247\Core\Support\StoredTextDecoder::markStoredAsTyped('text_storage_decoded_front');
 
         //== Begin setup template default
         // Install the default template. Since modification 20260913T200309 this
