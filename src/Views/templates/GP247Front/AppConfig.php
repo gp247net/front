@@ -301,10 +301,10 @@ class AppConfig extends ExtensionConfigDefault
             // the owning store is set on the banner row itself (no pivot insert).
             $modelBanner = new FrontBanner;
 
-            $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner home 1 ('.$this->configKey.')', 'image' => 'https://picsum.photos/1000/400?random=1', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner', 'store_id' => $storeId]);
-            $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner home 2 ('.$this->configKey.')', 'image' => 'https://picsum.photos/1000/400?random=2', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner', 'store_id' => $storeId]);
-            $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner breadcrumb ('.$this->configKey.')', 'image' => 'https://picsum.photos/1000/400?random=3', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'breadcrumb', 'store_id' => $storeId]);
-            $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner store ('.$this->configKey.')', 'image' => 'https://picsum.photos/1000/400?random=4', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner-store', 'store_id' => $storeId]);
+            $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner home 1 ('.$this->configKey.')', 'image' => 'https://static.gp247.net/file/s-cart/where/large/pic1.jpg', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner', 'store_id' => $storeId]);
+            $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner home 2 ('.$this->configKey.')', 'image' => 'https://static.gp247.net/file/s-cart/where/large/pic2.jpg', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner', 'store_id' => $storeId]);
+            $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner breadcrumb ('.$this->configKey.')', 'image' => 'https://static.gp247.net/file/s-cart/where/large/pic3.jpg', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'breadcrumb', 'store_id' => $storeId]);
+            $modelBanner->create(['id' => $this->uuid(), 'name' => 'Banner store ('.$this->configKey.')', 'image' => 'https://static.gp247.net/file/s-cart/where/large/pic4.jpg', 'target' => '_self', 'html' => '', 'status' => 1, 'type' => 'banner-store', 'store_id' => $storeId]);
         } else {
             return null;
         }
