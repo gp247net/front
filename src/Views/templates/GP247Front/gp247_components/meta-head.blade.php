@@ -19,7 +19,13 @@
 <meta name="keywords" content="{{ $keyword ?? gp247_store_info('keyword') }}">
 <title>{{ $title ?? gp247_store_info('name') }}</title>
 <link rel="icon" href="{{ gp247_file(gp247_store_info(key: 'icon', default: 'GP247/Core/logo/icon.png')) }}" type="image/png" sizes="16x16">
-<meta property="og:image" content="{{ !empty($og_image) ? gp247_file($og_image) : gp247_file(gp247_store_info(key: 'og_image', default: 'GP247/Core/images/org.jpg')) }}" />
+@php
+    // No bundled default image: page image, else the store's og_image, else no tag (US-SEO-001).
+    $shareImage = !empty($og_image) ? $og_image : trim((string) gp247_store_info(key: 'og_image'));
+@endphp
+@if($shareImage !== '')
+<meta property="og:image" content="{{ gp247_file($shareImage) }}" />
+@endif
 <meta property="og:url" content="{{ \Request::fullUrl() }}" />
 <meta property="og:type" content="{{ $ogType ?? 'website' }}" />
 <meta property="og:title" content="{{ $title ?? gp247_store_info('name') }}" />

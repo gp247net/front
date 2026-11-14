@@ -270,18 +270,25 @@ class SeoMeta
     }
 
     /**
-     * Resolve the OG image path: use the given value if non-empty,
-     * otherwise fall back to the store's default og_image.
+     * Resolve the OG image URL: the given value if non-empty, otherwise the
+     * store's og_image, otherwise no image at all. There is deliberately no
+     * bundled default picture — GP247's sample image standing in for the shop's
+     * own brand was removed (modification 20261114T133728).
      *
      * @param string|null $ogImage  Raw path from content model.
-     * @return string  Absolute or root-relative URL via gp247_file().
+     * @return string  URL via gp247_file(), or '' when neither the page nor the store has an image.
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-001
      */
     private static function resolveOgImage(?string $ogImage): string
     {
-        $path = ($ogImage !== null && $ogImage !== '')
-            ? $ogImage
-            : gp247_store_info(key: 'og_image', default: 'GP247/Core/images/org.jpg');
+        $path = trim((string) $ogImage);
+        if ($path === '') {
+            $path = trim((string) gp247_store_info(key: 'og_image'));
+        }
 
-        return (string) gp247_file($path);
+        // WHY: gp247_file('') is the site root URL, which is not an image.
+        return $path === '' ? '' : (string) gp247_file($path);
     }
 }
