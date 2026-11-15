@@ -34,7 +34,7 @@ class FrontInstall extends GP247Command
      *
      * @var string
      */
-    protected $signature = 'gp247:front-install';
+    protected $signature = 'gp247:front-install {--force=0 : Reinstall over existing front tables without asking (DESTROYS their data)}';
 
     /**
      * The console command description.
@@ -50,12 +50,22 @@ class FrontInstall extends GP247Command
      */
     protected function handleGp247(): int
     {
+        // WHY before the uninstall: a site that already has front tables loses their data on a
+        // reinstall, so it needs consent (--force=1 or "yes"); a fresh site is not asked (US-CLI-003).
+        if (($stop = $this->guardReinstall('front_layout_block', 'front')) !== null) {
+            return $stop;
+        }
+
         // Uninstall gp247 front before install
         $this->runArtisan('gp247:front-uninstall');
 
         // Install gp247 front
         \DB::connection(GP247_DB_CONNECTION)->table('migrations')->where('migration', '00_00_00_create_tables_front')->delete();
-        $this->runArtisan('migrate', ['--path' => '/vendor/gp247/front/src/Admin/Database/Migrations/00_00_00_create_tables_front.php']);
+        // WHY migrateForInstall(): --force so an APP_ENV=production site gets its tables back, and a
+        // failed migration stops before the seeder writes into tables that are not there.
+        if (($stop = $this->migrateForInstall('/vendor/gp247/front/src/Admin/Database/Migrations/00_00_00_create_tables_front.php')) !== null) {
+            return $stop;
+        }
         $this->info('---------------> Migrate schema Front default done!');
 
         $this->runArtisan('db:seed', ['--class' => '\GP247\Front\Admin\Database\Seeders\DataFrontDefaultSeeder', '--force' => true]);
