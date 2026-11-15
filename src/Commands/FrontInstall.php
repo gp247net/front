@@ -63,6 +63,10 @@ class FrontInstall extends GP247Command
         // WHY: front tables are new here, so their text is already stored as typed; without the
         // flag the first gp247:update would decode "&amp;" a user typed on purpose.
         \GP247\Core\Support\StoredTextDecoder::markStoredAsTyped('text_storage_decoded_front');
+        // WHY: the base migration and the seeders already did what front's upgrade migrations do;
+        // without rows the first gp247:update would run them all again (US-CLI-fresh-install-upgrade-baseline).
+        $recorded = \GP247\Core\Support\UpgradeMigrationBaseline::markApplied(dirname(__DIR__) . '/Admin/Database/Migrations/upgrade');
+        $this->info('---------------> Front upgrade migrations recorded: ' . count($recorded));
 
         //== Begin setup template default
         // Install the default template. Since modification 20260913T200309 this

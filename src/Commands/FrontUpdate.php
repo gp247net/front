@@ -15,9 +15,12 @@ use Throwable;
  * 1-1 standardization (modification 20260828T090911) can reach already-installed
  * front schemas via gp247:update (core UpdateAll).
  *
+ * Then runs the front language seeder (insertOrIgnore) so labels added since the
+ * install reach the site without an upgrade migration of their own.
+ *
  * @aidlc-unit compat-foundation
- * @aidlc-story US-CLI-005
- * @aidlc-adr system-cli_output-contract, multi-store_one-to-one-store-ownership
+ * @aidlc-story US-CLI-005, US-CLI-upgrade-migration-delivery, US-CMP-language-rows-via-seeder
+ * @aidlc-adr system-cli_output-contract, multi-store_one-to-one-store-ownership, compat-foundation_public-release-migration-policy
  */
 class FrontUpdate extends GP247Command
 {
@@ -55,8 +58,23 @@ class FrontUpdate extends GP247Command
             return $this->respondFailure('upgrade_failed', 'Front upgrade failed: '.$e->getMessage());
         }
 
+        // WHY after the migrations: new labels ship in the language seeder, not in upgrade
+        // migrations; insertOrIgnore adds the missing ones and keeps a translation the site
+        // owner edited (US-CMP-language-rows-via-seeder).
+        try {
+            $this->runArtisan('db:seed', [
+                '--class' => '\GP247\Front\Admin\Database\Seeders\DataFrontLanguageSeeder',
+                '--force' => true,
+            ]);
+            $this->info('---------------> Front language rows done!');
+        } catch (Throwable $e) {
+            gp247_report($e->getMessage());
+            return $this->respondFailure('seed_failed', 'Front language rows failed: '.$e->getMessage());
+        }
+
         return $this->respondSuccess([
             'upgraded' => true,
+            'languages_seeded' => true,
         ]);
     }
 }
