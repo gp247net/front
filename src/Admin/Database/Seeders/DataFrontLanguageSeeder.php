@@ -236,6 +236,17 @@ class DataFrontLanguageSeeder extends Seeder
                 ['code' => 'admin.seo.jsonld_enabled','text' => 'Enable JSON-LD (Organization/Product/Breadcrumb/Article)','position' => 'admin.seo','location' => 'en'],
                 ['code' => 'admin.seo.jsonld_help','text' => 'Tắt khi cần gỡ lỗi Google Rich Results — ảnh hưởng toàn bộ site (trang chủ, sản phẩm, danh mục, nội dung plugin).','position' => 'admin.seo','location' => 'vi'],
                 ['code' => 'admin.seo.jsonld_help','text' => 'Turn off to debug Google Rich Results issues — affects the whole site (home, products, categories, plugin content).','position' => 'admin.seo','location' => 'en'],
+                // Site verification codes (US-SEO-site-verification, modification 20261116T050835).
+                ['code' => 'admin.seo.verify_title','text' => 'Xác minh quyền sở hữu site','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.verify_title','text' => 'Site ownership verification','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.verify_google','text' => 'Mã xác minh Google Search Console','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.verify_google','text' => 'Google Search Console verification code','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.verify_bing','text' => 'Mã xác minh Bing Webmaster','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.verify_bing','text' => 'Bing Webmaster verification code','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.verify_help','text' => 'Dán mã (hoặc nguyên thẻ <meta> được cung cấp), lưu, rồi bấm "Xác minh" trên Search Console / Bing. Để trống để gỡ.','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.verify_help','text' => 'Paste the code (or the whole <meta> tag you were given), save, then click "Verify" in Search Console / Bing. Leave empty to remove.','position' => 'admin.seo','location' => 'en'],
+                ['code' => 'admin.seo.verify_invalid','text' => 'Mã không hợp lệ: chỉ gồm chữ, số, dấu gạch ngang và gạch dưới, tối đa 100 ký tự.','position' => 'admin.seo','location' => 'vi'],
+                ['code' => 'admin.seo.verify_invalid','text' => 'Invalid code: letters, digits, hyphens and underscores only, at most 100 characters.','position' => 'admin.seo','location' => 'en'],
                 // Redirect 301 screen labels (US-SEO-006, modification 20260712T011152).
                 ['code' => 'admin.menu_titles.seo_redirect_settings','text' => 'Redirect 301','position' => 'admin.menu_titles','location' => 'vi'],
                 ['code' => 'admin.menu_titles.seo_redirect_settings','text' => 'Redirect 301','position' => 'admin.menu_titles','location' => 'en'],

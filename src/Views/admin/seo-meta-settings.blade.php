@@ -6,7 +6,7 @@
     duplicated here — see modification 20260711T114155).
 
     @aidlc-unit seo
-    @aidlc-story US-SEO-004, US-SEO-005
+    @aidlc-story US-SEO-004, US-SEO-005, US-SEO-site-verification
 
     Variables:
       - $robotsMaxLength (int)
@@ -46,6 +46,31 @@
             />
             <p class="text-xs text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.seo.jsonld_help') }}</p>
         </div>
+    </x-gp247::card>
+
+    {{-- Site verification codes (US-SEO-site-verification, modification 20261116T050835) --}}
+    <x-gp247::card :title="gp247_language_render('admin.seo.verify_title')">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            @foreach (['verifyGoogle' => ['admin.seo.verify_google', 'seo-meta-verify-google'], 'verifyBing' => ['admin.seo.verify_bing', 'seo-meta-verify-bing']] as $field => [$labelKey, $testId])
+                <div class="space-y-1">
+                    <label for="{{ $testId }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ gp247_language_render($labelKey) }}</label>
+                    <input
+                        id="{{ $testId }}"
+                        type="text"
+                        wire:model.live.blur="{{ $field }}"
+                        maxlength="500"
+                        autocomplete="off"
+                        spellcheck="false"
+                        data-testid="{{ $testId }}"
+                        class="{{ $input }}"
+                    >
+                    @error($field)
+                        <p class="text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+            @endforeach
+        </div>
+        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.seo.verify_help') }}</p>
     </x-gp247::card>
 
     <x-gp247::card>

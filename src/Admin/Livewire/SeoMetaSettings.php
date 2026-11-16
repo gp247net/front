@@ -5,6 +5,7 @@ namespace GP247\Front\Admin\Livewire;
 use GP247\Core\AdminShell\Infrastructure\GP247AdminComponent;
 use GP247\Core\Models\AdminConfig;
 use GP247\Front\Controllers\SeoController;
+use GP247\Front\Library\SeoMeta;
 use Illuminate\Contracts\View\View;
 
 /**
@@ -17,10 +18,12 @@ use Illuminate\Contracts\View\View;
  *
  * Values persist to `admin_config` (group `seo`) the same key names
  * `SeoController`/`SeoMeta` already read (`seo.robots_txt`,
- * `seo.jsonld_enabled`). Gated by `admin_seo_meta`.
+ * `seo.jsonld_enabled`). Gated by `admin_seo_meta`. Also holds the Google /
+ * Bing site-verification tokens (`seo.verify_google`, `seo.verify_bing`,
+ * modification 20261116T050835).
  *
  * @aidlc-unit seo
- * @aidlc-story US-SEO-004, US-SEO-005
+ * @aidlc-story US-SEO-004, US-SEO-005, US-SEO-site-verification
  */
 class SeoMetaSettings extends GP247AdminComponent
 {
@@ -44,6 +47,12 @@ class SeoMetaSettings extends GP247AdminComponent
 
     /** @var bool Master on/off switch for all JSON-LD output (Organization + any @push('jsonld')). */
     public bool $jsonldEnabled = true;
+
+    /** @var string Google Search Console verification token (US-SEO-site-verification). */
+    public string $verifyGoogle = '';
+
+    /** @var string Bing Webmaster verification token (US-SEO-site-verification). */
+    public string $verifyBing = '';
 
     /**
      * The store this screen edits. WHY: unlike `WebsiteInfo`/`CustomConfigForm`
@@ -78,6 +87,67 @@ class SeoMetaSettings extends GP247AdminComponent
         // single source of truth prevents the two from drifting.
         $this->robotsTxt = (string) gp247_config(self::CONFIG_ROBOTS, $storeId, SeoController::defaultRobots());
         $this->jsonldEnabled = gp247_config(self::CONFIG_JSONLD_ENABLED, $storeId, '1') != '0';
+        $this->verifyGoogle = (string) gp247_config(SeoMeta::VERIFICATION_KEYS['google'], $storeId, '');
+        $this->verifyBing = (string) gp247_config(SeoMeta::VERIFICATION_KEYS['bing'], $storeId, '');
+    }
+
+    /**
+     * Persist the Google verification token on blur (Layer-2 gated).
+     *
+     * @param mixed $value Typed or pasted input (a bare token or a whole <meta> tag).
+     * @return void
+     * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When denied.
+     *
+     * @aidlc-story US-SEO-site-verification
+     */
+    public function updatedVerifyGoogle($value): void
+    {
+        $this->saveVerification('verifyGoogle', 'google', (string) $value);
+    }
+
+    /**
+     * Persist the Bing verification token on blur (Layer-2 gated).
+     *
+     * @param mixed $value Typed or pasted input (a bare token or a whole <meta> tag).
+     * @return void
+     * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When denied.
+     *
+     * @aidlc-story US-SEO-site-verification
+     */
+    public function updatedVerifyBing($value): void
+    {
+        $this->saveVerification('verifyBing', 'bing', (string) $value);
+    }
+
+    /**
+     * Normalize, validate and store one verification token. Only a plain token is
+     * ever stored — never the pasted HTML — so the storefront prints nothing but
+     * `[A-Za-z0-9_-]`. An empty value clears the code.
+     *
+     * @param string $property Component property bound to the input.
+     * @param string $engine   Key of SeoMeta::VERIFICATION_KEYS.
+     * @param string $raw      Input as received.
+     * @return void
+     * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When denied.
+     *
+     * @aidlc-story US-SEO-site-verification
+     */
+    private function saveVerification(string $property, string $engine, string $raw): void
+    {
+        $this->authorizeAction('update');
+
+        $token = SeoMeta::normalizeVerificationInput($raw);
+        if ($token !== '' && !SeoMeta::isVerificationToken($token)) {
+            $this->addError($property, gp247_language_render('admin.seo.verify_invalid'));
+            $this->notify('error', gp247_language_render('admin.seo.verify_invalid'));
+
+            return;
+        }
+
+        $this->resetErrorBag($property);
+        $this->{$property} = $token;
+        $this->upsertConfig(SeoMeta::VERIFICATION_KEYS[$engine], $token);
+        $this->notify('success', gp247_language_render('admin.setting_saved'));
     }
 
     /**

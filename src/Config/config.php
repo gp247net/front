@@ -38,6 +38,21 @@ return [
         // gp247_extension_check_active() check. SeoController::collectUrls()
         // reads this list — front never hardcodes a plugin's name.
         'seo_sitemap_providers' => [],
+        // Indexing signals (ADR-seo-indexing-signals, modification 20261116T050835).
+        // Runtime-append like seo_sitemap_providers: each package/plugin adds ONLY
+        // its own private routes / filter parameters from its provider — front
+        // never knows shop or plugin route names.
+        //   seo_noindex_routes: route names, a trailing `*` matches a prefix
+        //     (`customer.*`); a lone `*` is ignored. Matching pages get
+        //     `<meta name="robots" content="noindex, follow">`.
+        //   seo_noindex_query_params: query parameters that make a URL a
+        //     filtered/sorted variant (same noindex). `page`/`lang` never count.
+        //   seo_product_rating_resolvers: callables
+        //     (string $productId, $storeId): ?array{ratingValue, reviewCount, bestRating?}
+        //     feeding aggregateRating into JSON-LD Product.
+        'seo_noindex_routes' => ['front.search'],
+        'seo_noindex_query_params' => ['keyword'],
+        'seo_product_rating_resolvers' => [],
         // Storefront extension points a plugin can render into WITHOUT editing a
         // template (ADR front_storefront-plugin-hooks). Shape:
         //   ['<hook-name>' => [ ['key' => 'PluginKey', 'callback' => [Class, 'method']], ... ]]

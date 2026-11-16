@@ -2,6 +2,8 @@
 
 namespace GP247\Front\TemplateComponents;
 
+use GP247\Front\Library\SeoMeta;
+
 /**
  * Shared <head> block: meta/OG/favicon/csrf plus the full SEO surface
  * (canonical, hreflang, Twitter card, JSON-LD Organization).
@@ -16,12 +18,15 @@ namespace GP247\Front\TemplateComponents;
  * to be the single source for every <head> SEO tag — folding in what used
  * to be two separate includes (seo_head.blade.php, jsonld_organization.blade.php)
  * that a later refactor silently dropped from layout.blade.php (RISK-TECH-012).
- * $canonical/$hreflang default to values that reproduce today's behaviour
- * (auto canonical, no hreflang) so existing callers are unaffected.
+ * Indexing signals are decided HERE, not by the caller (ADR-seo-indexing-signals,
+ * modification 20261116T050835): robots, canonical, og:url, hreflang and the
+ * search-engine verification codes are computed from the current route when a
+ * prop is not passed, because template layouts (GP247EC, MKP) pass only the
+ * original six props. A prop that is passed always wins.
  *
  * @aidlc-unit seo
- * @aidlc-story US-SEO-001, US-SEO-002, US-SEO-003, US-SEO-005
- * @aidlc-adr ADR-013, ADR-014
+ * @aidlc-story US-SEO-001, US-SEO-002, US-SEO-003, US-SEO-005, US-SEO-robots-meta, US-SEO-site-verification
+ * @aidlc-adr ADR-013, ADR-014, ADR-seo-indexing-signals
  */
 class MetaHead extends BaseFrontViewComponent
 {
@@ -38,12 +43,25 @@ class MetaHead extends BaseFrontViewComponent
      */
     public ?string $og_image;
 
+    /** Canonical URL — the prop, or SeoMeta::canonicalUrl(); never null after construction. */
     public ?string $canonical;
 
     /** @var array<string, string> Locale => absolute URL, from SeoMeta::hreflangLinks(). */
     public array $hreflang;
 
+    /** x-default target of $hreflang (store default language), null when there is no hreflang. */
+    public ?string $hreflangDefault;
+
     public ?string $ogType;
+
+    /** og:url — always the canonical, so shared links match it. */
+    public string $ogUrl;
+
+    /** `<meta name="robots">` content, or null for no tag (search engines then index). */
+    public ?string $robots;
+
+    /** @var array<string, string> Search engine => verification token, from SeoMeta::verificationCodes(). */
+    public array $verification;
 
     /** Placeholder gp247_image_get_path() returns when a record has no usable image. */
     private const NO_IMAGE_PLACEHOLDER = 'GP247/Core/images/no-image.jpg';
@@ -55,7 +73,9 @@ class MetaHead extends BaseFrontViewComponent
      *        did, so every page shared the store image
      *        (RISK-TECH-blade-component-snake-param, modification 20261025T084752).
      *
-     * @aidlc-story US-SEO-001
+     * @param string|null $robots  Robots directive; null = decide from the route/query.
+     *
+     * @aidlc-story US-SEO-001, US-SEO-002, US-SEO-003, US-SEO-robots-meta, US-SEO-site-verification
      */
     public function __construct(
         ?string $title = null,
@@ -64,15 +84,39 @@ class MetaHead extends BaseFrontViewComponent
         ?string $ogImage = null,
         ?string $canonical = null,
         array $hreflang = [],
-        ?string $ogType = null
+        ?string $ogType = null,
+        ?string $robots = null
     ) {
         $this->title = $title;
         $this->description = $description;
         $this->keyword = $keyword;
         $this->og_image = $this->pageImageOrNull($ogImage);
-        $this->canonical = $canonical;
-        $this->hreflang = $hreflang;
+        $this->canonical = $canonical ?? SeoMeta::canonicalUrl();
+        $this->ogUrl = $this->canonical;
         $this->ogType = $ogType;
+        $this->robots = ($robots !== null && trim($robots) !== '') ? trim($robots) : SeoMeta::robotsFor();
+        $this->hreflang = $this->resolveHreflang($hreflang);
+        $this->hreflangDefault = SeoMeta::hreflangDefault($this->hreflang);
+        $this->verification = SeoMeta::verificationCodes();
+    }
+
+    /**
+     * hreflang of the page: none on a noindex page (an alternate of a page that
+     * must not be indexed is noise), else the caller's map, else the map built
+     * from the current route.
+     *
+     * @param array<string, string> $given Map passed by the caller.
+     * @return array<string, string>
+     *
+     * @aidlc-story US-SEO-003
+     */
+    private function resolveHreflang(array $given): array
+    {
+        if ($this->robots !== null && str_contains(strtolower($this->robots), 'noindex')) {
+            return [];
+        }
+
+        return $given !== [] ? $given : SeoMeta::currentRouteHreflangLinks();
     }
 
     /**

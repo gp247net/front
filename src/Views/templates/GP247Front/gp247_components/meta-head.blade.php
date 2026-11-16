@@ -10,15 +10,31 @@
     20260702T190000) — folds in what used to be two separate includes
     (seo_head.blade.php, jsonld_organization.blade.php) that a later,
     unrelated refactor silently dropped from layout.blade.php (RISK-TECH-012).
+
+    A template that overrides this view must print these component variables,
+    all decided by MetaHead/SeoMeta (ADR-seo-indexing-signals, modification
+    20261116T050835 — RISK-TECH-meta-head-view-override-drift):
+      $robots (string|null) · $canonical (string) · $ogUrl (string) ·
+      $hreflang (array locale => url) + $hreflangDefault (string|null) ·
+      $verification (array: google|bing => token)
 --}}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="{{ config('app.name') }}">
-<link rel="canonical" href="{{ $canonical ?? \GP247\Front\Library\SeoMeta::canonicalUrl() }}" />
+@if(!empty($robots))
+<meta name="robots" content="{{ $robots }}">
+@endif
+<link rel="canonical" href="{{ $canonical }}" />
 <meta name="description" content="{{ $description ?? gp247_store_info('description') }}">
 <meta name="keywords" content="{{ $keyword ?? gp247_store_info('keyword') }}">
 <title>{{ $title ?? gp247_store_info('name') }}</title>
 <link rel="icon" href="{{ gp247_file(gp247_store_info(key: 'icon', default: 'GP247/Core/logo/icon.png')) }}" type="image/png" sizes="16x16">
+@if(!empty($verification['google']))
+<meta name="google-site-verification" content="{{ $verification['google'] }}">
+@endif
+@if(!empty($verification['bing']))
+<meta name="msvalidate.01" content="{{ $verification['bing'] }}">
+@endif
 @php
     // No bundled default image: page image, else the store's og_image, else no tag (US-SEO-001).
     $shareImage = !empty($og_image) ? $og_image : trim((string) gp247_store_info(key: 'og_image'));
@@ -26,18 +42,18 @@
 @if($shareImage !== '')
 <meta property="og:image" content="{{ gp247_file($shareImage) }}" />
 @endif
-<meta property="og:url" content="{{ \Request::fullUrl() }}" />
+<meta property="og:url" content="{{ $ogUrl }}" />
 <meta property="og:type" content="{{ $ogType ?? 'website' }}" />
 <meta property="og:title" content="{{ $title ?? gp247_store_info('name') }}" />
 <meta property="og:description" content="{{ $description ?? gp247_store_info('description') }}" />
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
-{{-- hreflang (only rendered when a caller passed locale => URL entries) --}}
+{{-- hreflang (caller's map, or built from the current route; none on a noindex page) --}}
 @if(!empty($hreflang))
     @foreach($hreflang as $locale => $url)
         <link rel="alternate" hreflang="{{ $locale }}" href="{{ $url }}" />
     @endforeach
-    <link rel="alternate" hreflang="x-default" href="{{ reset($hreflang) }}" />
+    <link rel="alternate" hreflang="x-default" href="{{ $hreflangDefault }}" />
 @endif
 
 {{-- Twitter card --}}
