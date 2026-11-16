@@ -12,6 +12,8 @@
  */
 return [
     'admin.menu_titles.ADMIN_SEO' => 'SEO',
+    'admin.menu_titles.template_customize' => 'テーマのカスタマイズ',
+    'admin.template.no_customize' => 'このストアで使用中のテーマ「:name」には専用のカスタマイズページがありません。',
     'admin.menu_titles.seo_meta_settings' => 'Meta & JSON-LD',
     'admin.menu_titles.seo_sitemap_settings' => 'Sitemap.xml',
     'admin.seo.meta_title' => 'Meta & JSON-LD',

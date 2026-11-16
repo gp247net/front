@@ -36,6 +36,36 @@ class AdminTemplateController extends RootAdminController
         ];
     }
 
+    /**
+     * The fixed "Customize theme" menu entry: open the settings page of the template the working store uses, or go
+     * back to the Template manager with a notice when that template has none (not installed, disabled, no clickApp,
+     * or clickApp failing — the shared core helper decides).
+     *
+     * @return mixed What the template's clickApp() returns, or a redirect to the Template manager.
+     *
+     * @aidlc-unit front-admin
+     * @aidlc-story US-FADM-template-customize-entry
+     * @aidlc-adr front-admin_template-settings-entry
+     */
+    public function customize()
+    {
+        // WHY session('adminStoreId'): the store this admin works on — ROOT, or the store a store-admin is bound to
+        // (same value ResourcePanel and the template's own settings screen scope to).
+        $storeId = session('adminStoreId') ?: GP247_STORE_ID_ROOT;
+        $key = (string) AdminStore::where('id', $storeId)->value('template');
+        $class = $key !== '' ? gp247_extension_get_namespace(type: $this->groupType, key: $key).'\AppConfig' : null;
+
+        if ($class && class_exists($class) && gp247_extension_check_active($this->groupType, $key)) {
+            $appConfig = new $class;
+            if (gp247_extension_has_settings($appConfig)) {
+                return $appConfig->clickApp();
+            }
+        }
+
+        return redirect(gp247_route_admin('admin_template.index'))
+            ->with('warning', gp247_language_render('admin.template.no_customize', ['name' => $key ?: '—']));
+    }
+
     protected function processUninstall(string $key)
     {
         // Check template use

@@ -121,6 +121,11 @@ class DataFrontLanguageSeeder extends Seeder
         // Contact form (front-contact, modification 20261025T074941). The upgrade
         // migration re-seeds exactly these rows via ContactInstaller::labelRows().
         $this->writeLang([
+            // Fixed "Customize theme" menu entry (US-FADM-template-customize-entry, modification 20261116T211056).
+            ['code' => 'admin.menu_titles.template_customize', 'text' => 'Tuỳ chỉnh giao diện', 'position' => 'admin.menu_titles', 'location' => 'vi'],
+            ['code' => 'admin.menu_titles.template_customize', 'text' => 'Customize theme', 'position' => 'admin.menu_titles', 'location' => 'en'],
+            ['code' => 'admin.template.no_customize', 'text' => 'Giao diện ":name" đang dùng cho cửa hàng này không có phần tuỳ chỉnh riêng.', 'position' => 'admin.template', 'location' => 'vi'],
+            ['code' => 'admin.template.no_customize', 'text' => 'The theme ":name" this store uses has no customization page.', 'position' => 'admin.template', 'location' => 'en'],
             ['code' => 'admin.layout_block_page.contact', 'text' => 'Liên hệ', 'position' => 'admin.layout_block', 'location' => 'vi'],
             ['code' => 'admin.layout_block_page.contact', 'text' => 'Contact', 'position' => 'admin.layout_block', 'location' => 'en'],
             ['code' => 'admin.menu_titles.contact_messages', 'text' => 'Tin nhắn liên hệ', 'position' => 'admin.menu_titles', 'location' => 'vi'],

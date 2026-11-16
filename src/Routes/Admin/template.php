@@ -15,6 +15,8 @@ Route::group(['prefix' => 'template'], function () use ($templateController) {
     //End process
 
     Route::get('/', $templateController.'@index')->name('admin_template.index');
+    // Fixed "Customize theme" menu entry: settings of the template the working store uses.
+    Route::get('customize', $templateController.'@customize')->name('admin_template.customize');
     Route::post('install', $templateController.'@install')->name('admin_template.install');
     Route::post('uninstall', $templateController.'@uninstall')->name('admin_template.uninstall');
     Route::post('enable', $templateController.'@enable')->name('admin_template.enable');

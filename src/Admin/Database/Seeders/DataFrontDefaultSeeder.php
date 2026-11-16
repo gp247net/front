@@ -65,6 +65,10 @@ class DataFrontDefaultSeeder extends Seeder
             ]
         );
 
+        // Fixed "Customize theme" entry under the Template manager (US-FADM-template-customize-entry);
+        // the upgrade migration adds the same row on running sites.
+        \GP247\Front\Support\TemplateCustomizeMenu::ensure(DB::connection(GP247_DB_CONNECTION));
+
         // SEO menu group (US-SEO-004, modification 20260711T114155): top-level
         // group + 3 screens — "Meta & JSON-LD" and "Sitemap.xml" (split
         // modification 20260711T154553, each its own RBAC permission), plus
