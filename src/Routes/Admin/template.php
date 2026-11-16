@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Route;
 
 // Template
 $templateController = gp247_namespace(AdminTemplateController::class);
+// Fixed "Customize theme" menu entry: settings of the template the working store uses. Template settings pages
+// live under this shared root (<admin>/theme/<key>), so the sidebar lights the entry on them.
+Route::get('theme', $templateController.'@customize')->name('admin_template.customize');
+
 Route::group(['prefix' => 'template'], function () use ($templateController) {
     //Process import
     Route::get('/import', $templateController.'@importExtension')
@@ -15,8 +19,8 @@ Route::group(['prefix' => 'template'], function () use ($templateController) {
     //End process
 
     Route::get('/', $templateController.'@index')->name('admin_template.index');
-    // Fixed "Customize theme" menu entry: settings of the template the working store uses.
-    Route::get('customize', $templateController.'@customize')->name('admin_template.customize');
+    // Front 3.10.0 address of the "Customize theme" entry — kept for bookmarks (mod 20261117T061746).
+    Route::redirect('customize', '/'.GP247_ADMIN_PREFIX.'/theme');
     Route::post('install', $templateController.'@install')->name('admin_template.install');
     Route::post('uninstall', $templateController.'@uninstall')->name('admin_template.uninstall');
     Route::post('enable', $templateController.'@enable')->name('admin_template.enable');
