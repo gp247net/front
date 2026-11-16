@@ -88,16 +88,31 @@ class MetaHead extends BaseFrontViewComponent
         ?string $robots = null
     ) {
         $this->title = $title;
-        $this->description = $description;
-        $this->keyword = $keyword;
+        // WHY: controllers pass '' for "no description"; the view only falls back to
+        // the store's value on null, so '' used to print content="" (mod 20261117T055341).
+        $this->description = self::nullIfBlank($description);
+        $this->keyword = self::nullIfBlank($keyword);
         $this->og_image = $this->pageImageOrNull($ogImage);
-        $this->canonical = $canonical ?? SeoMeta::canonicalUrl();
+        $this->canonical = self::nullIfBlank($canonical) ?? SeoMeta::canonicalUrl();
         $this->ogUrl = $this->canonical;
-        $this->ogType = $ogType;
+        $this->ogType = self::nullIfBlank($ogType) ?? SeoMeta::ogTypeFor() ?? 'website';
         $this->robots = ($robots !== null && trim($robots) !== '') ? trim($robots) : SeoMeta::robotsFor();
         $this->hreflang = $this->resolveHreflang($hreflang);
         $this->hreflangDefault = SeoMeta::hreflangDefault($this->hreflang);
         $this->verification = SeoMeta::verificationCodes();
+    }
+
+    /**
+     * Treat an empty or whitespace-only string as "not given".
+     *
+     * @param string|null $value
+     * @return string|null
+     *
+     * @aidlc-story US-SEO-001
+     */
+    private static function nullIfBlank(?string $value): ?string
+    {
+        return ($value === null || trim($value) === '') ? null : $value;
     }
 
     /**

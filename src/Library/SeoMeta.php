@@ -108,6 +108,36 @@ class SeoMeta
     }
 
     /**
+     * og:type of the current route from `gp247-config.front.seo_og_types`
+     * (`['<route name or prefix*>' => '<og type>']`), e.g. News registers
+     * `'news.content' => 'article'`. Only plain lowercase types are accepted.
+     *
+     * @return string|null Null when no entry matches (the caller then uses `website`).
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-001
+     */
+    public static function ogTypeFor(): ?string
+    {
+        $route     = request()->route();
+        $routeName = is_object($route) ? (string) $route->getName() : '';
+        if ($routeName === '') {
+            return null;
+        }
+
+        foreach ((array) config('gp247-config.front.seo_og_types', []) as $pattern => $type) {
+            if (!is_string($pattern) || !is_string($type) || preg_match('/^[a-z][a-z.]{0,30}$/', $type) !== 1) {
+                continue;
+            }
+            if (self::routeMatchesAny($routeName, [$pattern])) {
+                return $type;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Whether a route name matches one of the registered patterns: exact name,
      * or a prefix when the pattern ends with `*`.
      *
@@ -176,7 +206,7 @@ class SeoMeta
         static $warned = false;
         if (!$warned) {
             $warned = true;
-            \Illuminate\Support\Facades\Log::warning('[gp247 seo] A "*" entry in gp247-config.front.seo_noindex_routes was ignored: it would hide the whole site from search engines.');
+            \Illuminate\Support\Facades\Log::warning('[gp247 seo] A lone "*" entry in a gp247-config.front SEO route registry (seo_noindex_routes / seo_og_types) was ignored: it would apply to every page of the site.');
         }
     }
 
@@ -579,7 +609,9 @@ class SeoMeta
      * @param string|null $imageUrl      Absolute URL to the cover image (optional).
      * @param string|null $datePublished ISO 8601 publish date (optional).
      * @param string|null $dateModified  ISO 8601 last-modified date (optional).
-     * @param string|null $description   Short article description.
+     * @param string|null $description   Short article description; empty = omitted.
+     * @param string|array|null $author  Author name (becomes a Person) or a schema.org node.
+     * @param array|null  $publisher     schema.org Organization node of the publisher.
      * @return string  JSON-LD encoded string.
      *
      * @aidlc-unit seo
@@ -591,15 +623,27 @@ class SeoMeta
         ?string $imageUrl,
         ?string $datePublished,
         ?string $dateModified,
-        ?string $description
+        ?string $description,
+        string|array|null $author = null,
+        ?array $publisher = null
     ): string {
         $data = [
             '@context'    => 'https://schema.org',
             '@type'       => 'Article',
             'headline'    => $headline,
             'url'         => $url,
-            'description' => $description ?? '',
         ];
+        if (trim((string) $description) !== '') {
+            $data['description'] = $description;
+        }
+        if (is_string($author) && trim($author) !== '') {
+            $data['author'] = ['@type' => 'Person', 'name' => trim($author)];
+        } elseif (is_array($author) && $author !== []) {
+            $data['author'] = $author;
+        }
+        if (!empty($publisher)) {
+            $data['publisher'] = $publisher;
+        }
 
         // RISK-OPS-007: only add optional fields when present — a stale/empty
         // value in the JSON-LD script is worse than omitting the property.

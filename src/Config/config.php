@@ -53,6 +53,10 @@ return [
         'seo_noindex_routes' => ['front.search'],
         'seo_noindex_query_params' => ['keyword'],
         'seo_product_rating_resolvers' => [],
+        //   seo_og_types: ['<route name or prefix*>' => '<og type>'] — og:type of a
+        //     route when the caller passes none (default `website`); e.g. News
+        //     registers 'news.content' => 'article' (modification 20261117T055341).
+        'seo_og_types' => [],
         // Storefront extension points a plugin can render into WITHOUT editing a
         // template (ADR front_storefront-plugin-hooks). Shape:
         //   ['<hook-name>' => [ ['key' => 'PluginKey', 'callback' => [Class, 'method']], ... ]]

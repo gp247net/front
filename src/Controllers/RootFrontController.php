@@ -37,21 +37,32 @@ class RootFrontController extends Controller
     }
 
     /**
-     * Default item not found
+     * The "not found" page every shop screen and plugin shows when the record a URL
+     * points at does not exist — always with HTTP 404.
      *
-     * @return  [view]
+     * WHY 404 and not a plain view (200): a 200 "not found" page is a soft 404 that
+     * search engines index as real, empty content and keep in results after the
+     * record is deleted (modification 20261117T055341). Plugins must call this
+     * instead of returning the notfound view themselves (RISK-TECH-plugin-soft-404).
+     *
+     * @return \Illuminate\Http\Response
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-006
+     * @aidlc-adr ADR-seo-indexing-signals
      */
     public function itemNotFound()
     {
         gp247_check_view( $this->GP247TemplatePath . '.screen.notfound');
-        return view(
+        return response()->view(
             $this->GP247TemplatePath . '.screen.notfound',
             [
                 'title' => gp247_language_render('front.notfound'),
                 'msg' => gp247_language_render('front.notfound_detail'),
                 'description' => '',
                 'keyword' => '',
-            ]
+            ],
+            404
         );
     }
 
