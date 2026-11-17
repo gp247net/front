@@ -216,12 +216,17 @@ class LayoutBlockManager extends ResourcePanel
     }
 
     /**
-     * @param int|string $id
+     * Delete a layout block of the current store scope; an id outside it is ignored.
+     *
+     * @param int|string $id Client-supplied layout block id.
      * @return void
+     *
+     * @aidlc-story US-admin-shell-store-scoped-resource
      */
     protected function deleteModel($id): void
     {
-        $model = FrontLayoutBlock::find($id);
+        // WHY baseQuery(): $id comes from the browser — a store-admin must not delete another store's layout block.
+        $model = $this->baseQuery()->find($id);
         if ($model !== null) {
             $model->delete();
         }

@@ -270,12 +270,17 @@ class LinkManager extends ResourcePanel
     }
 
     /**
-     * @param int|string $id
+     * Delete a link of the current store scope; an id outside it is ignored.
+     *
+     * @param int|string $id Client-supplied link id.
      * @return void
+     *
+     * @aidlc-story US-admin-shell-store-scoped-resource
      */
     protected function deleteModel($id): void
     {
-        $model = FrontLink::find($id);
+        // WHY baseQuery(): $id comes from the browser — a store-admin must not delete another store's link.
+        $model = $this->baseQuery()->find($id);
         if ($model !== null) {
             $model->delete();
         }
