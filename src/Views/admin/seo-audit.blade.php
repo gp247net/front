@@ -21,7 +21,8 @@
         </div>
         @if ($result)
             <p class="mt-3 text-xs text-gray-500 dark:text-gray-400" data-testid="seo-audit-checked-at">
-                {{ gp247_language_render('admin.seo_audit.checked_at') }}: {{ $result['checked_at'] ?? '' }}
+                {{-- WHY: the stored time is ISO 8601 in UTC (also read by MCP); show it in the app timezone like the System alerts block. --}}
+                {{ gp247_language_render('admin.seo_audit.checked_at') }}: {{ rescue(fn () => \Illuminate\Support\Carbon::parse((string) ($result['checked_at'] ?? ''))->setTimezone(config('app.timezone'))->format('H:i d/m/Y'), (string) ($result['checked_at'] ?? ''), false) }}
                 @if (empty($result['complete']))
                     — <span class="text-amber-600 dark:text-amber-400">{{ gp247_language_render('admin.seo_audit.partial') }}</span>
                 @endif
@@ -54,7 +55,8 @@
                                     <ul class="mt-2 space-y-1 text-sm">
                                         @foreach ($finding['examples'] as $example)
                                             <li class="flex items-center gap-2">
-                                                <span class="text-xs uppercase text-gray-400">{{ $example['type'] }}</span>
+                                                {{-- Type name in the admin language (registered label); an unregistered type keeps its key. --}}
+                                                <span class="text-xs text-gray-400">{{ isset(\GP247\Front\Library\SeoContentMeta::types()[$example['type']]['label']) ? gp247_language_render(\GP247\Front\Library\SeoContentMeta::types()[$example['type']]['label']) : $example['type'] }}</span>
                                                 @if ($example['url'] !== '')
                                                     <a href="{{ $example['url'] }}" class="break-all text-blue-600 hover:underline dark:text-blue-400" data-testid="seo-audit-example-link">{{ $example['label'] !== '' ? $example['label'] : $example['id'] }}</a>
                                                 @else
