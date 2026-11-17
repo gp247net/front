@@ -1,4 +1,5 @@
 <?php
+use GP247\Front\Admin\Livewire\SeoAuditScreen;
 use GP247\Front\Admin\Livewire\SeoMetaSettings;
 use GP247\Front\Admin\Livewire\SeoNotFoundLog;
 use GP247\Front\Admin\Livewire\SeoRedirectManager;
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('seo_meta', gp247_namespace(SeoMetaSettings::class))->name('admin_seo_meta.index');
 // 404 log (US-SEO-not-found-log): own RBAC permission `admin_seo_not_found`.
 Route::get('seo_not_found', gp247_namespace(SeoNotFoundLog::class))->name('admin_seo_not_found.index');
+// SEO check (US-SEO-audit): own RBAC permission `admin_seo_audit`.
+Route::get('seo_audit', gp247_namespace(SeoAuditScreen::class))->name('admin_seo_audit.index');
 Route::get('seo_sitemap', gp247_namespace(SeoSitemapSettings::class))->name('admin_seo_sitemap.index');
 
 // Redirect 301 (US-SEO-006, modification 20260712T011152): 3rd screen under the

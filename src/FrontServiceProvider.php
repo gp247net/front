@@ -247,6 +247,12 @@ class FrontServiceProvider extends ServiceProvider
 
             $this->registerBackupDataGroups();
 
+            // SEO check summary in "System alerts" and gp247:doctor (US-SEO-health-alert).
+            // WHY class_exists: front keeps booting on a core without the alert registry.
+            if (class_exists(\GP247\Core\AdminShell\Support\AdminAlertRegistry::class)) {
+                \GP247\Core\AdminShell\Support\AdminAlertRegistry::register(\GP247\Front\Support\SeoHealthCheck::class);
+            }
+
             // Storefront 404 log (US-SEO-not-found-log): global, so addresses that match no
             // route are seen too; it does nothing unless the store switched the log on.
             try {

@@ -92,6 +92,7 @@ class DataFrontDefaultSeeder extends Seeder
                 ['parent_id' => $idBlockSeo,'sort' => 3,'title' => 'admin.menu_titles.seo_redirect_settings','icon' => 'fas fa-random','uri' => 'admin::seo_redirect','key' => null,'type' => 0],
                 // Same row as the SEO phase 2 upgrade migration writes.
                 \GP247\Front\Support\SeoUrlLifecycleInstaller::menuRow((int) $idBlockSeo),
+                \GP247\Front\Support\SeoUrlLifecycleInstaller::auditMenuRow((int) $idBlockSeo),
             ]
         );
 

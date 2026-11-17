@@ -22,6 +22,9 @@ class SeoUrlLifecycleInstaller
 
     public const MENU_URI = 'admin::seo_not_found';
 
+    /** Menu of the SEO check screen (SEO phase 3). */
+    public const AUDIT_MENU_URI = 'admin::seo_audit';
+
     /**
      * Create the 404 log table and add the redirect `source` column when missing.
      *
@@ -88,6 +91,47 @@ class SeoUrlLifecycleInstaller
             'title' => 'admin.menu_titles.seo_not_found',
             'icon' => 'fas fa-unlink',
             'uri' => self::MENU_URI,
+            'key' => null,
+            'type' => 0,
+        ];
+    }
+
+    /**
+     * Add the "SEO check" entry under the SEO menu group when missing (SEO phase 3).
+     *
+     * @return void
+     *
+     * @aidlc-story US-SEO-audit
+     */
+    public static function seedAuditMenu(): void
+    {
+        $db = DB::connection(GP247_DB_CONNECTION);
+        $menu = GP247_DB_PREFIX . 'admin_menu';
+        if ($db->table($menu)->where('uri', self::AUDIT_MENU_URI)->exists()) {
+            return;
+        }
+        $parent = $db->table($menu)->where('key', 'ADMIN_SEO')->value('id');
+        if ($parent) {
+            $db->table($menu)->insert(self::auditMenuRow((int) $parent));
+        }
+    }
+
+    /**
+     * The "SEO check" menu row, shared with DataFrontDefaultSeeder.
+     *
+     * @param int $parentId Id of the ADMIN_SEO group.
+     * @return array<string, mixed>
+     *
+     * @aidlc-story US-SEO-audit
+     */
+    public static function auditMenuRow(int $parentId): array
+    {
+        return [
+            'parent_id' => $parentId,
+            'sort' => 5,
+            'title' => 'admin.menu_titles.seo_audit',
+            'icon' => 'fas fa-clipboard-check',
+            'uri' => self::AUDIT_MENU_URI,
             'key' => null,
             'type' => 0,
         ];

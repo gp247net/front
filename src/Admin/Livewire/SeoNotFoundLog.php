@@ -3,6 +3,7 @@
 namespace GP247\Front\Admin\Livewire;
 
 use GP247\Core\AdminShell\Infrastructure\GP247AdminComponent;
+use GP247\Core\AdminShell\Infrastructure\ListSearch;
 use GP247\Core\Models\AdminConfig;
 use GP247\Front\Library\NotFoundLog;
 use GP247\Front\Models\FrontNotFoundLog;
@@ -21,6 +22,7 @@ use Livewire\WithPagination;
  */
 class SeoNotFoundLog extends GP247AdminComponent
 {
+    use ListSearch;
     use WithPagination;
 
     protected ?string $permission = 'admin_seo_not_found';
@@ -32,6 +34,26 @@ class SeoNotFoundLog extends GP247AdminComponent
 
     /** @var string Path filter. */
     public string $keyword = '';
+
+    /**
+     * Columns the search box looks in (ListSearch contract).
+     *
+     * @return array<int, string>
+     */
+    protected function searchable(): array
+    {
+        return ['path'];
+    }
+
+    /**
+     * Names of the searched columns shown in the shared search box.
+     *
+     * @return array<string, string>
+     */
+    protected function searchLabels(): array
+    {
+        return ['path' => 'admin.seo_not_found.path'];
+    }
 
     /**
      * The store this screen reads and writes — the store the middleware records under
@@ -113,7 +135,7 @@ class SeoNotFoundLog extends GP247AdminComponent
         $rows = null;
         if (NotFoundLog::tableReady()) {
             $query = FrontNotFoundLog::where('store_id', (string) $this->storeId());
-            $keyword = trim($this->keyword);
+            $keyword = $this->searchKeyword();
             if ($keyword !== '') {
                 $query->where('path', 'like', '%' . addcslashes($keyword, '%_\\') . '%');
             }

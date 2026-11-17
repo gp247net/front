@@ -23,9 +23,7 @@
             <x-gp247::alert type="warning">{{ gp247_language_render('admin.seo_not_found.needs_update') }}</x-gp247::alert>
         @else
             <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <input type="search" wire:model.live.debounce.400ms="keyword"
-                    placeholder="{{ gp247_language_render('admin.seo_not_found.search') }}"
-                    class="w-full max-w-sm rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                <x-gp247::search-box class="w-full max-w-sm" :placeholder="$this->searchPlaceholder()" :hint="$this->searchHint()" />
                 @if ($rows->total() > 0)
                     <x-gp247::button size="sm" variant="ghost" wire:click="clearAll"
                         wire:confirm="{{ gp247_language_render('action.delete_confirm') }}" data-testid="seo-not-found-clear">
