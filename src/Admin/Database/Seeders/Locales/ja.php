@@ -13,6 +13,13 @@
 return [
     'admin.menu_titles.ADMIN_SEO' => 'SEO',
     'admin.menu_titles.template_customize' => 'テーマのカスタマイズ',
+    'admin.template.customize_intro' => 'インストール済みの各テーマで何をカスタマイズできるかを確認できます。開けるのはこのストアで使用中のテーマだけです。',
+    'admin.template.customize_in_use' => '使用中',
+    'admin.template.customize_has_settings' => 'カスタマイズ可能',
+    'admin.template.customize_no_settings' => 'カスタマイズ非対応',
+    'admin.template.customize_disabled' => '無効',
+    'admin.template.customize_open' => 'カスタマイズ',
+    'admin.template.customize_switch_hint' => 'ストアのテーマは次の画面で変更します：',
     'admin.template.no_customize' => 'このストアで使用中のテーマ「:name」には専用のカスタマイズページがありません。',
     'admin.menu_titles.seo_meta_settings' => 'Meta & JSON-LD',
     'admin.menu_titles.seo_sitemap_settings' => 'Sitemap.xml',

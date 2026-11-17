@@ -37,11 +37,11 @@ class AdminTemplateController extends RootAdminController
     }
 
     /**
-     * The fixed "Customize theme" menu entry: open the settings page of the template the working store uses, or go
-     * back to the Template manager with a notice when that template has none (not installed, disabled, no clickApp,
-     * or clickApp failing — the shared core helper decides).
+     * The fixed "Customize theme" menu entry: a template picker listing every installed template with what it lets
+     * the owner customize. Only the template the working store uses can be opened (through its clickApp(), like the
+     * config button); the others are shown disabled so the owner sees their capability without switching the store.
      *
-     * @return mixed What the template's clickApp() returns, or a redirect to the Template manager.
+     * @return \Illuminate\Contracts\View\View
      *
      * @aidlc-unit front-admin
      * @aidlc-story US-FADM-template-customize-entry
@@ -52,18 +52,56 @@ class AdminTemplateController extends RootAdminController
         // WHY session('adminStoreId'): the store this admin works on — ROOT, or the store a store-admin is bound to
         // (same value ResourcePanel and the template's own settings screen scope to).
         $storeId = session('adminStoreId') ?: GP247_STORE_ID_ROOT;
-        $key = (string) AdminStore::where('id', $storeId)->value('template');
-        $class = $key !== '' ? gp247_extension_get_namespace(type: $this->groupType, key: $key).'\AppConfig' : null;
+        $inUse = (string) AdminStore::where('id', $storeId)->value('template');
 
-        if ($class && class_exists($class) && gp247_extension_check_active($this->groupType, $key)) {
-            $appConfig = new $class;
-            if (gp247_extension_has_settings($appConfig)) {
-                return $appConfig->clickApp();
+        return view('gp247-front-admin::template-customize', [
+            'title' => gp247_language_render('admin.menu_titles.template_customize'),
+            'templates' => $this->customizableTemplates($inUse),
+            'configUrl' => gp247_route_admin('admin_template.index'),
+            'storeInfoUrl' => gp247_route_admin('admin_store.index'),
+        ]);
+    }
+
+    /**
+     * Installed templates for the picker, the store's template first.
+     *
+     * WHY clickApp() only for enabled templates: a template registers its admin routes only while it is on, so asking a
+     * disabled one would fail; it is shown as "disabled" instead of guessing its capability.
+     *
+     * @param string $inUse Key of the template the working store uses.
+     * @return array<int, array{key: string, title: string, image: string|null, version: string, capability: string, inUse: bool}>
+     *
+     * @aidlc-unit front-admin
+     * @aidlc-story US-FADM-template-customize-entry
+     */
+    private function customizableTemplates(string $inUse): array
+    {
+        $installed = gp247_extension_get_installed(type: $this->groupType, active: false)->toArray();
+        $templates = [];
+        foreach (gp247_extension_get_all_local(type: $this->groupType) as $key => $namespace) {
+            if (!array_key_exists($key, $installed) || !class_exists($namespace.'\AppConfig')) {
+                continue;
             }
+            try {
+                $class = $namespace.'\AppConfig';
+                $appConfig = new $class;
+            } catch (\Throwable $e) {
+                gp247_report(msg: 'Template picker: '.$key.' AppConfig failed: '.$e->getMessage(), channel: null);
+                continue;
+            }
+            $enabled = (int) ($installed[$key]['value'] ?? 0) === 1;
+            $templates[] = [
+                'key' => (string) $key,
+                'title' => (string) ($appConfig->title ?? $key),
+                'image' => $appConfig->image ?? null,
+                'version' => (string) ($appConfig->version ?? ''),
+                'capability' => !$enabled ? 'disabled' : (gp247_extension_has_settings($appConfig) ? 'settings' : 'none'),
+                'inUse' => (string) $key === $inUse,
+            ];
         }
+        usort($templates, fn ($a, $b) => $b['inUse'] <=> $a['inUse']);
 
-        return redirect(gp247_route_admin('admin_template.index'))
-            ->with('warning', gp247_language_render('admin.template.no_customize', ['name' => $key ?: '—']));
+        return $templates;
     }
 
     protected function processUninstall(string $key)
