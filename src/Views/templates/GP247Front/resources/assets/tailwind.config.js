@@ -35,6 +35,11 @@ export default {
         'vendor/livewire/livewire/src/Features/SupportPagination/views/*.blade.php',
         'vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
     ],
+    // Plugin storefront views (app/GP247/Plugins/*/Views) render inside this layout
+    // but are not scanned — they only get the classes this bundle already ships.
+    // Keep the ones a plugin relies on once no template view uses them any more
+    // (items-end: MultiVendor vendor_info filter row).
+    safelist: ['items-end'],
     theme: {
         extend: {
             colors: {
