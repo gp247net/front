@@ -259,7 +259,9 @@ class PageManager extends ResourcePanel
 
         if ($this->editingId !== null) {
             // Store is immutable on edit — do NOT touch store_id (ADR 1-1).
-            $page = FrontPage::findOrFail($this->editingId);
+            // WHY baseQuery(): only a page of the current store scope may be written;
+            // one outside it (another store) fails closed with a 404.
+            $page = $this->baseQuery()->findOrFail($this->editingId);
             $page->update($attributes);
         } else {
             // WHY: 1-1 ownership — a new page is owned by the store picked on create
@@ -296,12 +298,17 @@ class PageManager extends ResourcePanel
     }
 
     /**
-     * @param int|string $id
+     * Delete a page of the current store scope; an id outside it is ignored.
+     *
+     * @param int|string $id Client-supplied page id.
      * @return void
+     *
+     * @aidlc-story US-admin-shell-store-scoped-resource
      */
     protected function deleteModel($id): void
     {
-        $model = FrontPage::find($id);
+        // WHY baseQuery(): $id comes from the browser — a store-admin must not delete another store's page.
+        $model = $this->baseQuery()->find($id);
         if ($model !== null) {
             $model->delete();
             // WHY: keep the cached page-title dropdown consistent after a delete
