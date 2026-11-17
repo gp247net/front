@@ -57,6 +57,14 @@ return [
         //     route when the caller passes none (default `website`); e.g. News
         //     registers 'news.content' => 'article' (modification 20261117T055341).
         'seo_og_types' => [],
+        //   seo_content_types: ['<type>' => ['label' => '<language key>']] — content
+        //     with its own SEO values (front_seo_meta, SEO phase 1, modification
+        //     20261117T140612). Keys match [a-z0-9_-]{1,50}. Front registers `page`;
+        //     shop registers product/category/brand; a plugin appends its own type
+        //     and declares the displayed content with SeoContentMeta::subject().
+        'seo_content_types' => [
+            'page' => ['label' => 'admin.seo.type_page'],
+        ],
         // Storefront extension points a plugin can render into WITHOUT editing a
         // template (ADR front_storefront-plugin-hooks). Shape:
         //   ['<hook-name>' => [ ['key' => 'PluginKey', 'callback' => [Class, 'method']], ... ]]

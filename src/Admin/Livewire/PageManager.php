@@ -5,6 +5,7 @@ namespace GP247\Front\Admin\Livewire;
 use GP247\Core\AdminShell\Infrastructure\HasValidationLabels;
 use GP247\Core\AdminShell\Infrastructure\ResourcePanel;
 use GP247\Core\Models\AdminLanguage;
+use GP247\Front\Admin\Livewire\Concerns\HasSeoPanel;
 use GP247\Front\Models\FrontPage;
 use GP247\Front\Models\FrontPageDescription;
 use Illuminate\Contracts\View\View;
@@ -15,13 +16,16 @@ use Illuminate\Contracts\View\View;
  * PageList + PageForm pair. Multi-language descriptions and a scalar store_id owner (1-1)
  * are preserved. Gated by `admin_page`.
  *
+ * Carries the shared SEO panel (HasSeoPanel, US-SEO-content-meta, modification 20261117T140612).
+ *
  * @aidlc-unit front-admin
- * @aidlc-story US-FADM-002
+ * @aidlc-story US-FADM-002, US-SEO-content-meta
  * @aidlc-adr ADR-001, ADR-005, ADR-006, ADR-007
  */
 class PageManager extends ResourcePanel
 {
     use HasValidationLabels;
+    use HasSeoPanel;
 
     protected ?string $permission = 'admin_page';
 
@@ -179,6 +183,7 @@ class PageManager extends ResourcePanel
         }
 
         $this->descriptions = $descriptions;
+        $this->fillSeo($model->id);
 
         // Store is immutable on edit — expose it for the read-only display.
         $this->formStoreId = (string) $model->store_id;
@@ -199,6 +204,7 @@ class PageManager extends ResourcePanel
     {
         parent::resetForm();
         $this->descriptions = $this->emptyDescriptions();
+        $this->fillSeo(null);
     }
 
     /**
@@ -206,13 +212,13 @@ class PageManager extends ResourcePanel
      */
     protected function rules(): array
     {
-        return [
+        return array_merge([
             'form.alias'                   => ['required', 'string', 'max:100'],
             'descriptions.*.name'          => ['required', 'string', 'max:200'],
             'descriptions.*.keyword'       => ['nullable', 'string', 'max:200'],
             'descriptions.*.description'   => ['nullable', 'string', 'max:500'],
             'descriptions.*.content'       => ['nullable', 'string'],
-        ];
+        ], $this->seoRules());
     }
 
     /**
@@ -229,7 +235,7 @@ class PageManager extends ResourcePanel
             'descriptions.*.keyword' => 'admin.page.keyword',
             'descriptions.*.description' => 'admin.page.description',
             'descriptions.*.content' => 'admin.page.content',
-        ];
+        ] + $this->seoAttributeLabels();
     }
 
     /**
@@ -241,6 +247,28 @@ class PageManager extends ResourcePanel
      * @return void
      */
     protected function persist(array $data): void
+    {
+        $this->persistWithSeo(fn () => $this->persistContent($data));
+    }
+
+    /**
+     * SEO content-type key of this screen (US-SEO-content-meta).
+     *
+     * @return string
+     */
+    protected function seoType(): string
+    {
+        return 'page';
+    }
+
+    /**
+     * Save the record itself; the SEO panel is saved right after, in the same
+     * transaction (persistWithSeo, ADR-seo-content-meta-table).
+     *
+     * @param array<string, mixed> $data Sanitised form.
+     * @return void
+     */
+    private function persistContent(array $data): void
     {
         // WHY: mirror legacy — when alias is blank, derive it from the first
         // active language title, slugify and cap at 100 chars.

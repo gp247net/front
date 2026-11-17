@@ -137,6 +137,8 @@ class FrontPage extends Model
         static::deleting(
             function ($page) {
                 $page->descriptions()->delete();
+                // Own SEO values go with the page (US-SEO-content-meta).
+                \GP247\Front\Library\SeoContentMeta::forget('page', $page->id);
                 // Store ownership is a scalar column now; nothing to detach.
 
                 //Delete custom field

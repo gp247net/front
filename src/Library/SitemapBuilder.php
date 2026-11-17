@@ -527,6 +527,34 @@ class SitemapBuilder
     }
 
     /**
+     * Leave out content the site owner marked noindex (US-SEO-content-index-control,
+     * US-SEO-004). Applied to the base query, so counts and slices agree. Skipped
+     * while the SEO tables do not exist yet (code updated, gp247:update not run).
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $type Content-type key in front_seo_meta.
+     * @param string $table Content table (its `id` is the content id).
+     * @return \Illuminate\Database\Eloquent\Builder
+     *
+     * @aidlc-story US-SEO-content-index-control, US-SEO-004
+     * @aidlc-adr ADR-seo-content-meta-table
+     */
+    private function withoutNoindex($query, string $type, string $table)
+    {
+        if (!\GP247\Front\Library\SeoContentMeta::tableReady()) {
+            return $query;
+        }
+
+        return $query->whereNotExists(function ($sub) use ($type, $table) {
+            $sub->selectRaw('1')
+                ->from(GP247_DB_PREFIX . \GP247\Front\Support\SeoMetaInstaller::TABLE_META . ' as seo_noindex')
+                ->where('seo_noindex.type', $type)
+                ->where('seo_noindex.noindex', 1)
+                ->whereColumn('seo_noindex.content_id', $table . '.id');
+        });
+    }
+
+    /**
      * Base query for active front CMS pages in this store.
      *
      * @return \Illuminate\Database\Eloquent\Builder
@@ -536,8 +564,10 @@ class SitemapBuilder
         // WHY: 1-1 ownership — filter pages by their own store_id column.
         $tablePage = (new FrontPage)->getTable();
 
-        return FrontPage::where($tablePage . '.store_id', $this->storeId)
-            ->where($tablePage . '.status', 1)
+        $query = FrontPage::where($tablePage . '.store_id', $this->storeId)
+            ->where($tablePage . '.status', 1);
+
+        return $this->withoutNoindex($query, 'page', $tablePage)
             ->orderBy($tablePage . '.id')
             ->select($tablePage . '.alias', $tablePage . '.updated_at');
     }
@@ -616,11 +646,13 @@ class SitemapBuilder
         $model    = new \GP247\Shop\Models\ShopProduct;
         $storeAdm = new \GP247\Core\Models\AdminStore;
 
-        return $model
+        $query = $model
             ->join($storeAdm->getTable(), $storeAdm->getTable() . '.id', $model->getTable() . '.store_id')
             ->where($model->getTable() . '.store_id', $this->storeId)
             ->where($storeAdm->getTable() . '.status', 1)
-            ->where($model->getTable() . '.status', 1)
+            ->where($model->getTable() . '.status', 1);
+
+        return $this->withoutNoindex($query, 'product', $model->getTable())
             ->orderBy($model->getTable() . '.id')
             ->select($model->getTable() . '.alias', $model->getTable() . '.updated_at');
     }
@@ -676,9 +708,11 @@ class SitemapBuilder
         // WHY: 1-1 ownership — filter categories by their own store_id column.
         $model = new \GP247\Shop\Models\ShopCategory;
 
-        return $model
+        $query = $model
             ->where($model->getTable() . '.store_id', $this->storeId)
-            ->where($model->getTable() . '.status', 1)
+            ->where($model->getTable() . '.status', 1);
+
+        return $this->withoutNoindex($query, 'category', $model->getTable())
             ->orderBy($model->getTable() . '.id')
             ->select($model->getTable() . '.alias', $model->getTable() . '.updated_at');
     }

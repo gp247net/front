@@ -5,6 +5,7 @@ namespace GP247\Front\Admin\Livewire;
 use GP247\Core\AdminShell\Infrastructure\GP247AdminComponent;
 use GP247\Core\Models\AdminConfig;
 use GP247\Front\Controllers\SeoController;
+use GP247\Front\Library\SeoContentMeta;
 use GP247\Front\Library\SeoMeta;
 use Illuminate\Contracts\View\View;
 
@@ -23,7 +24,10 @@ use Illuminate\Contracts\View\View;
  * modification 20261116T050835).
  *
  * @aidlc-unit seo
- * @aidlc-story US-SEO-004, US-SEO-005, US-SEO-site-verification
+ * Also holds the title templates per content type (`seo.title_template.<type>`,
+ * SEO phase 1, modification 20261117T140612).
+ *
+ * @aidlc-story US-SEO-004, US-SEO-005, US-SEO-site-verification, US-SEO-title-template
  */
 class SeoMetaSettings extends GP247AdminComponent
 {
@@ -53,6 +57,13 @@ class SeoMetaSettings extends GP247AdminComponent
 
     /** @var string Bing Webmaster verification token (US-SEO-site-verification). */
     public string $verifyBing = '';
+
+    /**
+     * Title template per registered content type + `default` (US-SEO-title-template).
+     *
+     * @var array<string, string>
+     */
+    public array $titleTemplates = [];
 
     /**
      * The store this screen edits. WHY: unlike `WebsiteInfo`/`CustomConfigForm`
@@ -89,6 +100,68 @@ class SeoMetaSettings extends GP247AdminComponent
         $this->jsonldEnabled = gp247_config(self::CONFIG_JSONLD_ENABLED, $storeId, '1') != '0';
         $this->verifyGoogle = (string) gp247_config(SeoMeta::VERIFICATION_KEYS['google'], $storeId, '');
         $this->verifyBing = (string) gp247_config(SeoMeta::VERIFICATION_KEYS['bing'], $storeId, '');
+        foreach ($this->titleTemplateTypes() as $type => $labelKey) {
+            $this->titleTemplates[$type] = SeoContentMeta::titleTemplate($type, $storeId);
+        }
+    }
+
+    /**
+     * Content types offered a title template: every registered type, then `default`.
+     *
+     * @return array<string, string> Type => language key of its label.
+     *
+     * @aidlc-story US-SEO-title-template
+     */
+    public function titleTemplateTypes(): array
+    {
+        $types = [];
+        foreach (SeoContentMeta::types() as $type => $definition) {
+            $types[$type] = (string) ($definition['label'] ?? $type);
+        }
+        $types[SeoContentMeta::TITLE_TEMPLATE_DEFAULT] = 'admin.seo.title_template_default';
+
+        return $types;
+    }
+
+    /**
+     * Persist one title template on blur (Layer-2 gated). Refused unless empty or
+     * containing `{title}` within TITLE_TEMPLATE_MAX characters.
+     *
+     * @param mixed  $value Typed template.
+     * @param string $type  Changed key of $titleTemplates.
+     * @return void
+     * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When denied.
+     *
+     * @aidlc-story US-SEO-title-template
+     */
+    public function updatedTitleTemplates($value, $type): void
+    {
+        $this->authorizeAction('update');
+
+        $type = (string) $type;
+        $property = 'titleTemplates.' . $type;
+        if (!array_key_exists($type, $this->titleTemplateTypes())) {
+            unset($this->titleTemplates[$type]);
+
+            return;
+        }
+        if (!is_string($value) && $value !== null) {
+            $this->titleTemplates[$type] = SeoContentMeta::titleTemplate($type, $this->storeId());
+
+            return;
+        }
+        $template = gp247_text_plain((string) $value, stripTags: true);
+        if (!SeoContentMeta::isValidTitleTemplate($template)) {
+            $this->addError($property, gp247_language_render('admin.seo.title_template_invalid'));
+            $this->notify('error', gp247_language_render('admin.seo.title_template_invalid'));
+
+            return;
+        }
+
+        $this->resetErrorBag($property);
+        $this->titleTemplates[$type] = $template;
+        $this->upsertConfig(SeoContentMeta::TITLE_TEMPLATE_KEY . $type, $template);
+        $this->notify('success', gp247_language_render('admin.setting_saved'));
     }
 
     /**

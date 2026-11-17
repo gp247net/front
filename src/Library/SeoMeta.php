@@ -85,6 +85,21 @@ class SeoMeta
     }
 
     /**
+     * Whether the request is the content's own URL: no registered filter/sort
+     * parameter and not a later page. A per-content canonical applies only here
+     * (ADR-seo-content-meta-table).
+     *
+     * @return bool
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-content-index-control
+     */
+    public static function isPlainFirstPage(): bool
+    {
+        return !self::hasFilterParameter() && self::canonicalUrl() === request()->url();
+    }
+
+    /**
      * Decide the robots directive of the current request: `noindex, follow` when
      * the route is registered as private (`seo_noindex_routes`) or the query
      * carries a registered filter/sort parameter (`seo_noindex_query_params`);

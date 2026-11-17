@@ -73,6 +73,31 @@
         <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.seo.verify_help') }}</p>
     </x-gp247::card>
 
+    {{-- Title templates per content type (US-SEO-title-template) --}}
+    <x-gp247::card :title="gp247_language_render('admin.seo.title_template')">
+        <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.seo.title_template_help') }}</p>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            @foreach ($this->titleTemplateTypes() as $type => $labelKey)
+                <div class="space-y-1">
+                    <label for="seo-meta-title-template-{{ $type }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ gp247_language_render($labelKey) }}</label>
+                    <input
+                        id="seo-meta-title-template-{{ $type }}"
+                        type="text"
+                        wire:model.live.blur="titleTemplates.{{ $type }}"
+                        maxlength="{{ \GP247\Front\Library\SeoContentMeta::TITLE_TEMPLATE_MAX }}"
+                        placeholder="{title} | {site}"
+                        autocomplete="off"
+                        data-testid="seo-meta-title-template-{{ $type }}"
+                        class="{{ $input }}"
+                    >
+                    @error('titleTemplates.' . $type)
+                        <p class="text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+            @endforeach
+        </div>
+    </x-gp247::card>
+
     <x-gp247::card>
         <p class="text-sm text-gray-600 dark:text-gray-300">
             {{ gp247_language_render('admin.seo.meta_og_note') }}

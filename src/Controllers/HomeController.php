@@ -59,6 +59,8 @@ class HomeController extends RootFrontController
     {
         $page = (new FrontPage)->getDetail($alias, $type = 'alias');
         if ($page) {
+            // Lets MetaHead read the page's own SEO values (US-SEO-content-meta).
+            \GP247\Front\Library\SeoContentMeta::subject('page', $page->id);
             $view = $this->GP247TemplatePath . '.screen.page_detail';
             gp247_check_view($view);
             return view(

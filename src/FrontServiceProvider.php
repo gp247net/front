@@ -270,6 +270,7 @@ class FrontServiceProvider extends ServiceProvider
         \GP247\Core\Backup\Application\DataGroupRegistry::declare('content', [
             'front_banner', 'front_banner_type', 'front_layout_block', 'front_link', 'front_link_group',
             'front_page', 'front_page_description', 'front_redirects', 'front_country',
+            'front_seo_meta', 'front_seo_meta_description',
         ], [], $help::key('content'));
         \GP247\Core\Backup\Application\DataGroupRegistry::declare('customers', ['front_contact', 'front_subscribe'], [], $help::key('customers'));
     }
