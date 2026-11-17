@@ -5,6 +5,7 @@ namespace GP247\Front\Admin\Livewire;
 use GP247\Core\AdminShell\Infrastructure\GP247AdminComponent;
 use GP247\Core\Models\AdminConfig;
 use GP247\Front\Controllers\SeoController;
+use GP247\Front\Library\IndexNow;
 use GP247\Front\Library\SeoContentMeta;
 use GP247\Front\Library\SeoMeta;
 use Illuminate\Contracts\View\View;
@@ -27,7 +28,7 @@ use Illuminate\Contracts\View\View;
  * Also holds the title templates per content type (`seo.title_template.<type>`,
  * SEO phase 1, modification 20261117T140612).
  *
- * @aidlc-story US-SEO-004, US-SEO-005, US-SEO-site-verification, US-SEO-title-template
+ * @aidlc-story US-SEO-004, US-SEO-005, US-SEO-site-verification, US-SEO-title-template, US-SEO-indexnow
  */
 class SeoMetaSettings extends GP247AdminComponent
 {
@@ -64,6 +65,12 @@ class SeoMetaSettings extends GP247AdminComponent
      * @var array<string, string>
      */
     public array $titleTemplates = [];
+
+    /** @var bool IndexNow switch of this store (US-SEO-indexnow). */
+    public bool $indexNowEnabled = false;
+
+    /** @var string IndexNow key of this store ('' until first switched on). */
+    public string $indexNowKey = '';
 
     /**
      * The store this screen edits. WHY: unlike `WebsiteInfo`/`CustomConfigForm`
@@ -103,6 +110,53 @@ class SeoMetaSettings extends GP247AdminComponent
         foreach ($this->titleTemplateTypes() as $type => $labelKey) {
             $this->titleTemplates[$type] = SeoContentMeta::titleTemplate($type, $storeId);
         }
+        $this->indexNowEnabled = IndexNow::enabled($storeId);
+        $this->indexNowKey = IndexNow::key($storeId);
+    }
+
+    /**
+     * Persist the IndexNow switch (Layer-2 gated); switching on creates a key when none.
+     *
+     * @param mixed $value
+     * @return void
+     * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When denied.
+     *
+     * @aidlc-story US-SEO-indexnow
+     */
+    public function updatedIndexNowEnabled($value): void
+    {
+        $this->authorizeAction('update');
+        $this->indexNowEnabled = (bool) $value;
+        if ($this->indexNowEnabled && IndexNow::key($this->storeId()) === '') {
+            $this->storeIndexNowKey(IndexNow::generateKey());
+        }
+        $this->upsertConfig(IndexNow::CONFIG_ENABLED, $this->indexNowEnabled ? '1' : '0');
+        $this->notify('success', gp247_language_render('admin.setting_saved'));
+    }
+
+    /**
+     * Replace the IndexNow key with a new random one (Layer-2 gated).
+     *
+     * @return void
+     * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When denied.
+     *
+     * @aidlc-story US-SEO-indexnow
+     */
+    public function regenerateIndexNowKey(): void
+    {
+        $this->authorizeAction('update');
+        $this->storeIndexNowKey(IndexNow::generateKey());
+        $this->notify('success', gp247_language_render('admin.setting_saved'));
+    }
+
+    /**
+     * @param string $key
+     * @return void
+     */
+    private function storeIndexNowKey(string $key): void
+    {
+        $this->upsertConfig(IndexNow::CONFIG_KEY, $key);
+        $this->indexNowKey = $key;
     }
 
     /**

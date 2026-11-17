@@ -4,6 +4,8 @@ namespace GP247\Front\Admin\Livewire;
 
 use GP247\Core\AdminShell\Infrastructure\HasValidationLabels;
 use GP247\Core\AdminShell\Infrastructure\ResourcePanel;
+use GP247\Core\Models\AdminConfig;
+use GP247\Front\Library\SeoUrlLifecycle;
 use GP247\Front\Models\FrontRedirect;
 use Illuminate\Validation\Rule;
 
@@ -36,6 +38,52 @@ class SeoRedirectManager extends ResourcePanel
      * @aidlc-adr ADR-admin-shell-rbac-two-panel-state-preservation
      */
     protected bool $keepStateOnSave = true;
+
+    /**
+     * Per-store switch of automatic redirects on alias change (`seo.auto_redirect_alias`).
+     *
+     * @var bool
+     * @aidlc-story US-SEO-alias-auto-redirect
+     */
+    public bool $autoRedirect = true;
+
+    /**
+     * Load the screen; `?from=<path>` (from the 404 log) prefills a new redirect.
+     *
+     * @param string|null $id Redirect id to edit; null for create mode.
+     * @return void
+     *
+     * @aidlc-story US-SEO-alias-auto-redirect, US-SEO-not-found-log
+     */
+    public function mount($id = null): void
+    {
+        parent::mount($id);
+        $this->autoRedirect = SeoUrlLifecycle::autoRedirectEnabled($this->storeContext());
+        $from = request()->query('from');
+        if ($this->editingId === null && is_string($from) && str_starts_with($from, '/')) {
+            $this->form['from'] = mb_substr(gp247_text_plain($from), 0, 500);
+        }
+    }
+
+    /**
+     * Persist the automatic-redirect switch for the store in context (Layer-2 gated).
+     *
+     * @param mixed $value
+     * @return void
+     * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When denied.
+     *
+     * @aidlc-story US-SEO-alias-auto-redirect
+     */
+    public function updatedAutoRedirect($value): void
+    {
+        $this->authorizeAction('update');
+        $this->autoRedirect = (bool) $value;
+        AdminConfig::updateOrCreate(
+            ['key' => SeoUrlLifecycle::CONFIG_AUTO_REDIRECT, 'store_id' => (string) $this->storeContext()],
+            ['value' => $this->autoRedirect ? '1' : '0', 'group' => 'seo', 'code' => 'seo_redirect', 'sort' => 0]
+        );
+        $this->notify('success', gp247_language_render('admin.setting_saved'));
+    }
 
     /**
      * Store-scoped: pick a store on create (root admin), show it in the list, lock
@@ -203,6 +251,8 @@ class SeoRedirectManager extends ResourcePanel
             'to'       => $data['to'],
             'code'     => (int) $data['code'],
             'status'   => empty($data['status']) ? 0 : 1,
+            // WHY: once edited by hand, an automatic redirect is the owner's own rule.
+            'source'   => FrontRedirect::SOURCE_MANUAL,
         ];
 
         if ($this->editingId !== null) {

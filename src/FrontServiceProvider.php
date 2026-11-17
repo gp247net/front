@@ -247,6 +247,15 @@ class FrontServiceProvider extends ServiceProvider
 
             $this->registerBackupDataGroups();
 
+            // Storefront 404 log (US-SEO-not-found-log): global, so addresses that match no
+            // route are seen too; it does nothing unless the store switched the log on.
+            try {
+                $this->app->make(\Illuminate\Contracts\Http\Kernel::class)
+                    ->pushMiddleware(\GP247\Front\Middleware\LogNotFound::class);
+            } catch (\Throwable $e) {
+                // WHY: the 404 log is optional; it must never abort boot.
+            }
+
         }
     }
 
@@ -270,7 +279,7 @@ class FrontServiceProvider extends ServiceProvider
         \GP247\Core\Backup\Application\DataGroupRegistry::declare('content', [
             'front_banner', 'front_banner_type', 'front_layout_block', 'front_link', 'front_link_group',
             'front_page', 'front_page_description', 'front_redirects', 'front_country',
-            'front_seo_meta', 'front_seo_meta_description',
+            'front_seo_meta', 'front_seo_meta_description', 'front_not_found_log',
         ], [], $help::key('content'));
         \GP247\Core\Backup\Application\DataGroupRegistry::declare('customers', ['front_contact', 'front_subscribe'], [], $help::key('customers'));
     }

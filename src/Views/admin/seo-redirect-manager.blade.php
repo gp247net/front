@@ -68,6 +68,13 @@
     {{-- Right: list --}}
     <x-gp247::card :title="gp247_language_render('admin.seo_redirect.title')">
 
+        {{-- Automatic 301 on alias change (US-SEO-alias-auto-redirect) --}}
+        <div class="mb-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-900/40">
+            <x-gp247::checkbox wire:model.live="autoRedirect" data-testid="seo-redirect-auto-switch"
+                :label="gp247_language_render('admin.seo_redirect.auto_switch')"
+                :help="gp247_language_render('admin.seo_redirect.auto_help')" />
+        </div>
+
         <div class="mb-3">
             <x-gp247::search-box :placeholder="$this->searchPlaceholder()" :hint="$this->searchHint()" />
         </div>
@@ -106,6 +113,9 @@
                     wire:key="seo-redirect-{{ $row->id }}">
                     <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-100">
                         <code class="text-xs">{{ $row->from }}</code>
+                        @if (($row->source ?? 'manual') === 'auto')
+                            <x-gp247::badge color="blue" data-testid="seo-redirect-source-badge">{{ gp247_language_render('admin.seo_redirect.source_auto') }}</x-gp247::badge>
+                        @endif
                         @include('gp247-admin::partials.store-scope-line', ['storeId' => $row->store_id])
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-100"><code class="text-xs">{{ $row->to }}</code></td>

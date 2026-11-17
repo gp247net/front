@@ -144,6 +144,9 @@ return new class extends Migration
         // Per-content SEO values (SEO phase 1): one definition shared with the upgrade migration.
         \GP247\Front\Support\SeoMetaInstaller::createTables();
 
+        // 404 log (SEO phase 2): one definition shared with the upgrade migration.
+        \GP247\Front\Support\SeoUrlLifecycleInstaller::install();
+
         $schema->create(
             GP247_DB_PREFIX.'front_country',
             function (Blueprint $table) {
@@ -163,6 +166,8 @@ return new class extends Migration
                     $table->unsignedSmallInteger('code')->default(301);
                     $table->uuid('store_id')->index();
                     $table->tinyInteger('status')->default(1);
+                    // manual | auto (SEO phase 2 — redirect written on an alias change)
+                    $table->string('source', 10)->default('manual');
                     $table->timestamps();
                 }
             );
@@ -199,6 +204,8 @@ return new class extends Migration
         $schema->dropIfExists(GP247_DB_PREFIX.'front_contact');
         // WARNING: drops the SEO titles/descriptions typed by the site owner.
         \GP247\Front\Support\SeoMetaInstaller::dropTables();
+        // WARNING: drops the storefront 404 log.
+        \GP247\Front\Support\SeoUrlLifecycleInstaller::dropTables();
 
     }
 };

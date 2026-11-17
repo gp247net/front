@@ -26,7 +26,13 @@ class FrontRedirect extends Model
 
     protected $table = GP247_DB_PREFIX . 'front_redirects';
 
-    protected $fillable = ['from', 'to', 'code', 'store_id', 'status'];
+    protected $fillable = ['from', 'to', 'code', 'store_id', 'status', 'source'];
+
+    /** Redirect typed on the "Redirect 301" screen. */
+    public const SOURCE_MANUAL = 'manual';
+
+    /** Redirect written by SeoUrlLifecycle on an alias change (US-SEO-alias-auto-redirect). */
+    public const SOURCE_AUTO = 'auto';
 
     /**
      * Find an active redirect for the given path within the current store.

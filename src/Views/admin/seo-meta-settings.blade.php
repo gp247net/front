@@ -73,6 +73,26 @@
         <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.seo.verify_help') }}</p>
     </x-gp247::card>
 
+    {{-- IndexNow (US-SEO-indexnow) --}}
+    <x-gp247::card :title="gp247_language_render('admin.seo.indexnow_title')">
+        <div class="space-y-3">
+            <x-gp247::checkbox wire:model.live="indexNowEnabled" data-testid="seo-indexnow-switch"
+                :label="gp247_language_render('admin.seo.indexnow_enabled')" />
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.seo.indexnow_help') }}</p>
+            @if ($indexNowKey !== '')
+                <div class="flex flex-wrap items-center gap-2 text-sm">
+                    <span class="text-gray-600 dark:text-gray-300">{{ gp247_language_render('admin.seo.indexnow_key') }}:</span>
+                    <code class="rounded bg-gray-100 px-2 py-0.5 text-xs dark:bg-gray-900" data-testid="seo-indexnow-key">{{ $indexNowKey }}</code>
+                    <a href="{{ url('/' . $indexNowKey . '.txt') }}" target="_blank" rel="noopener" class="text-xs text-blue-600 hover:underline dark:text-blue-400">/{{ $indexNowKey }}.txt</a>
+                    <x-gp247::button size="sm" variant="ghost" wire:click="regenerateIndexNowKey"
+                        wire:confirm="{{ gp247_language_render('admin.seo.indexnow_regenerate_confirm') }}" data-testid="seo-indexnow-regenerate">
+                        <i class="fas fa-sync-alt"></i> {{ gp247_language_render('admin.seo.indexnow_regenerate') }}
+                    </x-gp247::button>
+                </div>
+            @endif
+        </div>
+    </x-gp247::card>
+
     {{-- Title templates per content type (US-SEO-title-template) --}}
     <x-gp247::card :title="gp247_language_render('admin.seo.title_template')">
         <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">{{ gp247_language_render('admin.seo.title_template_help') }}</p>

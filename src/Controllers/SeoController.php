@@ -109,6 +109,28 @@ class SeoController extends RootFrontController
     }
 
     /**
+     * Serve the IndexNow key file `/<key>.txt` of the current store: the key as
+     * text/plain, or 404 when IndexNow is off or the key does not match.
+     *
+     * @param string $key 32 lowercase hex characters (route constraint).
+     * @return Response
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-indexnow
+     * @aidlc-adr ADR-seo-url-lifecycle
+     */
+    public function indexNowKey(string $key): Response
+    {
+        $storeId = config('app.storeId');
+        $own = \GP247\Front\Library\IndexNow::key($storeId);
+        if (!\GP247\Front\Library\IndexNow::enabled($storeId) || !hash_equals($own, $key)) {
+            abort(404);
+        }
+
+        return response($own, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
+    }
+
+    /**
      * Serve robots.txt for the current store.
      *
      * Content is read from AdminConfig key 'seo.robots_txt'; when absent a

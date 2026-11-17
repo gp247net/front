@@ -22,6 +22,8 @@ Route::get('/sitemap-{segment}.xml', $seoController . '@sitemapSegment')
 // Human-readable CSS stylesheet referenced by the sitemaps' xml-stylesheet PI.
 Route::get('/sitemap.css', $seoController . '@sitemapStylesheet')->name('front.sitemap.css');
 Route::get('/robots.txt',  $seoController . '@robots')->name('front.robots');
+// IndexNow key file (US-SEO-indexnow): 404 unless the store switched IndexNow on with this key.
+Route::get('/{key}.txt', $seoController . '@indexNowKey')->where('key', '[a-f0-9]{32}')->name('front.indexnow.key');
 
 $homeController = gp247_namespace(HomeController::class);
 

@@ -62,8 +62,10 @@ return [
         //     20261117T140612). Keys match [a-z0-9_-]{1,50}. Front registers `page`;
         //     shop registers product/category/brand; a plugin appends its own type
         //     and declares the displayed content with SeoContentMeta::subject().
+        //     Optional `route`: detail route taking `alias` (+ `lang`) — enables the
+        //     automatic 301 on alias change and IndexNow (SeoUrlLifecycle, SEO phase 2).
         'seo_content_types' => [
-            'page' => ['label' => 'admin.seo.type_page'],
+            'page' => ['label' => 'admin.seo.type_page', 'route' => 'front.page.detail'],
         ],
         // Storefront extension points a plugin can render into WITHOUT editing a
         // template (ADR front_storefront-plugin-hooks). Shape:

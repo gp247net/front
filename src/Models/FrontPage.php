@@ -133,6 +133,8 @@ class FrontPage extends Model
     protected static function boot()
     {
         parent::boot();
+        // Alias change => automatic 301; saves/deletes => IndexNow (US-SEO-alias-auto-redirect, US-SEO-indexnow).
+        \GP247\Front\Library\SeoUrlLifecycle::watch(static::class, 'page');
         // before delete() method call this
         static::deleting(
             function ($page) {
