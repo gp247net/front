@@ -24,6 +24,18 @@
 
             @include('gp247-admin::partials.store-scope-picker', ['testid' => 'page-store-select'])
 
+            {{-- Two tabs like the product screen: content, then the shared SEO panel (it used to sit collapsed at the bottom of a long form). --}}
+            @php
+                $tabsMap = ['content' => gp247_language_render('admin.page.content'), 'seo' => gp247_language_render('admin.seo.panel_title')];
+                $errorTabs = [];
+                foreach ($errors->keys() as $errorKey) {
+                    $errorTabs[] = str_starts_with($errorKey, 'seo.') ? 'seo' : 'content';
+                }
+                $tabsWithErrors = array_values(array_intersect(array_keys($tabsMap), array_unique($errorTabs)));
+            @endphp
+            <x-gp247::tabs :tabs="$tabsMap" :errors="$tabsWithErrors" default="content">
+            <div x-show="tab === 'content'" class="space-y-4">
+
             {{-- Per-language descriptions --}}
             @foreach ($languages as $code => $language)
                 <div class="space-y-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700" wire:key="page-lang-{{ $code }}">
@@ -59,14 +71,13 @@
                 wire:model="form.alias" :error="$errors->first('form.alias')" required />
 
             <x-gp247::checkbox :label="gp247_language_render('admin.active')" wire:model="form.status" value="1" />
+            </div>
 
             {{-- SEO (shared panel of gp247/front, US-SEO-content-meta) --}}
-            <details class="rounded-lg border border-gray-200 p-3 dark:border-gray-700" data-testid="page-form-seo" @if($errors->has('seo.*')) open @endif>
-                <summary class="cursor-pointer text-sm font-semibold text-gray-700 dark:text-gray-200">{{ gp247_language_render('admin.seo.panel_title') }}</summary>
-                <div class="mt-3">
-                    @include('gp247-front-admin::partials.seo-panel', ['nameField' => 'descriptions.{code}.name', 'descriptionField' => 'descriptions.{code}.description', 'aliasField' => 'form.alias', 'imageType' => 'page'])
-                </div>
-            </details>
+            <div x-show="tab === 'seo'" x-cloak data-testid="page-form-seo">
+                @include('gp247-front-admin::partials.seo-panel', ['nameField' => 'descriptions.{code}.name', 'descriptionField' => 'descriptions.{code}.description', 'aliasField' => 'form.alias', 'imageType' => 'page'])
+            </div>
+            </x-gp247::tabs>
 
             <div class="flex items-center justify-end border-t border-gray-200 pt-4 dark:border-gray-700">
                 <x-gp247::button type="submit" wire:loading.attr="disabled" wire:target="save">
