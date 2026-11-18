@@ -3,9 +3,14 @@
 namespace GP247\Front\Library;
 
 use GP247\Core\Models\AdminLanguage;
+use GP247\Front\Models\FrontPage;
 use GP247\Front\Models\FrontRedirect;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * URL lifecycle of storefront content (SEO phase 2): an alias change leaves a 301 from
@@ -14,14 +19,44 @@ use Illuminate\Support\Facades\Route;
  * MCP all behave alike. Never breaks a save: errors are logged
  * (ADR-seo-url-lifecycle, RISK-OPS-seo-auto-redirect-misfire).
  *
+ * Packages that bring content from another platform write a 301 from its old
+ * addresses through redirectLegacyPath(), under the same rules.
+ *
  * @aidlc-unit seo
- * @aidlc-story US-SEO-alias-auto-redirect, US-SEO-indexnow
+ * @aidlc-story US-SEO-alias-auto-redirect, US-SEO-indexnow, US-SEO-legacy-path-redirect
  * @aidlc-adr ADR-seo-url-lifecycle
  */
 class SeoUrlLifecycle
 {
     /** Per-store switch of automatic redirects; on unless set to `0`. */
     public const CONFIG_AUTO_REDIRECT = 'seo.auto_redirect_alias';
+
+    /** checkLegacyPath(): the redirect can be written. */
+    public const LEGACY_OK = 'ok';
+
+    /** checkLegacyPath(): not a safe path of this site (`//host`, scheme, control characters, `..`). */
+    public const LEGACY_NOT_LOCAL = 'not_local';
+
+    /** checkLegacyPath(): the old path already is the content's address. */
+    public const LEGACY_SAME_AS_TARGET = 'same_as_target';
+
+    /** checkLegacyPath(): the old path is the address of content of this site. */
+    public const LEGACY_OWNED_BY_CONTENT = 'owned_by_content';
+
+    /** checkLegacyPath(): the old path is a fixed page of this site (cart, login, admin…). */
+    public const LEGACY_RESERVED_ROUTE = 'reserved_route';
+
+    /** checkLegacyPath(): the same 301 is already in place (writing it again changes nothing). */
+    public const LEGACY_ALREADY_REDIRECTED = 'already_redirected';
+
+    /** checkLegacyPath(): another redirect (hand-made, switched off, or pointing elsewhere) already starts there — never overwritten. */
+    public const LEGACY_REDIRECT_EXISTS = 'redirect_exists';
+
+    /** checkLegacyPath(): unknown content type, type without route, empty alias or old database. */
+    public const LEGACY_UNSUPPORTED_TYPE = 'unsupported_type';
+
+    /** Longest path the `from` column holds. */
+    private const MAX_PATH_LENGTH = 500;
 
     /**
      * Hook a content model: alias changes and saves/deletes of `$class` follow `$type`'s
@@ -103,6 +138,208 @@ class SeoUrlLifecycle
     }
 
     /**
+     * Whether a 301 from an address of a previous platform to a content of this site
+     * can be written, without writing it (for an import preview).
+     *
+     * @param int|string $storeId    Store of the content.
+     * @param string     $legacyPath Old path (`/products/a`), never a full URL.
+     * @param string     $type       Registered SEO content type with a `route`.
+     * @param string     $alias      Alias of the content on this site.
+     * @return string One of the LEGACY_* reasons.
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-legacy-path-redirect
+     * @aidlc-adr ADR-seo-url-lifecycle
+     */
+    public static function checkLegacyPath($storeId, string $legacyPath, string $type, string $alias): string
+    {
+        return self::inspectLegacyPath($storeId, $legacyPath, $type, $alias)['reason'];
+    }
+
+    /**
+     * Write a 301 (source `import`) from an address of a previous platform to the
+     * content's address in the store's default language, under the same rules as the
+     * automatic redirect: content and fixed pages win, chains are flattened, one row
+     * per old path. Safe to call again with the same data. Database errors are thrown
+     * to the caller, who is inside its own transaction.
+     *
+     * @param int|string $storeId    Store of the content.
+     * @param string     $legacyPath Old path (`/products/a`), never a full URL.
+     * @param string     $type       Registered SEO content type with a `route`.
+     * @param string     $alias      Alias of the content on this site.
+     * @return int|null Redirect id, or null when skipped (see checkLegacyPath()).
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-legacy-path-redirect
+     * @aidlc-adr ADR-seo-url-lifecycle
+     */
+    public static function redirectLegacyPath($storeId, string $legacyPath, string $type, string $alias): ?int
+    {
+        $check = self::inspectLegacyPath($storeId, $legacyPath, $type, $alias);
+        if ($check['reason'] !== self::LEGACY_OK && $check['reason'] !== self::LEGACY_ALREADY_REDIRECTED) {
+            return null;
+        }
+
+        return self::writeRedirect((string) $storeId, $check['from'], $check['to'], FrontRedirect::SOURCE_IMPORT);
+    }
+
+    /**
+     * Remove a redirect written by redirectLegacyPath() while nobody touched it since:
+     * still source `import` (a hand edit makes it `manual`), still pointing at
+     * `$expectedTo` (a later rename re-points it) and created at or after
+     * `$createdSince` (an older row belongs to an earlier import).
+     *
+     * @param int                $id           Redirect id returned by redirectLegacyPath().
+     * @param string             $expectedTo   Target path when it was written.
+     * @param \DateTimeInterface $createdSince Start of the import that wrote it.
+     * @return bool True when the row was removed.
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-legacy-path-redirect
+     * @aidlc-adr ADR-seo-url-lifecycle
+     */
+    public static function removeImportedRedirect(int $id, string $expectedTo, \DateTimeInterface $createdSince): bool
+    {
+        return FrontRedirect::whereKey($id)
+            ->where('source', FrontRedirect::SOURCE_IMPORT)
+            ->where('to', $expectedTo)
+            ->where('created_at', '>=', $createdSince)
+            ->delete() === 1;
+    }
+
+    /**
+     * @param int|string $storeId
+     * @param string     $legacyPath
+     * @param string     $type
+     * @param string     $alias
+     * @return array{reason: string, from: string, to: string}
+     */
+    private static function inspectLegacyPath($storeId, string $legacyPath, string $type, string $alias): array
+    {
+        $result = ['reason' => self::LEGACY_OK, 'from' => '', 'to' => ''];
+        if (!self::isSafeLegacyPath($legacyPath)) {
+            return ['reason' => self::LEGACY_NOT_LOCAL] + $result;
+        }
+        $to = self::defaultLanguagePath($type, $alias, $storeId);
+        if ($to === null || !self::hasSourceColumn()) {
+            return ['reason' => self::LEGACY_UNSUPPORTED_TYPE] + $result;
+        }
+        $from = FrontRedirect::normalizePath($legacyPath);
+        if ($from === FrontRedirect::normalizePath($to)) {
+            return ['reason' => self::LEGACY_SAME_AS_TARGET] + $result;
+        }
+        $owner = self::routeOwner((string) $storeId, $from);
+        if ($owner !== null) {
+            return ['reason' => $owner] + $result;
+        }
+
+        $existing = FrontRedirect::where('store_id', (string) $storeId)->where('from', $from)->first(['to', 'status', 'code']);
+        if ($existing === null) {
+            return ['reason' => self::LEGACY_OK, 'from' => $from, 'to' => $to];
+        }
+        // WHY: an existing rule from this path is the owner's (or an earlier line's) decision — a hand-made
+        // target, a rule switched off on purpose; an import only confirms the very same 301, never rewrites it.
+        $same = (int) $existing->status === 1 && (int) $existing->code === 301 && (string) $existing->to === $to;
+
+        return $same
+            ? ['reason' => self::LEGACY_ALREADY_REDIRECTED, 'from' => $from, 'to' => $to]
+            : ['reason' => self::LEGACY_REDIRECT_EXISTS] + $result;
+    }
+
+    /**
+     * @return bool Whether the redirect table has the `source` column (front database upgraded).
+     */
+    private static function hasSourceColumn(): bool
+    {
+        static $has = null;
+
+        return $has ??= Schema::connection(GP247_DB_CONNECTION)->hasColumn(GP247_DB_PREFIX . 'front_redirects', 'source');
+    }
+
+    /**
+     * @param string $path
+     * @return bool A same-site path with no control character, backslash or dot segment.
+     */
+    private static function isSafeLegacyPath(string $path): bool
+    {
+        if ($path === '' || strlen($path) > self::MAX_PATH_LENGTH || !self::isLocalPath($path) || strpbrk($path, '?#') !== false) {
+            return false;
+        }
+        $decoded = rawurldecode($path);
+        if (preg_match('/[\x00-\x1F\x7F\\\\]/', $path . $decoded)) {
+            return false;
+        }
+        foreach (explode('/', $decoded) as $segment) {
+            if ($segment === '.' || $segment === '..') {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string     $type
+     * @param string     $alias
+     * @param int|string $storeId
+     * @return string|null Content path in the store's default language (one target per old path).
+     */
+    private static function defaultLanguagePath(string $type, string $alias, $storeId): ?string
+    {
+        $paths = self::pathsFor($type, $alias);
+        if ($paths === []) {
+            return null;
+        }
+        $lang = (string) gp247_store_info('language', null, $storeId);
+
+        return $paths[$lang] ?? $paths['_'] ?? reset($paths);
+    }
+
+    /**
+     * Who already answers `$path` on this site. FrontRedirectMiddleware runs before the
+     * route, so a redirect from such a path would take the page over.
+     *
+     * @param string $storeId
+     * @param string $path Normalised path.
+     * @return string|null LEGACY_OWNED_BY_CONTENT, LEGACY_RESERVED_ROUTE or null (free).
+     */
+    private static function routeOwner(string $storeId, string $path): ?string
+    {
+        try {
+            $route = Route::getRoutes()->match(Request::create($path, 'GET'));
+        } catch (MethodNotAllowedHttpException $e) {
+            // A POST-only page (newsletter, checkout step): the redirect middleware runs for every method.
+            return self::LEGACY_RESERVED_ROUTE;
+        } catch (HttpExceptionInterface $e) {
+            return null;
+        }
+        $name = (string) $route->getName();
+        $contentRoutes = array_column(SeoContentMeta::types(), 'route');
+        if ($name !== '' && in_array($name, $contentRoutes, true)) {
+            // WHY: `{alias}.html` of CMS pages also catches every old `/x.html` address
+            // (Magento); only a page that exists owns it. Shop/plugin detail routes have
+            // their own prefix and are kept as content addresses.
+            if ($name === 'front.page.detail') {
+                return self::pageExists($storeId, (string) $route->parameter('alias')) ? self::LEGACY_OWNED_BY_CONTENT : null;
+            }
+
+            return self::LEGACY_OWNED_BY_CONTENT;
+        }
+
+        return self::LEGACY_RESERVED_ROUTE;
+    }
+
+    /**
+     * @param string $storeId
+     * @param string $alias
+     * @return bool
+     */
+    private static function pageExists(string $storeId, string $alias): bool
+    {
+        return FrontPage::where('store_id', $storeId)->where('alias', rawurldecode($alias))->exists();
+    }
+
+    /**
      * Content wins over redirects, chains are flattened, then old → new is written.
      *
      * @param int|string $storeId
@@ -116,18 +353,33 @@ class SeoUrlLifecycle
         if ($from === $to || !self::isLocalPath($from) || !self::isLocalPath($to)) {
             return;
         }
-        $store = (string) $storeId;
+        self::writeRedirect((string) $storeId, FrontRedirect::normalizePath($from), $to, FrontRedirect::SOURCE_AUTO);
+    }
+
+    /**
+     * Free `$to` (content wins), point redirects aimed at `$from` straight at `$to`,
+     * then upsert `$from` ⇒ `$to` as an enabled 301.
+     *
+     * @param string $store
+     * @param string $from   Normalised source path.
+     * @param string $to     Target path.
+     * @param string $source FrontRedirect::SOURCE_*.
+     * @return int Redirect id.
+     */
+    private static function writeRedirect(string $store, string $from, string $to, string $source): int
+    {
         self::releasePath($store, $to);
         FrontRedirect::where('store_id', $store)->where('to', $from)->where('status', 1)->update(['to' => $to]);
 
         $existing = FrontRedirect::where('store_id', $store)->where('from', $from)->first();
-        $values = ['to' => $to, 'code' => 301, 'status' => 1, 'source' => FrontRedirect::SOURCE_AUTO];
+        $values = ['to' => $to, 'code' => 301, 'status' => 1, 'source' => $source];
         if ($existing !== null) {
             $existing->update($values);
 
-            return;
+            return (int) $existing->getKey();
         }
-        FrontRedirect::create($values + ['from' => $from, 'store_id' => $store]);
+
+        return (int) FrontRedirect::create($values + ['from' => $from, 'store_id' => $store])->getKey();
     }
 
     /**
@@ -180,7 +432,10 @@ class SeoUrlLifecycle
      */
     private static function releasePath(string $store, string $path): void
     {
-        $hidden = FrontRedirect::where('store_id', $store)->where('from', $path)->where('status', 1)->pluck('id');
+        // WHY the variants: findActive() also matches the normalised path with or without a trailing slash.
+        $normal = FrontRedirect::normalizePath($path);
+        $variants = array_values(array_unique([$path, $normal, $normal === '/' ? $normal : $normal . '/']));
+        $hidden = FrontRedirect::where('store_id', $store)->whereIn('from', $variants)->where('status', 1)->pluck('id');
         if ($hidden->isEmpty()) {
             return;
         }

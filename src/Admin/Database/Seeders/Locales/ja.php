@@ -80,6 +80,7 @@ return [
     'admin.seo_redirect.auto_switch' => '商品・カテゴリ・ブランド・ページのURL（エイリアス）を変更したら301リダイレクトを自動作成する',
     'admin.seo_redirect.auto_help' => '古いリンクからも新しいページへ案内されます。自動作成のリダイレクトには「自動」ラベルが付き、手動のものと同様に編集・無効化できます。',
     'admin.seo_redirect.source_auto' => '自動',
+    'admin.seo_redirect.source_import' => 'インポート',
     'admin.seo_not_found.title' => '404ログ',
     'admin.seo_not_found.switch' => '見つからないページ（404）を記録する',
     'admin.seo_not_found.help' => '404を返したストアのURLをURLごとにまとめて記録します。最大1,000行、90日間再発しない行は自動削除されます。訪問者のIPは保存しません。',

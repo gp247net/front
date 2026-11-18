@@ -329,6 +329,8 @@ class DataFrontLanguageSeeder extends Seeder
                 ['code' => 'admin.seo_redirect.auto_help','text' => 'Old links keep taking visitors to the new page. Automatic redirects carry the "Automatic" label and can be edited or switched off like your own.','position' => 'admin.seo_redirect','location' => 'en'],
                 ['code' => 'admin.seo_redirect.source_auto','text' => 'Tự động','position' => 'admin.seo_redirect','location' => 'vi'],
                 ['code' => 'admin.seo_redirect.source_auto','text' => 'Automatic','position' => 'admin.seo_redirect','location' => 'en'],
+                ['code' => 'admin.seo_redirect.source_import','text' => 'Nhập','position' => 'admin.seo_redirect','location' => 'vi'],
+                ['code' => 'admin.seo_redirect.source_import','text' => 'Imported','position' => 'admin.seo_redirect','location' => 'en'],
                 ['code' => 'admin.seo_not_found.title','text' => 'Nhật ký 404','position' => 'admin.seo_not_found','location' => 'vi'],
                 ['code' => 'admin.seo_not_found.title','text' => '404 log','position' => 'admin.seo_not_found','location' => 'en'],
                 ['code' => 'admin.seo_not_found.switch','text' => 'Ghi nhật ký trang không tìm thấy (404)','position' => 'admin.seo_not_found','location' => 'vi'],

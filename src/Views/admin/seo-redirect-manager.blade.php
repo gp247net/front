@@ -115,6 +115,8 @@
                         <code class="text-xs">{{ $row->from }}</code>
                         @if (($row->source ?? 'manual') === 'auto')
                             <x-gp247::badge color="blue" data-testid="seo-redirect-source-badge">{{ gp247_language_render('admin.seo_redirect.source_auto') }}</x-gp247::badge>
+                        @elseif (($row->source ?? 'manual') === 'import')
+                            <x-gp247::badge color="purple" data-testid="seo-redirect-source-badge">{{ gp247_language_render('admin.seo_redirect.source_import') }}</x-gp247::badge>
                         @endif
                         @include('gp247-admin::partials.store-scope-line', ['storeId' => $row->store_id])
                     </td>

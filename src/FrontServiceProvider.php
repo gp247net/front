@@ -255,9 +255,12 @@ class FrontServiceProvider extends ServiceProvider
 
             // Storefront 404 log (US-SEO-not-found-log): global, so addresses that match no
             // route are seen too; it does nothing unless the store switched the log on.
+            // RedirectOnNotFound is pushed after (inside) LogNotFound: a 404 it turns into a
+            // redirect is not logged (US-SEO-006, US-SEO-legacy-path-redirect).
             try {
                 $this->app->make(\Illuminate\Contracts\Http\Kernel::class)
-                    ->pushMiddleware(\GP247\Front\Middleware\LogNotFound::class);
+                    ->pushMiddleware(\GP247\Front\Middleware\LogNotFound::class)
+                    ->pushMiddleware(\GP247\Front\Middleware\RedirectOnNotFound::class);
             } catch (\Throwable $e) {
                 // WHY: the 404 log is optional; it must never abort boot.
             }
