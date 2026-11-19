@@ -6,7 +6,8 @@
  * Unit tracking-consent · ADR tracking-consent_deferred-script-activation,
  * tracking-consent_head-injection-via-meta-head · stories US-tracking-consent-preset-services,
  * US-tracking-consent-custom-code, US-tracking-consent-template-hook, US-tracking-consent-banner,
- * US-tracking-consent-consent-gate, US-tracking-consent-google-consent-mode.
+ * US-tracking-consent-consent-gate, US-tracking-consent-google-consent-mode,
+ * US-tracking-consent-commerce-events (ADR tracking-consent_commerce-event-contract).
  */
 (function (window, doc) {
     'use strict';
@@ -265,10 +266,224 @@
         var step = function () {
             if (pending.length) {
                 activate(pending.shift(), step);
+            } else {
+                flushCommerce();
             }
         };
         step();
     }
+
+    // ---- E-commerce events (TC-3) -------------------------------------------------
+
+    var META_EVENTS = { view_item: 'ViewContent', add_to_cart: 'AddToCart', begin_checkout: 'InitiateCheckout', purchase: 'Purchase' };
+    var PURCHASE_KEY = 'gp247_purchase_sent';
+    var CHECKOUT_KEY = 'gp247_checkout_sent';
+    var MAX_PURCHASES = 20;
+    var PAYLOAD_TEXT = ['transaction_id', 'currency'];
+    var PAYLOAD_NUMBERS = ['value', 'tax', 'shipping'];
+    var ITEM_TEXT = ['item_id', 'item_name', 'item_category', 'item_brand'];
+    var ITEM_NUMBERS = ['price', 'quantity'];
+    var commerceQueue = [];
+
+    /**
+     * Copy only the allowed fields, as text or numbers (NFR-SEC-tracking-no-personal-data).
+     * WHY here too: browser events come from any plugin or template, not through the server.
+     * @param {Object} payload
+     * @returns {Object}
+     */
+    function cleanPayload(payload) {
+        var copy = function (source, texts, numbers) {
+            var out = {};
+            texts.forEach(function (key) {
+                if (typeof source[key] === 'string' || typeof source[key] === 'number') { out[key] = String(source[key]); }
+            });
+            numbers.forEach(function (key) {
+                if (source[key] !== undefined && source[key] !== null && source[key] !== '' && !isNaN(Number(source[key]))) { out[key] = Number(source[key]); }
+            });
+            return out;
+        };
+        var clean = copy(payload, PAYLOAD_TEXT, PAYLOAD_NUMBERS);
+        clean.items = (Array.isArray(payload.items) ? payload.items : []).slice(0, 100).filter(function (item) {
+            return item && typeof item === 'object';
+        }).map(function (item) { return copy(item, ITEM_TEXT, ITEM_NUMBERS); });
+        return clean;
+    }
+
+    /**
+     * A checkout start identical to the last one sent in this browser tab session.
+     * WHY: reloading the checkout page, or coming back from a cancelled payment, is not a
+     * new start; sending it again would inflate the funnel.
+     * @param {Object} payload
+     * @returns {boolean}
+     */
+    function repeatedCheckout(payload) {
+        var signature = JSON.stringify([payload.currency, payload.value, payload.items.map(function (item) { return [item.item_id, item.quantity]; })]);
+        try {
+            if (window.sessionStorage.getItem(CHECKOUT_KEY) === signature) {
+                return true;
+            }
+            window.sessionStorage.setItem(CHECKOUT_KEY, signature);
+        } catch (e) {
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * Order ids whose purchase this browser already sent (localStorage may be blocked).
+     * @returns {Array<string>}
+     */
+    function sentPurchases() {
+        try {
+            var list = JSON.parse(window.localStorage.getItem(PURCHASE_KEY) || '[]');
+            return Array.isArray(list) ? list : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    /**
+     * @param {string} id Order id just sent.
+     */
+    function rememberPurchase(id) {
+        try {
+            var list = sentPurchases().filter(function (known) { return known !== id; });
+            list.push(id);
+            window.localStorage.setItem(PURCHASE_KEY, JSON.stringify(list.slice(-MAX_PURCHASES)));
+        } catch (e) {
+            // WHY ignore: private mode / blocked storage; GA4 still drops duplicates by transaction_id.
+        }
+    }
+
+    /**
+     * Queue one event for every service of the page.
+     * WHY drop a known purchase: a thank-you page restored from the browser cache must not
+     * count the order twice (ADR §5, RISK-TECH-tracking-purchase-double-count).
+     * @param {{type: string, payload: Object}} event
+     */
+    function queueCommerce(event) {
+        if (!event || !META_EVENTS[event.type] || !event.payload || typeof event.payload !== 'object') {
+            return;
+        }
+        var payload = cleanPayload(event.payload);
+        var id = payload.transaction_id;
+        if (event.type === 'purchase' && (!id || sentPurchases().indexOf(String(id)) !== -1)) {
+            return;
+        }
+        if (event.type === 'begin_checkout' && repeatedCheckout(payload)) {
+            return;
+        }
+        commerceQueue.push({ type: event.type, payload: payload, sent: {}, started: false });
+    }
+
+    /**
+     * A preset service whose code is running and whose group the visitor accepted.
+     * @param {string} service ga4|gtm|pixel
+     * @returns {boolean}
+     */
+    function serviceReady(service) {
+        var el = doc.querySelector(DORMANT + '[data-gp247-service="' + service + '"]');
+        if (!el || !el.hasAttribute('data-gp247-done') || !allowed(el.getAttribute('data-gp247-consent'))) {
+            return false;
+        }
+        if (service === 'ga4') {
+            return typeof window.gtag === 'function';
+        }
+        if (service === 'pixel') {
+            return typeof window.fbq === 'function';
+        }
+        return Array.isArray(window.dataLayer);
+    }
+
+    /**
+     * Hand one event to one service, in the format that service reads.
+     * @param {string} service
+     * @param {string} type
+     * @param {Object} p Payload: currency, value, items[], transaction_id.
+     */
+    function sendCommerce(service, type, p) {
+        var items = Array.isArray(p.items) ? p.items : [];
+        var params = { currency: p.currency, value: p.value, items: items };
+        ['transaction_id', 'tax', 'shipping'].forEach(function (key) {
+            if (p[key] !== undefined) {
+                params[key] = p[key];
+            }
+        });
+        if (service === 'ga4') {
+            // WHY gtag(), not a dataLayer object: gtag.js reads only its own command calls.
+            window.gtag('event', type, params);
+        } else if (service === 'gtm') {
+            // WHY clear first: GTM merges ecommerce objects of consecutive pushes.
+            window.dataLayer.push({ ecommerce: null });
+            window.dataLayer.push({ event: type, ecommerce: params });
+        } else if (service === 'pixel') {
+            window.fbq('track', META_EVENTS[type], {
+                content_ids: items.map(function (item) { return item.item_id; }),
+                contents: items.map(function (item) { return { id: item.item_id, quantity: item.quantity, item_price: item.price }; }),
+                content_type: 'product',
+                value: p.value,
+                currency: p.currency
+            });
+        }
+    }
+
+    /**
+     * Send every queued event to every ready service that has not had it yet — at once,
+     * or as soon as the visitor accepts the service's group on this page.
+     */
+    function flushCommerce() {
+        ['ga4', 'gtm', 'pixel'].forEach(function (service) {
+            if (!serviceReady(service)) {
+                return;
+            }
+            commerceQueue.forEach(function (event) {
+                if (event.sent[service]) {
+                    return;
+                }
+                // WHY check again: another tab of the same thank-you page may have sent the
+                // order while this one waited for consent.
+                if (event.type === 'purchase' && !event.started && sentPurchases().indexOf(String(event.payload.transaction_id)) !== -1) {
+                    event.sent = { ga4: true, gtm: true, pixel: true };
+                    return;
+                }
+                event.started = true;
+                event.sent[service] = true;
+                try {
+                    sendCommerce(service, event.type, event.payload);
+                } catch (e) {
+                    return;
+                }
+                if (event.type === 'purchase') {
+                    rememberPurchase(String(event.payload.transaction_id));
+                }
+            });
+        });
+    }
+
+    /**
+     * Events printed by the server for this page.
+     */
+    function readPageEvents() {
+        var el = doc.getElementById('gp247-commerce-events');
+        if (!el) {
+            return;
+        }
+        try {
+            var events = JSON.parse(el.textContent || '[]');
+            (Array.isArray(events) ? events : []).forEach(queueCommerce);
+        } catch (e) {
+            // WHY ignore: a broken block must not stop the tracking code of the page.
+        }
+    }
+
+    // Events of Livewire actions (add to cart) and of plugins / templates (open contract).
+    window.addEventListener('gp247-commerce', function (event) {
+        var detail = event.detail || {};
+        queueCommerce({ type: detail.type, payload: detail.payload });
+        if (config) {
+            flushCommerce();
+        }
+    });
 
     /**
      * Expire the cookies of the groups the visitor did not accept, on this host and its parents.
@@ -458,6 +673,8 @@
      * Banner on first visit (or after the policy version was raised) and the way back to it.
      */
     function start() {
+        config = config || readConfig();
+        readPageEvents();
         run();
         if (!config || config.mode === 'off' || !mountBanner()) {
             return;

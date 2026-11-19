@@ -102,8 +102,37 @@ final class TrackingHead
             /** @var CodeSnippet $snippet */
             $html .= DormantScript::wrap($snippet->content, $snippet->category, $snippet->region);
         }
+        // WHY only with a preset service: the events go to GA4 / GTM / Pixel only
+        // (US-tracking-consent-commerce-events "no service set ⇒ no event data on the page").
+        $events = $settings->hasAnyService() ? app(CommerceEventCollector::class)->pending() : [];
+        if ($events !== []) {
+            $html .= '<script type="application/json" id="gp247-commerce-events">' . DormantScript::json($events) . '</script>';
+        }
 
         return $html;
+    }
+
+    /**
+     * Gate the shop asks before building an e-commerce event payload: a storefront page of a
+     * store with tracking on and GA4, GTM or Meta Pixel set. Never throws.
+     *
+     * @param string $type Event type (unused: every type goes to the same services).
+     * @return bool
+     *
+     * @aidlc-story US-tracking-consent-commerce-events
+     */
+    public static function wantsCommerceEvents(string $type = ''): bool
+    {
+        try {
+            if (self::isAdminRequest() || !TrackingSettingsService::installed()) {
+                return false;
+            }
+            $settings = TrackingSettingsService::forStore(config('app.storeId'));
+
+            return $settings->enabled && $settings->hasAnyService();
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     /**

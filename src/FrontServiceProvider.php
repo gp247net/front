@@ -97,6 +97,17 @@ class FrontServiceProvider extends ServiceProvider
         // browser; encrypting it would make the server read it as empty (ADR
         // tracking-consent_deferred-script-activation §3).
         \Illuminate\Cookie\Middleware\EncryptCookies::except(\GP247\Front\Tracking\Application\TrackingHead::CONSENT_COOKIE);
+        // E-commerce events of gp247/shop for the tracking layer, by class name so front
+        // runs with or without the shop (NFR-MAINT-tracking-soft-coupling).
+        $this->app->scoped(\GP247\Front\Tracking\Application\CommerceEventCollector::class);
+        if (class_exists(\GP247\Front\Tracking\Application\CommerceEventCollector::SHOP_EVENT)) {
+            // The shop builds a payload only when this says a tracking service is set.
+            config(['gp247-config.shop.commerce_event_gate' => [\GP247\Front\Tracking\Application\TrackingHead::class, 'wantsCommerceEvents']]);
+            \Illuminate\Support\Facades\Event::listen(
+                \GP247\Front\Tracking\Application\CommerceEventCollector::SHOP_EVENT,
+                [\GP247\Front\Tracking\Application\CommerceEventCollector::class, 'handle']
+            );
+        }
 
         //Load publish
         try {
