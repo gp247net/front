@@ -8,6 +8,7 @@ use GP247\Core\AdminShell\Support\AdminAlertService;
 use GP247\Core\Models\AdminStore;
 use GP247\Front\Tracking\Application\PolicyPages;
 use GP247\Front\Tracking\Application\SnippetService;
+use GP247\Front\Tracking\Application\TemplateSupport;
 use GP247\Front\Tracking\Application\TrackingSettingsService;
 use GP247\Front\Tracking\Domain\CodeSnippet;
 use GP247\Front\Tracking\Domain\ConsentCategory;
@@ -120,6 +121,7 @@ class TrackingSettings extends GP247AdminComponent
             return;
         }
         $this->loadSettings();
+        $this->refreshAlerts();
         $this->notify('success', gp247_language_render('admin.setting_saved'));
     }
 
@@ -155,6 +157,7 @@ class TrackingSettings extends GP247AdminComponent
             return;
         }
         $this->loadSettings();
+        $this->refreshAlerts();
         $this->notify('success', gp247_language_render('admin.setting_saved'));
     }
 
@@ -181,6 +184,7 @@ class TrackingSettings extends GP247AdminComponent
         $this->authorizeAdministrator();
         TrackingSettingsService::saveSwitch($this->currentStore(), 'tracking_enabled', $this->enabled);
         $this->loadSettings();
+        $this->refreshAlerts();
         $this->notify('success', gp247_language_render('admin.setting_saved'));
     }
 
@@ -197,6 +201,7 @@ class TrackingSettings extends GP247AdminComponent
         }
         TrackingSettingsService::saveSwitch($this->currentStore(), 'tracking_snippet_own', $this->snippetOwn);
         $this->loadSettings();
+        $this->refreshAlerts();
         $this->notify('success', gp247_language_render('admin.setting_saved'));
     }
 
@@ -214,6 +219,7 @@ class TrackingSettings extends GP247AdminComponent
         }
         TrackingSettingsService::resetToRoot($this->currentStore(), $key);
         $this->loadSettings();
+        $this->refreshAlerts();
         $this->notify('success', gp247_language_render('admin.setting_saved'));
     }
 
@@ -273,6 +279,7 @@ class TrackingSettings extends GP247AdminComponent
         }
         $changed = SnippetService::save($this->currentStore(), $snippets);
         $this->load();
+        $this->refreshAlerts();
         $this->notify('success', gp247_language_render($changed ? 'admin.setting_saved' : 'admin.tracking.no_change'));
     }
 
@@ -295,6 +302,8 @@ class TrackingSettings extends GP247AdminComponent
             'offWithCode' => $effective->bannerMode === Settings::MODE_OFF
                 && ($effective->hasAnyService() || SnippetService::activeFor($store, $effective) !== []),
             'maxBannerText' => Settings::MAX_BANNER_TEXT,
+            // WHY: a template without meta-head runs no tracking code at all (template-hook).
+            'templateMissing' => TemplateSupport::callsMetaHead(TemplateSupport::templateOf($store)) ? '' : TemplateSupport::templateOf($store),
             'storeOptions' => $this->multiStore() ? $this->storeOptions() : [],
             'isSubStore' => $isSub,
             'rootOff' => $isSub && !TrackingSettingsService::forStore(TrackingSettingsService::rootId())->enabled,
@@ -417,6 +426,20 @@ class TrackingSettings extends GP247AdminComponent
         }
 
         return $options;
+    }
+
+    /**
+     * Re-evaluate the system alerts so the tracking warning follows a save at once.
+     *
+     * @return void
+     */
+    private function refreshAlerts(): void
+    {
+        try {
+            app(AdminAlertService::class)->refresh();
+        } catch (\Throwable $e) {
+            // WHY ignore: the alert block re-checks on its own after its TTL.
+        }
     }
 
     /**

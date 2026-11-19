@@ -275,6 +275,7 @@ class FrontServiceProvider extends ServiceProvider
             // WHY class_exists: front keeps booting on a core without the alert registry.
             if (class_exists(\GP247\Core\AdminShell\Support\AdminAlertRegistry::class)) {
                 \GP247\Core\AdminShell\Support\AdminAlertRegistry::register(\GP247\Front\Support\SeoHealthCheck::class);
+                \GP247\Core\AdminShell\Support\AdminAlertRegistry::register(\GP247\Front\Tracking\Application\TrackingHealthCheck::class);
             }
 
             // Storefront 404 log (US-SEO-not-found-log): global, so addresses that match no

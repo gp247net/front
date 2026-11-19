@@ -48,6 +48,9 @@
                 :label="gp247_language_render('admin.tracking.enabled')"
                 :help="gp247_language_render('admin.tracking.enabled_help')"
             />
+            @if ($templateMissing !== '')
+                <x-gp247::alert type="warning" data-testid="tracking-settings-template-warning">{{ gp247_language_render('admin.tracking.template_missing', ['template' => $templateMissing]) }}</x-gp247::alert>
+            @endif
             @if ($rootOff)
                 <x-gp247::alert type="warning" data-testid="tracking-settings-root-off">{{ gp247_language_render('admin.tracking.disabled_by_root') }}</x-gp247::alert>
             @endif
