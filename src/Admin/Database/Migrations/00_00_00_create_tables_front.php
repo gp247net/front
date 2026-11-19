@@ -147,6 +147,9 @@ return new class extends Migration
         // 404 log (SEO phase 2): one definition shared with the upgrade migration.
         \GP247\Front\Support\SeoUrlLifecycleInstaller::install();
 
+        // Tracking code blocks + their revisions (tracking-consent): one definition shared with the upgrade migration.
+        \GP247\Front\Tracking\Infrastructure\TrackingInstaller::createTables();
+
         $schema->create(
             GP247_DB_PREFIX.'front_country',
             function (Blueprint $table) {
@@ -206,6 +209,8 @@ return new class extends Migration
         \GP247\Front\Support\SeoMetaInstaller::dropTables();
         // WARNING: drops the storefront 404 log.
         \GP247\Front\Support\SeoUrlLifecycleInstaller::dropTables();
+        // WARNING: drops the custom tracking code blocks and their before/after revisions.
+        \GP247\Front\Tracking\Infrastructure\TrackingInstaller::dropTables();
 
     }
 };

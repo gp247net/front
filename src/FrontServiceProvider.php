@@ -85,6 +85,19 @@ class FrontServiceProvider extends ServiceProvider
             gp247_report('#GP247-FRONT::template_assets:: '.$e->getMessage());
         }
 
+        // Consent loader of the tracking layer (tracking-consent): for every template,
+        // refreshed when the package ships a new build. A failed copy only means no
+        // tracking code runs, so it is reported and the boot goes on.
+        try {
+            \GP247\Front\Tracking\Infrastructure\TrackingAssets::sync();
+        } catch (\Throwable $e) {
+            gp247_report('#GP247-FRONT::tracking_assets:: '.$e->getMessage());
+        }
+        // WHY: the consent cookie is written and read by the consent loader in the
+        // browser; encrypting it would make the server read it as empty (ADR
+        // tracking-consent_deferred-script-activation §3).
+        \Illuminate\Cookie\Middleware\EncryptCookies::except(\GP247\Front\Tracking\Application\TrackingHead::CONSENT_COOKIE);
+
         //Load publish
         try {
             $this->registerPublishing();
@@ -468,6 +481,7 @@ class FrontServiceProvider extends ServiceProvider
 
             $this->publishes([__DIR__.'/Views/admin' => resource_path('views/vendor/gp247-front-admin')], 'gp247:front-admin');
             $this->publishes([__DIR__.'/public/js/sweetalert2.all.min.js' => public_path('GP247/Core/js/sweetalert2.all.min.js')], 'gp247:front-assets');
+            $this->publishes([__DIR__.'/Resources/tracking' => public_path(\GP247\Front\Tracking\Infrastructure\TrackingAssets::PUBLIC_DIR)], 'gp247:front-tracking');
         }
     }
 

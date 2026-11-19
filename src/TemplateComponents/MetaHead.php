@@ -4,6 +4,7 @@ namespace GP247\Front\TemplateComponents;
 
 use GP247\Front\Library\SeoContentMeta;
 use GP247\Front\Library\SeoMeta;
+use GP247\Front\Tracking\Application\TrackingHead;
 
 /**
  * Shared <head> block: meta/OG/favicon/csrf plus the full SEO surface
@@ -186,6 +187,35 @@ class MetaHead extends BaseFrontViewComponent
         }
 
         return $image;
+    }
+
+    /**
+     * The resolved meta-head view (package default or the template's override) followed
+     * by the tracking layer of Unit tracking-consent. Hooked on the class, not the view,
+     * because templates override the view (GP247EC, GP247MKP) but every template calls
+     * the component — no template has to be ported
+     * (ADR tracking-consent_head-injection-via-meta-head). The tracking logic lives in
+     * TrackingHead; this method only joins the two outputs.
+     *
+     * WHY an HtmlString from a closure: a plain string returned from render() is compiled
+     * as Blade, and custom code pasted by the site owner (`@php`, `{{ }}`) must never be
+     * executed as a template.
+     *
+     * @return \Closure
+     *
+     * @aidlc-unit tracking-consent
+     * @aidlc-story US-tracking-consent-template-hook
+     * @aidlc-adr tracking-consent_head-injection-via-meta-head
+     */
+    public function resolveView()
+    {
+        $view = parent::resolveView();
+
+        return static function (array $data = []) use ($view) {
+            $head = $view instanceof \Illuminate\Contracts\View\View ? $view->with($data)->render() : (string) $view;
+
+            return new \Illuminate\Support\HtmlString($head . TrackingHead::html());
+        };
     }
 
     protected function templateViewKey(): string

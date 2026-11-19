@@ -90,6 +90,8 @@
             <p>&copy; {{ date('Y') }} {{ gp247_store_info(key: 'name', default: null) }}. All rights reserved.</p>
         @endif
         <div class="flex items-center gap-3">
+            {{-- Shown by the consent loader only when the cookie banner is on (tracking-consent). --}}
+            <button type="button" class="hover:text-white transition" data-gp247-consent-open data-testid="tracking-consent-footer-settings" hidden>{{ gp247_language_render('front.consent.settings') }}</button>
             @if (gp247_config('fanpage_url'))
                 <a target="_blank" href="{{ gp247_config('fanpage_url') }}" class="hover:text-white transition">Fanpage FB</a>
             @endif

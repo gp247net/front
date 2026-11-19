@@ -93,6 +93,8 @@ class DataFrontDefaultSeeder extends Seeder
                 // Same row as the SEO phase 2 upgrade migration writes.
                 \GP247\Front\Support\SeoUrlLifecycleInstaller::menuRow((int) $idBlockSeo),
                 \GP247\Front\Support\SeoUrlLifecycleInstaller::auditMenuRow((int) $idBlockSeo),
+                // "Tracking code & cookies" (tracking-consent) — same row as the upgrade migration writes.
+                \GP247\Front\Tracking\Infrastructure\TrackingInstaller::menuRow((int) $idBlockSeo),
             ]
         );
 
@@ -266,6 +268,9 @@ class DataFrontDefaultSeeder extends Seeder
         \GP247\Front\Support\ContactInstaller::moveLegacyMailToggles();
         \GP247\Front\Support\ContactInstaller::seedConfig();
         \GP247\Front\Support\ContactInstaller::seedAdmin();
+
+        // Tracking settings on ROOT (tracking-consent): nothing set, switch on, banner off (Q21).
+        \GP247\Front\Tracking\Infrastructure\TrackingInstaller::seedConfig();
 
         // Language rows are seeded by the dedicated DataFrontLanguageSeeder so
         // they can be refreshed independently of menu/banner/page/link data.

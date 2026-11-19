@@ -91,6 +91,13 @@
                     <p>{{ gp247_language_render('admin.seo.verify_steps_bing') }}</p>
                 </div>
             </details>
+            {{-- Tracking code lives on its own screen (Q5, Unit tracking-consent): owners who look for GA4 here find the way. --}}
+            <p class="{{ $hint }}" data-testid="seo-meta-tracking-link">
+                <i class="{{ $hintIcon }}"></i>
+                <span>{{ gp247_language_render('admin.tracking.seo_link_hint') }}
+                    <a href="{{ gp247_route_admin('admin_tracking.index') }}" class="text-blue-600 hover:underline dark:text-blue-400">{{ gp247_language_render('admin.menu_titles.tracking') }}</a>
+                </span>
+            </p>
         </div>
     </x-gp247::card>
 
