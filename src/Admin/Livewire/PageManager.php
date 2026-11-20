@@ -8,7 +8,9 @@ use GP247\Core\Models\AdminLanguage;
 use GP247\Front\Admin\Livewire\Concerns\HasSeoPanel;
 use GP247\Front\Models\FrontPage;
 use GP247\Front\Models\FrontPageDescription;
+use GP247\Front\Support\PageDuplicator;
 use Illuminate\Contracts\View\View;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Page (CMS) manager — two-panel screen (form left, list right) following the
@@ -19,8 +21,8 @@ use Illuminate\Contracts\View\View;
  * Carries the shared SEO panel (HasSeoPanel, US-SEO-content-meta, modification 20261117T140612).
  *
  * @aidlc-unit front-admin
- * @aidlc-story US-FADM-002, US-SEO-content-meta
- * @aidlc-adr ADR-001, ADR-005, ADR-006, ADR-007
+ * @aidlc-story US-FADM-002, US-SEO-content-meta, US-FADM-page-duplicate
+ * @aidlc-adr ADR-001, ADR-005, ADR-006, ADR-007, front-admin_page-duplicate
  */
 class PageManager extends ResourcePanel
 {
@@ -323,6 +325,52 @@ class PageManager extends ResourcePanel
         if (function_exists('gp247_cache_clear')) {
             gp247_cache_clear('cache_page');
         }
+    }
+
+    /**
+     * Duplicate a page (list row or edit form) and open the copy for editing. Allowed to
+     * whoever may create pages; the original is read through baseQuery(), so a store admin
+     * only reaches pages of their own store. The stored page is duplicated, not unsaved
+     * input on the form.
+     *
+     * @param int|string $id Page to duplicate.
+     * @return void
+     * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When the admin may not create pages.
+     *
+     * @aidlc-unit front-admin
+     * @aidlc-story US-FADM-page-duplicate
+     * @aidlc-adr front-admin_page-duplicate
+     */
+    public function duplicate($id): void
+    {
+        $this->authorizeAction('store');
+
+        // WHY baseQuery(): $id comes from the browser — a store-admin must not read another store's page.
+        $source = $this->baseQuery()->find($id);
+        if ($source === null) {
+            $this->notify('error', gp247_language_render('admin.display.data_not_found'));
+
+            return;
+        }
+
+        try {
+            $copy = (new PageDuplicator)->duplicate($source);
+        } catch (ValidationException $e) {
+            // WHY: stored values of the original that no longer pass today's rules (e.g. an old
+            // SEO canonical) — the whole copy was rolled back; tell the admin how to fix it.
+            gp247_report(msg: 'Page duplicate rolled back (' . $source->id . '): ' . json_encode($e->errors()), channel: null);
+            $this->notify('error', gp247_language_render('admin.page.duplicate_failed'));
+
+            return;
+        }
+
+        // WHY: same cached page-title lists as persist() / deleteModel().
+        if (function_exists('gp247_cache_clear')) {
+            gp247_cache_clear('cache_page');
+        }
+        $this->editRow((string) $copy->id);
+        $this->showRecordPage((string) $copy->id);
+        $this->notify('success', gp247_language_render('admin.page.duplicate_success'));
     }
 
     /**

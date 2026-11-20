@@ -6,7 +6,7 @@
     UI text via gp247_language_render.
 
     @aidlc-unit front-admin
-    @aidlc-story US-FADM-002
+    @aidlc-story US-FADM-002, US-FADM-page-duplicate
     @aidlc-adr ADR-001, ADR-005, ADR-006, ADR-007
 
     Variables: $rows (FrontPage paginator, descriptions eager-loaded),
@@ -18,6 +18,12 @@
     {{-- Left: add / edit form --}}
     <x-gp247::card :title="gp247_language_render($editingId ? 'action.edit' : 'admin.page.add_new')">
         <x-slot:actions>
+            @if ($editingId)
+                {{-- Duplicates the SAVED page, not unsaved input (US-FADM-page-duplicate). --}}
+                <x-gp247::button size="sm" variant="ghost" wire:click="duplicate('{{ $editingId }}')" wire:confirm="{{ gp247_language_render('admin.page.duplicate_confirm') }}" wire:loading.attr="disabled" wire:target="duplicate" title="{{ gp247_language_render('admin.page.duplicate') }}" data-testid="admin-page-form-duplicate">
+                    <i class="fas fa-copy"></i> {{ gp247_language_render('admin.page.duplicate') }}
+                </x-gp247::button>
+            @endif
             <x-gp247::form-new-button :editing="$editingId" data-testid="admin-page-form-new" />
         </x-slot:actions>
         <form wire:submit="save" class="space-y-4">
@@ -134,6 +140,7 @@
                     <td class="px-4 py-3">
                         <div class="flex items-center justify-end gap-1">
                             <x-gp247::button size="sm" variant="ghost" wire:click="editRow('{{ $row->id }}')" data-testid="admin-page-list-edit"><i class="fas fa-edit"></i></x-gp247::button>
+                            <x-gp247::button size="sm" variant="ghost" wire:click="duplicate('{{ $row->id }}')" wire:confirm="{{ gp247_language_render('admin.page.duplicate_confirm') }}" title="{{ gp247_language_render('admin.page.duplicate') }}" data-testid="admin-page-list-duplicate"><i class="fas fa-copy"></i></x-gp247::button>
                             <x-gp247::button size="sm" variant="ghost" wire:click="delete('{{ $row->id }}')" data-testid="admin-page-list-delete" wire:confirm="{{ gp247_language_render('action.delete_confirm') }}"><i class="fas fa-trash-alt text-red-600"></i></x-gp247::button>
                         </div>
                     </td>
