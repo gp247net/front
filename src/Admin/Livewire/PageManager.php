@@ -404,11 +404,17 @@ class PageManager extends ResourcePanel
     }
 
     /**
+     * Screen title — the same label as the menu item ("Page manager").
+     *
+     * WHY not admin.page.title: that key holds the legacy column label ("Title"), so the
+     * screen showed "Title" as its heading. The menu key is seeded by front on every site,
+     * so no migration or language overwrite is needed.
+     *
      * @return string
      */
     protected function pageTitle(): string
     {
-        return gp247_language_render('admin.page.title');
+        return gp247_language_render('admin.menu_titles.page_manager');
     }
 
     /**

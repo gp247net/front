@@ -94,7 +94,7 @@
     </x-gp247::card>
 
     {{-- Right: list --}}
-    <x-gp247::card :title="gp247_language_render('admin.page.title')">
+    <x-gp247::card :title="gp247_language_render('admin.menu_titles.page_manager')">
         <div class="mb-3">
             <x-gp247::search-box :placeholder="$this->searchPlaceholder()" :hint="$this->searchHint()" />
         </div>
