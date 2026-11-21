@@ -64,9 +64,39 @@ return [
         //     and declares the displayed content with SeoContentMeta::subject().
         //     Optional `route`: detail route taking `alias` (+ `lang`) — enables the
         //     automatic 301 on alias change and IndexNow (SeoUrlLifecycle, SEO phase 2).
+        //     Optional `source`: where the content lives, so tools that list content
+        //     (SEO check, plugins) cover the type — ['table', 'class' (Eloquent model
+        //     owning the table), 'name' (label column), 'desc' + 'fk' (per-language
+        //     table), 'text' (long text columns), 'edit_route' (admin route taking
+        //     `id`)]; read through SeoContentMeta::sources() (modification 20261120T212919).
         'seo_content_types' => [
-            'page' => ['label' => 'admin.seo.type_page', 'route' => 'front.page.detail'],
+            'page' => [
+                'label' => 'admin.seo.type_page',
+                'route' => 'front.page.detail',
+                'source' => [
+                    'table' => 'front_page',
+                    'class' => \GP247\Front\Models\FrontPage::class,
+                    'desc' => 'front_page_description',
+                    'fk' => 'page_id',
+                    'name' => 'name',
+                    'text' => ['content'],
+                    'edit_route' => 'admin_page.edit',
+                ],
+            ],
         ],
+        //   seo_jsonld_extenders: ['Product' | 'Offer' | 'Organization' => [callable, …]]
+        //     — callable (array $context): array of extra schema.org fields merged into
+        //     the one block SeoMeta prints; fields already present are never
+        //     overwritten, the first registered wins, a failing callable is skipped.
+        //     Product/Offer context: product_id, store_id, price, currency, url (only
+        //     while a product is the displayed content); Organization: store_id, url.
+        'seo_jsonld_extenders' => [],
+        //   seo_redirect_sources: ['<source>' => ['label' => '<language key>']] — a
+        //     package/plugin writing redirects through
+        //     SeoUrlLifecycle::redirectToContent() under its own source name
+        //     ([a-z0-9_-]{1,10}, not manual/auto/import); the label is shown on the
+        //     "Redirect 301" screen.
+        'seo_redirect_sources' => [],
         // Storefront extension points a plugin can render into WITHOUT editing a
         // template (ADR front_storefront-plugin-hooks). Shape:
         //   ['<hook-name>' => [ ['key' => 'PluginKey', 'callback' => [Class, 'method']], ... ]]

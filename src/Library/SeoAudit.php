@@ -201,26 +201,15 @@ class SeoAudit
     }
 
     /**
-     * Content sources of the registered SEO types known to this package.
+     * Content sources of the registered SEO types — declared by the package or plugin
+     * owning each type (US-SEO-content-type-registry), so a plugin's content is checked
+     * like the built-in types.
      *
-     * @return array<string, array{table: string, desc: ?string, fk: ?string, route: string}>
+     * @return array<string, array{table: string, desc: ?string, fk: ?string, name: string, text: array, edit_route: ?string, class: string}>
      */
     private static function sources(): array
     {
-        $known = [
-            'page' => ['table' => 'front_page', 'desc' => 'front_page_description', 'fk' => 'page_id', 'route' => 'admin_page.edit', 'class' => \GP247\Front\Models\FrontPage::class],
-            'product' => ['table' => 'shop_product', 'desc' => 'shop_product_description', 'fk' => 'product_id', 'route' => 'admin_product.edit', 'class' => 'GP247\Shop\Models\ShopProduct'],
-            'category' => ['table' => 'shop_category', 'desc' => 'shop_category_description', 'fk' => 'category_id', 'route' => 'admin_category.edit', 'class' => 'GP247\Shop\Models\ShopCategory'],
-            'brand' => ['table' => 'shop_brand', 'desc' => null, 'fk' => null, 'route' => 'admin_brand.edit', 'class' => 'GP247\Shop\Models\ShopBrand'],
-        ];
-        $sources = [];
-        foreach (array_keys(SeoContentMeta::types()) as $type) {
-            if (isset($known[$type]) && class_exists($known[$type]['class'])) {
-                $sources[$type] = $known[$type];
-            }
-        }
-
-        return $sources;
+        return SeoContentMeta::sources();
     }
 
     /**
@@ -254,14 +243,18 @@ class SeoAudit
     }
 
     /**
-     * SQL of the label shown for a content row (own SEO title, else its name).
+     * SQL of the label shown for a content row (own SEO title, else its name). The name
+     * column comes from the type's declared source: already checked against a strict
+     * identifier pattern and the table's real columns (SeoContentMeta::sources()), and
+     * quoted here by the connection's grammar as a second guard.
      *
      * @param array $src
      * @return string
      */
     private static function titleSql(array $src): string
     {
-        $name = $src['desc'] !== null ? 'd.name' : 'c.name';
+        $column = DB::connection(GP247_DB_CONNECTION)->getQueryGrammar()->wrap($src['name']);
+        $name = ($src['desc'] !== null ? 'd.' : 'c.') . $column;
 
         return "COALESCE(NULLIF(TRIM(sd.title), ''), " . $name . ')';
     }
@@ -289,7 +282,7 @@ class SeoAudit
                 $rows = (clone $q)->selectRaw('c.id, ' . self::titleSql($src) . ' as label')
                     ->orderByDesc('c.updated_at')->limit(self::MAX_EXAMPLES - count($examples))->get();
                 foreach ($rows as $row) {
-                    $examples[] = self::example($type, (string) $row->id, (string) $row->label, $src['route']);
+                    $examples[] = self::example($type, (string) $row->id, (string) $row->label, $src['edit_route']);
                 }
             }
         }
@@ -345,7 +338,7 @@ class SeoAudit
                 if ($target !== '' && $target !== $host) {
                     $count++;
                     if (count($examples) < self::MAX_EXAMPLES) {
-                        $examples[] = self::example($type, (string) $row->id, (string) $row->label, $src['route']);
+                        $examples[] = self::example($type, (string) $row->id, (string) $row->label, $src['edit_route']);
                     }
                 }
             }
@@ -395,7 +388,7 @@ class SeoAudit
                     ->selectRaw('c.id, ' . $title . ' as label')
                     ->orderByRaw($title)->limit(self::MAX_EXAMPLES - count($examples))->get();
                 foreach ($rows as $row) {
-                    $examples[] = self::example($type, (string) $row->id, (string) $row->label, $src['route']);
+                    $examples[] = self::example($type, (string) $row->id, (string) $row->label, $src['edit_route']);
                 }
             }
         }
@@ -573,12 +566,12 @@ class SeoAudit
      * @param string $type
      * @param string $id
      * @param string $label Text typed by staff — escape when printed.
-     * @param string $route Admin edit route name.
+     * @param string|null $route Admin edit route name (a type may declare none).
      * @return array{type: string, id: string, label: string, url: string}
      */
-    private static function example(string $type, string $id, string $label, string $route): array
+    private static function example(string $type, string $id, string $label, ?string $route): array
     {
-        $url = Route::has($route) ? gp247_route_admin($route, ['id' => $id]) : '';
+        $url = $route !== null && Route::has($route) ? gp247_route_admin($route, ['id' => $id]) : '';
 
         return ['type' => $type, 'id' => $id, 'label' => mb_substr($label, 0, 255), 'url' => (string) $url];
     }

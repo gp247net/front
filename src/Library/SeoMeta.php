@@ -375,10 +375,11 @@ class SeoMeta
      * @param string      $name    Organisation / store name.
      * @param string      $url     Canonical site URL.
      * @param string|null $logoUrl Absolute URL to the logo image (optional).
-     * @return string  JSON-LD encoded string safe for inline <script> use.
+     * @return string  JSON-LD encoded string safe for inline <script> use, with the fields
+     *                 of the registered Organization extenders (SeoJsonLdExtenders).
      *
      * @aidlc-unit seo
-     * @aidlc-story US-SEO-005
+     * @aidlc-story US-SEO-005, US-SEO-jsonld-extenders
      */
     public static function buildOrganizationJsonLd(
         string $name,
@@ -395,6 +396,10 @@ class SeoMeta
         if ($logoUrl !== null && $logoUrl !== '') {
             $data['logo'] = $logoUrl;
         }
+        $data = SeoJsonLdExtenders::extend(SeoJsonLdExtenders::ORGANIZATION, $data, [
+            'store_id' => (string) config('app.storeId'),
+            'url' => $url,
+        ]);
 
         return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
     }
@@ -453,10 +458,12 @@ class SeoMeta
      * @param string|null $mpn             Manufacturer part number.
      * @param string|null $priceValidUntil Y-m-d end of the price shown (running promotion).
      * @param array|null  $rating          AggregateRating from {@see productRating()}.
-     * @return string  JSON-LD encoded string; empty optional fields are omitted.
+     * @return string  JSON-LD encoded string; empty optional fields are omitted. Fields of
+     *                 the registered Product / Offer extenders are added while a product is
+     *                 the displayed content (SeoJsonLdExtenders).
      *
      * @aidlc-unit seo
-     * @aidlc-story US-SEO-005
+     * @aidlc-story US-SEO-005, US-SEO-jsonld-extenders
      */
     public static function buildProductJsonLd(
         string $name,
@@ -500,6 +507,11 @@ class SeoMeta
         }
         if (!empty($rating)) {
             $data['aggregateRating'] = $rating;
+        }
+        $context = SeoJsonLdExtenders::productContext($price, $currency, $url);
+        if ($context !== null) {
+            $data = SeoJsonLdExtenders::extend(SeoJsonLdExtenders::PRODUCT, $data, $context);
+            $data['offers'] = SeoJsonLdExtenders::extend(SeoJsonLdExtenders::OFFER, $data['offers'], $context);
         }
 
         return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);

@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  * addresses through redirectLegacyPath(), under the same rules.
  *
  * @aidlc-unit seo
- * @aidlc-story US-SEO-alias-auto-redirect, US-SEO-indexnow, US-SEO-legacy-path-redirect
+ * @aidlc-story US-SEO-alias-auto-redirect, US-SEO-indexnow, US-SEO-legacy-path-redirect, US-SEO-plugin-redirect-source
  * @aidlc-adr ADR-seo-url-lifecycle
  */
 class SeoUrlLifecycle
@@ -181,6 +181,64 @@ class SeoUrlLifecycle
         }
 
         return self::writeRedirect((string) $storeId, $check['from'], $check['to'], FrontRedirect::SOURCE_IMPORT);
+    }
+
+    /**
+     * Whether a 301 from a path to a content of this site can be written, without writing
+     * it. Same rules and reasons as checkLegacyPath(); for packages and plugins writing
+     * redirects under their own source (redirectToContent()).
+     *
+     * @param int|string $storeId Store of the content.
+     * @param string     $from    Path to send away (`/old-name`), never a full URL.
+     * @param string     $type    Registered SEO content type with a `route`.
+     * @param string     $alias   Alias of the content on this site.
+     * @return string One of the LEGACY_* reasons.
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-plugin-redirect-source
+     * @aidlc-adr ADR-seo-url-lifecycle
+     */
+    public static function checkContentRedirect($storeId, string $from, string $type, string $alias): string
+    {
+        return self::inspectLegacyPath($storeId, $from, $type, $alias)['reason'];
+    }
+
+    /**
+     * Write a 301 from a path to the content's address under a source a package or
+     * plugin registered in `gp247-config.front.seo_redirect_sources`, with the rules of
+     * redirectLegacyPath(). An identical redirect that already exists is confirmed as
+     * it is (its source stays with whoever made it).
+     *
+     * @param int|string $storeId Store of the content.
+     * @param string     $from    Path to send away (`/old-name`), never a full URL.
+     * @param string     $type    Registered SEO content type with a `route`.
+     * @param string     $alias   Alias of the content on this site.
+     * @param string     $source  Registered source name.
+     * @return int|null Redirect id, or null when the source is not registered or the
+     *                  path is skipped (see checkContentRedirect()).
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-plugin-redirect-source
+     * @aidlc-adr ADR-seo-url-lifecycle
+     */
+    public static function redirectToContent($storeId, string $from, string $type, string $alias, string $source): ?int
+    {
+        if (!FrontRedirect::isRegisteredSource($source)) {
+            Log::warning('Redirect refused: source is not registered in seo_redirect_sources', ['source' => $source]);
+
+            return null;
+        }
+        $check = self::inspectLegacyPath($storeId, $from, $type, $alias);
+        if ($check['reason'] === self::LEGACY_ALREADY_REDIRECTED) {
+            $existing = FrontRedirect::where('store_id', (string) $storeId)->where('from', $check['from'])->value('id');
+
+            return $existing !== null ? (int) $existing : null;
+        }
+        if ($check['reason'] !== self::LEGACY_OK) {
+            return null;
+        }
+
+        return self::writeRedirect((string) $storeId, $check['from'], $check['to'], $source);
     }
 
     /**
@@ -363,7 +421,7 @@ class SeoUrlLifecycle
      * @param string $store
      * @param string $from   Normalised source path.
      * @param string $to     Target path.
-     * @param string $source FrontRedirect::SOURCE_*.
+     * @param string $source FrontRedirect::SOURCE_* or a registered source.
      * @return int Redirect id.
      */
     private static function writeRedirect(string $store, string $from, string $to, string $source): int

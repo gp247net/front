@@ -38,6 +38,52 @@ class FrontRedirect extends Model
     /** Redirect written for an address of a previous platform (US-SEO-legacy-path-redirect). */
     public const SOURCE_IMPORT = 'import';
 
+    /** Source names a package or plugin may register (fits the `source` column). */
+    public const SOURCE_PATTERN = '/^[a-z0-9_-]{1,10}$/';
+
+    /**
+     * Whether a package or plugin registered this source name in
+     * `gp247-config.front.seo_redirect_sources`; the base's own sources never count.
+     *
+     * @param string $source
+     * @return bool
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-plugin-redirect-source
+     */
+    public static function isRegisteredSource(string $source): bool
+    {
+        return preg_match(self::SOURCE_PATTERN, $source) === 1
+            && !in_array($source, [self::SOURCE_MANUAL, self::SOURCE_AUTO, self::SOURCE_IMPORT], true)
+            && is_array(config('gp247-config.front.seo_redirect_sources.' . $source));
+    }
+
+    /**
+     * Label of a source on the "Redirect 301" screen: the base's own labels, the label a
+     * package or plugin registered, or the raw name once that plugin is gone.
+     *
+     * @param string|null $source
+     * @return string Empty for hand-made redirects (no badge).
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-plugin-redirect-source
+     */
+    public static function sourceLabel(?string $source): string
+    {
+        $source = (string) ($source ?? self::SOURCE_MANUAL);
+        if ($source === '' || $source === self::SOURCE_MANUAL) {
+            return '';
+        }
+        if ($source === self::SOURCE_AUTO || $source === self::SOURCE_IMPORT) {
+            return gp247_language_render('admin.seo_redirect.source_' . $source);
+        }
+        $label = config('gp247-config.front.seo_redirect_sources.' . $source . '.label');
+
+        return self::isRegisteredSource($source) && is_string($label) && $label !== ''
+            ? gp247_language_render($label)
+            : $source;
+    }
+
     /**
      * Find an active redirect for the given path within the current store.
      *

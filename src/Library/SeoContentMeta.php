@@ -7,6 +7,7 @@ use GP247\Front\Controllers\SeoController;
 use GP247\Front\Models\FrontSeoMeta;
 use GP247\Front\Models\FrontSeoMetaDescription;
 use GP247\Front\Support\SeoMetaInstaller;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -61,6 +62,18 @@ class SeoContentMeta
     /** Memo of "both tables exist" for this process (a site may run new code before gp247:update). */
     private static ?bool $tableReady = null;
 
+    /** Table or column name a content source may declare. */
+    private const IDENTIFIER_PATTERN = '/^[a-z0-9_]{1,64}$/';
+
+    /** Columns every listed content table must have (read by the SEO check and listing tools). */
+    private const CONTENT_COLUMNS = ['id', 'store_id', 'status', 'updated_at'];
+
+    /** @var array<string, array<int, string>> Memo of the columns of tables named by content sources. */
+    private static array $tableColumns = [];
+
+    /** @var array<string, bool> Types whose broken source was already logged. */
+    private static array $warnedSources = [];
+
     /**
      * Registered content types (`gp247-config.front.seo_content_types`), keys
      * that do not match TYPE_PATTERN dropped.
@@ -86,6 +99,126 @@ class SeoContentMeta
     public static function isRegistered(string $type): bool
     {
         return array_key_exists($type, self::types());
+    }
+
+    /**
+     * Where the content of each registered type lives, for code that lists content
+     * (the SEO check, plugins). Built from the optional `source` key of a type:
+     * `table`, `class` (Eloquent model owning that table), `name` (label column, default
+     * `name`), `desc` + `fk` (per-language table holding the label), `text` (long text
+     * columns) and `edit_route` (admin edit route taking `id`). A type without a valid
+     * source keeps its own SEO values; it is only not listed.
+     *
+     * @return array<string, array{table: string, desc: ?string, fk: ?string, name: string, text: array<int, string>, edit_route: ?string, class: string}>
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-content-type-registry
+     * @aidlc-adr ADR-seo-content-meta-table
+     */
+    public static function sources(): array
+    {
+        $sources = [];
+        foreach (self::types() as $type => $definition) {
+            if (!array_key_exists('source', $definition)) {
+                continue;
+            }
+            $source = self::validSource($definition['source']);
+            if ($source === null) {
+                self::warnInvalidSource($type);
+                continue;
+            }
+            $sources[$type] = $source;
+        }
+
+        return $sources;
+    }
+
+    /**
+     * A declared source normalised, or null when any part is unsafe or does not exist.
+     * Table and column names end up as SQL identifiers, so they must match a strict
+     * pattern — bindings cannot protect identifiers.
+     *
+     * @param mixed $source Value of the `source` key.
+     * @return array|null
+     */
+    private static function validSource($source): ?array
+    {
+        if (!is_array($source)) {
+            return null;
+        }
+        $table = $source['table'] ?? null;
+        $class = $source['class'] ?? null;
+        $desc = $source['desc'] ?? null;
+        $fk = $desc !== null ? ($source['fk'] ?? null) : null;
+        $name = $source['name'] ?? 'name';
+        $text = $source['text'] ?? [];
+        $editRoute = $source['edit_route'] ?? null;
+
+        $identifiers = array_merge([$table, $name], $desc !== null ? [$desc, $fk] : [], is_array($text) ? $text : [null]);
+        foreach ($identifiers as $identifier) {
+            if (!is_string($identifier) || !preg_match(self::IDENTIFIER_PATTERN, $identifier)) {
+                return null;
+            }
+        }
+        if (($editRoute !== null && !is_string($editRoute))
+            || !is_string($class) || !class_exists($class) || !is_subclass_of($class, Model::class)) {
+            return null;
+        }
+        // WHY: the SEO check deletes SEO rows whose content is missing from this table; a
+        // table the model does not own would make every row of the type look orphaned.
+        if ((new $class())->getTable() !== GP247_DB_PREFIX . $table) {
+            return null;
+        }
+        $labelTable = $desc ?? $table;
+        $needed = [$table => self::CONTENT_COLUMNS];
+        $needed[$labelTable] = array_merge($needed[$labelTable] ?? [], [$name], $text, $desc !== null ? [$fk, 'lang'] : []);
+        foreach ($needed as $neededTable => $columns) {
+            if (!self::hasColumns($neededTable, $columns)) {
+                return null;
+            }
+        }
+
+        return [
+            'table' => $table,
+            'desc' => $desc,
+            'fk' => $fk,
+            'name' => $name,
+            'text' => array_values($text),
+            'edit_route' => $editRoute,
+            'class' => $class,
+        ];
+    }
+
+    /**
+     * Whether a table exists with all the given columns (column list read once per process).
+     *
+     * @param string             $table   Table name without the GP247 prefix.
+     * @param array<int, string> $columns
+     * @return bool
+     */
+    private static function hasColumns(string $table, array $columns): bool
+    {
+        if (!array_key_exists($table, self::$tableColumns)) {
+            self::$tableColumns[$table] = Schema::connection(GP247_DB_CONNECTION)->getColumnListing(GP247_DB_PREFIX . $table);
+        }
+
+        return self::$tableColumns[$table] !== [] && array_diff($columns, self::$tableColumns[$table]) === [];
+    }
+
+    /**
+     * Log a broken `source` declaration once per process, so a misconfigured plugin is
+     * visible without flooding the log on every page.
+     *
+     * @param string $type
+     * @return void
+     */
+    private static function warnInvalidSource(string $type): void
+    {
+        if (isset(self::$warnedSources[$type])) {
+            return;
+        }
+        self::$warnedSources[$type] = true;
+        Log::warning('SEO content type has an invalid source and is not listed', ['type' => $type]);
     }
 
     /**

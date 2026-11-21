@@ -117,6 +117,8 @@
                             <x-gp247::badge color="blue" data-testid="seo-redirect-source-badge">{{ gp247_language_render('admin.seo_redirect.source_auto') }}</x-gp247::badge>
                         @elseif (($row->source ?? 'manual') === 'import')
                             <x-gp247::badge color="purple" data-testid="seo-redirect-source-badge">{{ gp247_language_render('admin.seo_redirect.source_import') }}</x-gp247::badge>
+                        @elseif (\GP247\Front\Models\FrontRedirect::sourceLabel($row->source ?? null) !== '')
+                            <x-gp247::badge color="gray" data-testid="seo-redirect-source-badge">{{ \GP247\Front\Models\FrontRedirect::sourceLabel($row->source ?? null) }}</x-gp247::badge>
                         @endif
                         @include('gp247-admin::partials.store-scope-line', ['storeId' => $row->store_id])
                     </td>
