@@ -42,7 +42,7 @@
                         @foreach ($groups[$level] as $finding)
                             <div class="rounded-lg border border-gray-200 p-3 dark:border-gray-700" data-testid="seo-audit-finding-{{ $finding['code'] }}">
                                 <div class="flex items-center justify-between gap-2">
-                                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">{{ gp247_language_render('admin.seo_audit.code_' . $finding['code']) }}</p>
+                                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">{{ gp247_language_render(\GP247\Front\Library\SeoAudit::labelKey($finding['code'])) }}</p>
                                     <x-gp247::badge :color="$color">{{ $finding['count'] }}</x-gp247::badge>
                                 </div>
                                 @if ($finding['code'] === 'orphan_seo_rows')
@@ -61,6 +61,9 @@
                                                     <a href="{{ $example['url'] }}" class="break-all text-blue-600 hover:underline dark:text-blue-400" data-testid="seo-audit-example-link">{{ $example['label'] !== '' ? $example['label'] : $example['id'] }}</a>
                                                 @else
                                                     <span class="break-all text-gray-700 dark:text-gray-200">{{ $example['label'] !== '' ? $example['label'] : $example['id'] }}</span>
+                                                @endif
+                                                @if (!empty($example['last_404']))
+                                                    <span class="text-xs text-gray-400 whitespace-nowrap" data-testid="seo-audit-example-last-404">{{ gp247_language_render('admin.seo_audit.last_404', ['time' => $example['last_404']]) }}</span>
                                                 @endif
                                             </li>
                                         @endforeach

@@ -549,6 +549,11 @@ class DataFrontLanguageSeeder extends Seeder
                 ['code' => 'admin.seo_audit.code_redirect_loop','text' => 'Redirect loops','position' => 'admin.seo_audit','location' => 'en'],
                 ['code' => 'admin.seo_audit.code_redirect_to_missing','text' => 'Chuyển hướng tới trang không tồn tại (có trong nhật ký 404)','position' => 'admin.seo_audit','location' => 'vi'],
                 ['code' => 'admin.seo_audit.code_redirect_to_missing','text' => 'Redirects to missing pages (seen in the 404 log)','position' => 'admin.seo_audit','location' => 'en'],
+                // Title used by the screen since the check counts only recent 404s (SeoAudit::labelKey).
+                ['code' => 'admin.seo_audit.code_redirect_to_recent_404','text' => 'Chuyển hướng tới trang còn lỗi 404 trong 7 ngày qua','position' => 'admin.seo_audit','location' => 'vi'],
+                ['code' => 'admin.seo_audit.code_redirect_to_recent_404','text' => 'Redirects to pages that returned 404 in the last 7 days','position' => 'admin.seo_audit','location' => 'en'],
+                ['code' => 'admin.seo_audit.last_404','text' => '404 lần cuối: :time','position' => 'admin.seo_audit','location' => 'vi'],
+                ['code' => 'admin.seo_audit.last_404','text' => 'Last 404: :time','position' => 'admin.seo_audit','location' => 'en'],
                 ['code' => 'admin.seo_audit.code_canonical_offsite','text' => 'URL canonical trỏ sang domain khác','position' => 'admin.seo_audit','location' => 'vi'],
                 ['code' => 'admin.seo_audit.code_canonical_offsite','text' => 'Canonical URL points to another domain','position' => 'admin.seo_audit','location' => 'en'],
                 ['code' => 'admin.seo_audit.code_missing_description','text' => 'Thiếu mô tả','position' => 'admin.seo_audit','location' => 'vi'],

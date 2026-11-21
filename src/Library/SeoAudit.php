@@ -60,6 +60,35 @@ class SeoAudit
     ];
 
     /**
+     * A redirect target counts as missing only when it returned 404 within this many days.
+     * WHY: the 404 log keeps a row for 90 days, so a target that failed once and works now
+     * would otherwise stay "to fix"; a target still missing gets fresh 404s from the very
+     * visitors the redirect sends there.
+     */
+    public const RECENT_404_DAYS = 7;
+
+    /** Language key of a finding's title when it differs from `admin.seo_audit.code_<code>`. */
+    private const LABEL_KEYS = [
+        // WHY a new key: the old text ("seen in the 404 log") no longer says what is checked,
+        // and a new key reaches existing sites through the language seeder without a migration.
+        'redirect_to_missing' => 'admin.seo_audit.code_redirect_to_recent_404',
+    ];
+
+    /**
+     * Language key of the title of a finding.
+     *
+     * @param string $code One of CODES.
+     * @return string
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-audit
+     */
+    public static function labelKey(string $code): string
+    {
+        return self::LABEL_KEYS[$code] ?? 'admin.seo_audit.code_' . $code;
+    }
+
+    /**
      * Run every check for a store and keep the result.
      *
      * @param int|string $storeId
@@ -434,7 +463,8 @@ class SeoAudit
     }
 
     /**
-     * Enabled redirects whose target is in the 404 log (only while the log is on).
+     * Enabled redirects whose target returned 404 within RECENT_404_DAYS (only while the
+     * log is on). Each example carries the time of that last 404 (`last_404`).
      *
      * @return array{0: int, 1: array}
      */
@@ -447,9 +477,15 @@ class SeoAudit
             ->join(GP247_DB_PREFIX . SeoUrlLifecycleInstaller::TABLE_NOT_FOUND . ' as n', function ($j) {
                 $j->on('n.path', '=', 'r.to')->on('n.store_id', '=', 'r.store_id');
             })
-            ->where('r.store_id', $store)->where('r.status', 1);
+            ->where('r.store_id', $store)->where('r.status', 1)
+            ->where('n.last_seen_at', '>=', now()->subDays(self::RECENT_404_DAYS));
 
-        return [(clone $q)->count(), self::redirectExamples((clone $q)->select('r.id', 'r.from', 'r.to')->limit(self::MAX_EXAMPLES)->get())];
+        $examples = [];
+        foreach ((clone $q)->select('r.id', 'r.from', 'r.to', 'n.last_seen_at')->orderByDesc('n.last_seen_at')->limit(self::MAX_EXAMPLES)->get() as $row) {
+            $examples[] = self::redirectExample($row) + ['last_404' => \Illuminate\Support\Carbon::parse($row->last_seen_at)->format('Y-m-d H:i')];
+        }
+
+        return [(clone $q)->count(), $examples];
     }
 
     /**

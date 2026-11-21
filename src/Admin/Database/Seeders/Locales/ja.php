@@ -67,6 +67,8 @@ return [
     'admin.seo_audit.code_content_noindex' => '「noindex」に設定されたコンテンツ（意図したものか確認）',
     'admin.seo_audit.code_redirect_loop' => 'リダイレクトのループ',
     'admin.seo_audit.code_redirect_to_missing' => '存在しないページへのリダイレクト（404ログにあり）',
+    'admin.seo_audit.code_redirect_to_recent_404' => '過去7日間に404を返したページへのリダイレクト',
+    'admin.seo_audit.last_404' => '最後の404: :time',
     'admin.seo_audit.code_canonical_offsite' => 'カノニカルURLが別ドメインを指しています',
     'admin.seo_audit.code_missing_description' => '説明がありません',
     'admin.seo_audit.code_duplicate_title' => 'タイトルの重複',
