@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Schema;
  * does NOT rebuild the many-to-many data (documented, accepted trade-off).
  *
  * @aidlc-unit compat-foundation
- * @aidlc-story US-CMP-store-one-to-one
+ * @aidlc-story US-CMP-store-1to1-schema
  * @aidlc-adr multi-store_one-to-one-store-ownership
  */
 return new class extends Migration
