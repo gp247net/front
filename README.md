@@ -102,6 +102,26 @@ Assets will be stored at: `public/GP247/Templates/GP247Front`
 
 >Step 2: Change the namespace from `GP247\Front\Controllers` (or `GP247\Front\Api\Controllers`) to `App\GP247\Front\Controllers` (or `App\GP247\Front\Api\Controllers`) — just prepend `App`, keep the rest as-is.
 
+## Running the tests
+
+The `gp247/front` test suite lives in the `tests/` folder of this repository and runs automatically on GitHub Actions for
+every change (PHP 8.3 / 8.4 × MySQL / MariaDB). The tests are not part of the Composer package; to run them yourself,
+clone the repository:
+
+1. Clone this repository.
+2. Create a blank Laravel application and install `gp247/front` **from your clone** as described in the Installation
+   section above, with `gp247/core` 3.18.0 or later (the test base classes ship in `GP247\Core\Testing`). The tests
+   check the copy installed in the application's `vendor/`, so point Composer at the clone first:
+   `composer config repositories.front '{"type": "path", "url": "/path/to/front", "options": {"symlink": false}}'`, then
+   `composer require "gp247/core:^3.18" "gp247/front:*@dev"`. Use a database **reserved for tests** — its name must
+   end with `_test` or `_testing`. The suite refuses any other database so it never touches real data; to use another
+   name, confirm it with `GP247_TEST_DATABASE=<database name>`.
+3. From the application's root run:
+
+   ```bash
+   GP247_HOST_APP="$PWD" vendor/bin/phpunit -c /path/to/front/phpunit.xml.dist
+   ```
+
 ## Documentation
 For detailed documentation, visit [documentation](https://gp247.net/en/docs)
 

@@ -102,6 +102,25 @@ Các tài nguyên sẽ được lưu trữ tại: `public/GP247/Templates/GP247F
 
 >Bước 2: Đổi namespace từ `GP247\Front\Controllers` (hoặc `GP247\Front\Api\Controllers`) thành `App\GP247\Front\Controllers` (hoặc `App\GP247\Front\Api\Controllers`) — chỉ thêm `App` vào phía trước, giữ nguyên phần còn lại.
 
+## Chạy test
+
+Bộ test của `gp247/front` nằm ở thư mục `tests/` của repo này và chạy tự động trên GitHub Actions cho mỗi thay đổi
+(PHP 8.3 / 8.4 × MySQL / MariaDB). Thư mục test không có trong gói Composer, nên muốn tự chạy thì clone repo:
+
+1. Clone repo này.
+2. Tạo một ứng dụng Laravel trắng, cài `gp247/front` **từ bản clone** theo mục Cài đặt ở trên, cùng `gp247/core` từ 3.18.0
+   trở lên (lớp test gốc nằm trong `GP247\Core\Testing`). Test kiểm bản được cài trong `vendor/` của ứng dụng, nên trỏ
+   Composer vào bản clone trước:
+   `composer config repositories.front '{"type": "path", "url": "/đường/dẫn/tới/front", "options": {"symlink": false}}'`,
+   rồi `composer require "gp247/core:^3.18" "gp247/front:*@dev"`. Dùng một cơ sở dữ liệu **chỉ dùng cho test** — tên
+   kết thúc bằng `_test` hoặc `_testing`. Bộ test từ chối chạy trên cơ sở dữ liệu khác để không đụng tới dữ liệu thật;
+   muốn dùng tên khác thì khai rõ `GP247_TEST_DATABASE=<tên cơ sở dữ liệu>`.
+3. Từ thư mục gốc của ứng dụng chạy:
+
+   ```bash
+   GP247_HOST_APP="$PWD" vendor/bin/phpunit -c /đường/dẫn/tới/front/phpunit.xml.dist
+   ```
+
 ## Tài liệu
 Để xem tài liệu chi tiết, truy cập [tài liệu](https://gp247.net/vi/docs)
 

@@ -102,6 +102,26 @@ GP247/Front は、GP247 の**フロントエンド層全体の基盤となるパ
 
 >ステップ 2：名前空間を `GP247\Front\Controllers`（または `GP247\Front\Api\Controllers`）から `App\GP247\Front\Controllers`（または `App\GP247\Front\Api\Controllers`）に変更します — 先頭に `App` を追加するだけで、残りはそのままにします。
 
+## テストの実行
+
+`gp247/front` のテストはこのリポジトリの `tests/` フォルダーにあり、変更のたびに GitHub Actions で自動実行されます
+（PHP 8.3 / 8.4 × MySQL / MariaDB）。テストは Composer パッケージに含まれないため、自分で実行するにはリポジトリを
+クローンしてください。
+
+1. このリポジトリをクローンします。
+2. 空の Laravel アプリケーションを作成し、上の「インストール」の手順で `gp247/front` を**クローンから**インストールします。
+   `gp247/core` は 3.18.0 以降が必要です（テストの基底クラスは `GP247\Core\Testing` にあります）。テストはアプリケーションの
+   `vendor/` にインストールされたコピーを検証するため、先に Composer をクローンに向けます：
+   `composer config repositories.front '{"type": "path", "url": "/path/to/front", "options": {"symlink": false}}'`、続けて
+   `composer require "gp247/core:^3.18" "gp247/front:*@dev"`。データベースは**テスト専用**のもの（名前が `_test` または
+   `_testing` で終わるもの）を使ってください。実データに触れないよう、それ以外のデータベースではテストは実行を拒否します。
+   別の名前を使う場合は `GP247_TEST_DATABASE=<データベース名>` で明示してください。
+3. アプリケーションのルートで次を実行します。
+
+   ```bash
+   GP247_HOST_APP="$PWD" vendor/bin/phpunit -c /path/to/front/phpunit.xml.dist
+   ```
+
 ## ドキュメント
 詳しいドキュメントは、[ドキュメント](https://gp247.net/en/docs) をご覧ください
 
