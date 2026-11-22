@@ -40,6 +40,16 @@
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
                     </a>
                 @endif
+                {{-- WHY fallback: a site not yet updated by gp247:update still names the Facebook
+                     group link fanpage_url (renamed to group_url by a gp247/core upgrade migration). --}}
+                @php
+                    $footerGroupUrl = gp247_config('group_url') ?: gp247_config('fanpage_url');
+                @endphp
+                @if ($footerGroupUrl)
+                    <a target="_blank" rel="noopener" href="{{ $footerGroupUrl }}" aria-label="Facebook Group" data-testid="frontend-template-dev-footer-group-link" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </a>
+                @endif
                 @if (gp247_config('twitter_url'))
                     <a target="_blank" rel="noopener" href="{{ gp247_config('twitter_url') }}" aria-label="X" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.4l-5.8-7.58-6.64 7.58H.47l8.6-9.83L0 1.15h7.59l5.25 6.93 6.06-6.93Zm-1.29 19.5h2.04L6.49 3.24H4.3l13.31 17.4Z"/></svg>
@@ -92,9 +102,6 @@
         <div class="flex items-center gap-3">
             {{-- Shown by the consent loader only when the cookie banner is on (tracking-consent). --}}
             <button type="button" class="hover:text-white transition" data-gp247-consent-open data-testid="tracking-consent-footer-settings" hidden>{{ gp247_language_render('front.consent.settings') }}</button>
-            @if (gp247_config('fanpage_url'))
-                <a target="_blank" href="{{ gp247_config('fanpage_url') }}" class="hover:text-white transition">Fanpage FB</a>
-            @endif
             @if (!gp247_config('hidden_copyright_footer'))
                 <span>Power by <a href="{{ config('gp247.homepage') }}" class="hover:text-white transition">{{ config('gp247.name') }} {{ config('gp247.sub-version') }}</a></span>
             @endif
