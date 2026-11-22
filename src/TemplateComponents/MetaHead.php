@@ -23,7 +23,7 @@ use GP247\Front\Tracking\Application\TrackingHead;
  * Indexing signals are decided HERE, not by the caller (ADR-seo-indexing-signals,
  * modification 20261116T050835): robots, canonical, og:url, hreflang and the
  * search-engine verification codes are computed from the current route when a
- * prop is not passed, because template layouts (GP247EC, MKP) pass only the
+ * prop is not passed, because template layouts (GP247EC, GP247MKP) pass only the
  * original six props. A prop that is passed always wins — except title,
  * description and og_image, where the site owner's own SEO values of the content
  * the controller declared (SeoContentMeta::subject()) win over the layout's

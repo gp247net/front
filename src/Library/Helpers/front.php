@@ -381,7 +381,7 @@ if (!function_exists('gp247_layout_block_options') && !in_array('gp247_layout_bl
 /**
  * Resolve a storefront view of the active template, falling back to the copy that
  * ships with gp247/front. WHY: the template name is a path segment of the view key,
- * so a template other than GP247Front (MKP, a site's own theme) never sees the
+ * so a template other than GP247Front (GP247EC, a site's own theme) never sees the
  * package's file — a screen added after that template was written would otherwise
  * fail with "view not found" (RISK-TECH-contact-template-view-missing).
  *
