@@ -96,8 +96,9 @@ class MetaHead extends BaseFrontViewComponent
         // Own SEO values of the declared content (null when none) — phase 1.
         $content = SeoContentMeta::current();
         $this->title = $content['title'] ?? $this->generatedTitle($title);
-        // WHY: controllers pass '' for "no description"; the view only falls back to
-        // the store's value on null, so '' used to print content="" (mod 20261117T055341).
+        // WHY: controllers pass '' for "no description"; null means "no tag" — the view
+        // prints no description/keywords tag rather than content="" or the store's
+        // value (the store's description on every page reads as duplicate content).
         $this->description = $content['description'] ?? self::nullIfBlank($description);
         $this->keyword = self::nullIfBlank($keyword);
         $this->og_image = $this->pageImageOrNull($content['og_image'] ?? $ogImage);

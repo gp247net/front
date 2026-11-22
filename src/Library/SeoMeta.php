@@ -40,10 +40,11 @@ class SeoMeta
      * Build the core meta array for a page.
      *
      * @param string      $title       Page title; falls back to store title when empty.
-     * @param string|null $description Page description; falls back to store description.
-     * @param string|null $keyword     Meta keywords; falls back to store keywords.
+     * @param string|null $description Page description; blank = null (no tag — the store's
+     *                                 description is not copied onto every page).
+     * @param string|null $keyword     Meta keywords; blank = null (no tag).
      * @param string|null $ogImage     OG image path; falls back to store og_image.
-     * @return array{title:string, description:string, keyword:string, og_image:string}
+     * @return array{title:string, description:?string, keyword:?string, og_image:string}
      *
      * @aidlc-unit seo
      * @aidlc-story US-SEO-001
@@ -56,8 +57,8 @@ class SeoMeta
     ): array {
         return [
             'title'       => $title !== '' ? $title : (string) gp247_store_info('name'),
-            'description' => $description ?? (string) gp247_store_info('description'),
-            'keyword'     => $keyword     ?? (string) gp247_store_info('keyword'),
+            'description' => ($description !== null && trim($description) !== '') ? $description : null,
+            'keyword'     => ($keyword !== null && trim($keyword) !== '') ? $keyword : null,
             'og_image'    => self::resolveOgImage($ogImage),
         ];
     }

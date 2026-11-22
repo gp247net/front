@@ -25,8 +25,12 @@
 <meta name="robots" content="{{ $robots }}">
 @endif
 <link rel="canonical" href="{{ $canonical }}" />
-<meta name="description" content="{{ $description ?? gp247_store_info('description') }}">
-<meta name="keywords" content="{{ $keyword ?? gp247_store_info('keyword') }}">
+@if(!empty($description))
+<meta name="description" content="{{ $description }}">
+@endif
+@if(!empty($keyword))
+<meta name="keywords" content="{{ $keyword }}">
+@endif
 <title>{{ $title ?? gp247_store_info('name') }}</title>
 <link rel="icon" href="{{ gp247_file(gp247_store_info(key: 'icon', default: 'GP247/Core/logo/icon.png')) }}" type="image/png" sizes="16x16">
 @if(!empty($verification['google']))
@@ -45,7 +49,9 @@
 <meta property="og:url" content="{{ $ogUrl }}" />
 <meta property="og:type" content="{{ $ogType ?? 'website' }}" />
 <meta property="og:title" content="{{ $title ?? gp247_store_info('name') }}" />
-<meta property="og:description" content="{{ $description ?? gp247_store_info('description') }}" />
+@if(!empty($description))
+<meta property="og:description" content="{{ $description }}" />
+@endif
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 {{-- hreflang (caller's map, or built from the current route; none on a noindex page) --}}
@@ -59,7 +65,9 @@
 {{-- Twitter card --}}
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="{{ $title ?? gp247_store_info('name') }}" />
-<meta name="twitter:description" content="{{ $description ?? gp247_store_info('description') }}" />
+@if(!empty($description))
+<meta name="twitter:description" content="{{ $description }}" />
+@endif
 @if(!empty($og_image))
     <meta name="twitter:image" content="{{ gp247_file($og_image) }}" />
 @endif
