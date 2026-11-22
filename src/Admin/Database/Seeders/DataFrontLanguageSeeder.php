@@ -108,7 +108,13 @@ class DataFrontLanguageSeeder extends Seeder
         $this->buffer = [];
 
         // Descriptions of front's part of the backup groups (en/vi/ja), shared with the upgrade migration.
-        return array_merge($rows, LocaleRows::fromFile(__DIR__.'/Locales/ja.php', 'ja', $rows), \GP247\Front\Support\BackupGroupHelp::languageRows());
+        // Home welcome (en/vi/ja), named after the product the install is made for (US-DEP-install-default-product-name).
+        return array_merge(
+            $rows,
+            LocaleRows::fromFile(__DIR__.'/Locales/ja.php', 'ja', $rows),
+            \GP247\Front\Support\BackupGroupHelp::languageRows(),
+            \GP247\Front\Support\InstallWelcome::languageRows()
+        );
     }
 
     /**

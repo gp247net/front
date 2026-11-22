@@ -10,6 +10,7 @@ use GP247\Front\Models\FrontLinkGroup;
 use GP247\Front\Models\FrontPage;
 use GP247\Front\Models\FrontPageDescription;
 use GP247\Front\Models\FrontLink;
+use GP247\Front\Support\InstallWelcome;
 
 class DataFrontDefaultSeeder extends Seeder
 {
@@ -133,26 +134,7 @@ class DataFrontDefaultSeeder extends Seeder
             'status' => 0,
         ]);
 
-        $descriptions = [
-            'vi' => [
-                'name' => 'Trang chủ',
-                'keyword' => 'trang chu, home',
-                'description' => 'Trang chủ website',
-                'content' => '<h3>Chào mừng đến với CMS được tạo bởi hệ thống GP247</h3>'
-            ],
-            'en' => [
-                'name' => 'Home page',
-                'keyword' => 'home page',
-                'description' => 'Website homepage',
-                'content' => '<h3>Welcome to CMS created by GP247 system</h3>'
-            ],
-            'ja' => [
-                'name' => 'ホーム',
-                'keyword' => 'ホーム, トップページ',
-                'description' => 'ウェブサイトのトップページ',
-                'content' => '<h3>GP247 システムで作成された CMS へようこそ</h3>'
-            ]
-        ];
+        $descriptions = $this->homePageDescriptions();
 
         foreach ($descriptions as $lang => $description) {
             FrontPageDescription::create([
@@ -209,11 +191,92 @@ class DataFrontDefaultSeeder extends Seeder
         }
         // Store ownership is set on the page row (store_id) above.
 
-        $links = [
+        $links = $this->defaultLinks();
+
+        foreach ($links as $link) {
+            $frontLink = FrontLink::create([
+                'id' => (string)\Illuminate\Support\Str::orderedUuid(),
+                // WHY: 1-1 ownership — the link owns its store via the scalar store_id column.
+                'store_id' => GP247_STORE_ID_ROOT,
+                'name' => $link['name'],
+                'url' => $link['url'],
+                'target' => $link['target'],
+                'group' => $link['group'],
+                'sort' => $link['sort'],
+                'status' => $link['status'],
+            ]);
+
+            // Store ownership is set on the link row (store_id) above.
+        }
+
+        // Contact form (front-contact): settings on ROOT (taking over shop's legacy
+        // mail toggles if present), menu entry under ADMIN_CONTENT re-created above,
+        // and its two permissions — the same steps the upgrade migration runs.
+        \GP247\Front\Support\ContactInstaller::moveLegacyMailToggles();
+        \GP247\Front\Support\ContactInstaller::seedConfig();
+        \GP247\Front\Support\ContactInstaller::seedAdmin();
+
+        // Tracking settings on ROOT (tracking-consent): nothing set, switch on, banner off (Q21).
+        \GP247\Front\Tracking\Infrastructure\TrackingInstaller::seedConfig();
+
+        // Language rows are seeded by the dedicated DataFrontLanguageSeeder so
+        // they can be refreshed independently of menu/banner/page/link data.
+        $this->call(DataFrontLanguageSeeder::class);
+    }
+
+    /**
+     * Descriptions of the default home page per language; its welcome names the declared product.
+     *
+     * @return array<string, array{name: string, keyword: string, description: string, content: string}>
+     *
+     * @aidlc-unit installer-deploy
+     * @aidlc-story US-DEP-install-default-product-name
+     * @aidlc-adr installer-deploy_install-default-product-name
+     */
+    public function homePageDescriptions(): array
+    {
+        // WHY e(): the welcome holds the declared product name and is stored as page HTML.
+        $welcome = InstallWelcome::texts();
+        return [
+            'vi' => [
+                'name' => 'Trang chủ',
+                'keyword' => 'trang chu, home',
+                'description' => 'Trang chủ website',
+                'content' => '<h3>' . e($welcome['vi']) . '</h3>'
+            ],
+            'en' => [
+                'name' => 'Home page',
+                'keyword' => 'home page',
+                'description' => 'Website homepage',
+                'content' => '<h3>' . e($welcome['en']) . '</h3>'
+            ],
+            'ja' => [
+                'name' => 'ホーム',
+                'keyword' => 'ホーム, トップページ',
+                'description' => 'ウェブサイトのトップページ',
+                'content' => '<h3>' . e($welcome['ja']) . '</h3>'
+            ]
+        ];
+    }
+
+    /**
+     * Default menu and footer links; the first menu link points at the declared product.
+     *
+     * @return array<int, array{name: string, url: string, target: string, group: string, sort: int, status: int}>
+     *
+     * @aidlc-unit installer-deploy
+     * @aidlc-story US-DEP-install-default-product-name
+     * @aidlc-adr installer-deploy_install-default-product-name
+     */
+    public function defaultLinks(): array
+    {
+        $productLink = InstallWelcome::menuLink();
+
+        return [
             // Menu links
             [
-                'name' => 'GP247',
-                'url' => 'https://gp247.net',
+                'name' => $productLink['name'],
+                'url' => $productLink['url'],
                 'target' => '_self',
                 'group' => 'menu', // menu main
                 'sort' => 1,
@@ -245,36 +308,6 @@ class DataFrontDefaultSeeder extends Seeder
                 'status' => 1,
             ],
         ];
-
-        foreach ($links as $link) {
-            $frontLink = FrontLink::create([
-                'id' => (string)\Illuminate\Support\Str::orderedUuid(),
-                // WHY: 1-1 ownership — the link owns its store via the scalar store_id column.
-                'store_id' => GP247_STORE_ID_ROOT,
-                'name' => $link['name'],
-                'url' => $link['url'],
-                'target' => $link['target'],
-                'group' => $link['group'],
-                'sort' => $link['sort'],
-                'status' => $link['status'],
-            ]);
-
-            // Store ownership is set on the link row (store_id) above.
-        }
-
-        // Contact form (front-contact): settings on ROOT (taking over shop's legacy
-        // mail toggles if present), menu entry under ADMIN_CONTENT re-created above,
-        // and its two permissions — the same steps the upgrade migration runs.
-        \GP247\Front\Support\ContactInstaller::moveLegacyMailToggles();
-        \GP247\Front\Support\ContactInstaller::seedConfig();
-        \GP247\Front\Support\ContactInstaller::seedAdmin();
-
-        // Tracking settings on ROOT (tracking-consent): nothing set, switch on, banner off (Q21).
-        \GP247\Front\Tracking\Infrastructure\TrackingInstaller::seedConfig();
-
-        // Language rows are seeded by the dedicated DataFrontLanguageSeeder so
-        // they can be refreshed independently of menu/banner/page/link data.
-        $this->call(DataFrontLanguageSeeder::class);
     }
 
     public function updateDataVersion() {
