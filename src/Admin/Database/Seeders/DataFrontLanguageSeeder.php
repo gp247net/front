@@ -996,8 +996,6 @@ class DataFrontLanguageSeeder extends Seeder
             ['code' => 'admin.page.duplicate_confirm', 'text' => 'Tạo một bản sao (đang tắt) từ bản đã lưu của trang này?', 'position' => 'admin.page', 'location' => 'vi'],
             ['code' => 'admin.page.duplicate_success', 'text' => 'Copy created — it is switched off; check it, then turn it on.', 'position' => 'admin.page', 'location' => 'en'],
             ['code' => 'admin.page.duplicate_success', 'text' => 'Đã tạo bản sao — trang đang tắt, hãy kiểm tra rồi bật hiển thị.', 'position' => 'admin.page', 'location' => 'vi'],
-            ['code' => 'admin.page.duplicate_failed', 'text' => 'Could not duplicate: some saved values of this page (e.g. SEO) are no longer valid. Open the page, save it again, then retry. No copy was made.', 'position' => 'admin.page', 'location' => 'en'],
-            ['code' => 'admin.page.duplicate_failed', 'text' => 'Không nhân bản được: một số giá trị đã lưu của trang (vd SEO) không còn hợp lệ. Hãy mở trang, lưu lại rồi thử lại. Không có bản sao nào được tạo.', 'position' => 'admin.page', 'location' => 'vi'],
             ['code' => 'admin.page.duplicate_name_suffix', 'text' => '(copy)', 'position' => 'admin.page', 'location' => 'en'],
             ['code' => 'admin.page.duplicate_name_suffix', 'text' => '(bản sao)', 'position' => 'admin.page', 'location' => 'vi'],
 

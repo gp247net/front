@@ -224,7 +224,6 @@ return [
     'admin.page.duplicate' => '複製',
     'admin.page.duplicate_confirm' => 'このページの保存済みの内容から複製を作成しますか？（非公開）',
     'admin.page.duplicate_success' => '複製を作成しました。非公開のため、確認してから公開してください。',
-    'admin.page.duplicate_failed' => '複製できませんでした。このページの保存済みの値（SEO など）の一部が現在の規則に合いません。ページを開いて保存し直してから、もう一度お試しください。複製は作成されていません。',
     'admin.page.duplicate_name_suffix' => '(コピー)',
     'admin.page.choose_image' => '画像を選択',
     'admin.page.list' => 'ページ一覧',

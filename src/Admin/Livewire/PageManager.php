@@ -10,7 +10,6 @@ use GP247\Front\Models\FrontPage;
 use GP247\Front\Models\FrontPageDescription;
 use GP247\Front\Support\PageDuplicator;
 use Illuminate\Contracts\View\View;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Page (CMS) manager — two-panel screen (form left, list right) following the
@@ -353,16 +352,7 @@ class PageManager extends ResourcePanel
             return;
         }
 
-        try {
-            $copy = (new PageDuplicator)->duplicate($source);
-        } catch (ValidationException $e) {
-            // WHY: stored values of the original that no longer pass today's rules (e.g. an old
-            // SEO canonical) — the whole copy was rolled back; tell the admin how to fix it.
-            gp247_report(msg: 'Page duplicate rolled back (' . $source->id . '): ' . json_encode($e->errors()), channel: null);
-            $this->notify('error', gp247_language_render('admin.page.duplicate_failed'));
-
-            return;
-        }
+        $copy = (new PageDuplicator)->duplicate($source);
 
         // WHY: same cached page-title lists as persist() / deleteModel().
         if (function_exists('gp247_cache_clear')) {
