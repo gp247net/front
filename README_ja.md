@@ -122,6 +122,10 @@ GP247/Front は、GP247 の**フロントエンド層全体の基盤となるパ
    GP247_HOST_APP="$PWD" vendor/bin/phpunit -c /path/to/front/phpunit.xml.dist
    ```
 
+ストアフロントを開いた状態で動かす他パッケージやプラグインのテストでは、`GP247\Front\Testing` のヘルパーを再利用できます。
+`InteractsWithFrontStore`（テストのためにストアを公開状態にする）、`ConfiguresSeoStore`（ストアの SEO 設定を切り替える）、
+`ConfiguresTracking`（トラッキングと同意の設定を準備する）です。
+
 ## ドキュメント
 詳しいドキュメントは、[ドキュメント](https://gp247.net/en/docs) をご覧ください
 

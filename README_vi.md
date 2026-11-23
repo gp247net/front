@@ -121,6 +121,10 @@ Bộ test của `gp247/front` nằm ở thư mục `tests/` của repo này và 
    GP247_HOST_APP="$PWD" vendor/bin/phpunit -c /đường/dẫn/tới/front/phpunit.xml.dist
    ```
 
+Test của package khác và của plugin cần mở cửa hàng có thể dùng lại các helper trong `GP247\Front\Testing`:
+`InteractsWithFrontStore` (mở cửa hàng cho test), `ConfiguresSeoStore` (đặt các công tắc SEO của cửa hàng) và
+`ConfiguresTracking` (thiết lập theo dõi và đồng ý cookie).
+
 ## Tài liệu
 Để xem tài liệu chi tiết, truy cập [tài liệu](https://gp247.net/vi/docs)
 

@@ -122,6 +122,10 @@ clone the repository:
    GP247_HOST_APP="$PWD" vendor/bin/phpunit -c /path/to/front/phpunit.xml.dist
    ```
 
+Tests of other packages and plugins that need an open storefront can reuse the helpers in `GP247\Front\Testing`:
+`InteractsWithFrontStore` (opens the store for the test), `ConfiguresSeoStore` (sets the SEO switches of a store) and
+`ConfiguresTracking` (sets up the tracking and consent settings).
+
 ## Documentation
 For detailed documentation, visit [documentation](https://gp247.net/en/docs)
 
