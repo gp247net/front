@@ -9,12 +9,11 @@
 
 > 🌐 **言語:** [🇻🇳 Tiếng Việt](./README_vi.md) · [🇬🇧 English](./README.md) · 🇯🇵 日本語（現在）
 
-[![Tests](https://github.com/gp247net/front/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/gp247net/front/actions/workflows/tests.yml)
-
 GP247 のフロントエンド基盤＆CMS パッケージ
 
 `composer require gp247/front`
 
+[![Tests](https://github.com/gp247net/front/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/gp247net/front/actions/workflows/tests.yml)
 [![総ダウンロード数](https://poser.pugx.org/gp247/front/d/total.svg)](https://packagist.org/packages/gp247/front)
 [![最新の安定版](https://poser.pugx.org/gp247/front/v/stable.svg)](https://packagist.org/packages/gp247/front)
 [![ライセンス](https://poser.pugx.org/gp247/front/license.svg)](https://packagist.org/packages/gp247/front)
