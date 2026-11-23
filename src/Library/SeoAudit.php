@@ -362,7 +362,14 @@ class SeoAudit
     }
 
     /**
+     * Content rows of one type that share their shown title (own SEO title, else name).
+     *
+     * @param string $store
+     * @param string $lang
      * @return array{0: int, 1: array}
+     *
+     * @aidlc-unit seo
+     * @aidlc-story US-SEO-audit
      */
     private static function duplicateTitles(string $store, string $lang): array
     {
@@ -370,8 +377,11 @@ class SeoAudit
         $examples = [];
         foreach (self::sources() as $type => $src) {
             $title = self::titleSql($src);
+            // WHY MIN(): MariaDB's ONLY_FULL_GROUP_BY checks columns, not expressions, so a bare
+            // title expression in the select list is refused even though it equals the GROUP BY
+            // expression. Inside one group the expression has a single value, so MIN() is it.
             $groups = self::contentQuery($type, $src, $store, $lang)
-                ->selectRaw($title . ' as t, COUNT(*) as n')
+                ->selectRaw('MIN(' . $title . ') as t, COUNT(*) as n')
                 ->groupByRaw($title)
                 ->havingRaw('COUNT(*) > 1')
                 ->limit(1000)->get();
