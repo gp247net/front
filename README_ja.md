@@ -17,7 +17,7 @@ GP247 のフロントエンド基盤＆CMS パッケージ
 [![総ダウンロード数](https://poser.pugx.org/gp247/front/d/total.svg)](https://packagist.org/packages/gp247/front)
 [![最新の安定版](https://poser.pugx.org/gp247/front/v/stable.svg)](https://packagist.org/packages/gp247/front)
 [![ライセンス](https://poser.pugx.org/gp247/front/license.svg)](https://packagist.org/packages/gp247/front)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/gp247net/front)
+[![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/gp247net/front)
 
 ## 概要
 

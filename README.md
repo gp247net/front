@@ -17,7 +17,7 @@ Frontend foundation & CMS package for GP247
 [![Total Downloads](https://poser.pugx.org/gp247/front/d/total.svg)](https://packagist.org/packages/gp247/front)
 [![Latest Stable Version](https://poser.pugx.org/gp247/front/v/stable.svg)](https://packagist.org/packages/gp247/front)
 [![License](https://poser.pugx.org/gp247/front/license.svg)](https://packagist.org/packages/gp247/front)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/gp247net/front)
+[![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/gp247net/front)
 
 
 ## Introduction
