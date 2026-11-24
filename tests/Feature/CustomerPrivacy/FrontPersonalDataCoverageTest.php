@@ -20,18 +20,6 @@ class FrontPersonalDataCoverageTest extends TestCase
 {
     private const PATTERN = '/(^|_)(email|phone|first_name|last_name|name|address\d*|postcode|ip|ip_address|user_agent|customer_id|identity)$/';
 
-    /** @var array<string, string> Table => why it holds no customer data. */
-    private const NOT_CUSTOMER_DATA = [
-        'front_banner' => 'banners of the shop',
-        'front_banner_type' => 'list of banner places',
-        'front_country' => 'list of countries',
-        'front_layout_block' => 'page blocks of the shop',
-        'front_link' => 'menu links of the shop',
-        'front_link_group' => 'list of menu groups',
-        'front_page_description' => 'page texts written by the shop',
-        'front_tracking_revision' => 'changes made by administrators',
-        'front_tracking_snippet' => 'tracking code of the shop',
-    ];
 
     public function test_contact_messages_and_newsletter_sign_ups_are_deleted_by_email(): void
     {
@@ -56,7 +44,7 @@ class FrontPersonalDataCoverageTest extends TestCase
                 continue;
             }
             $logical = substr((string) $table['name'], strlen(GP247_DB_PREFIX));
-            if (!str_starts_with((string) $table['name'], GP247_DB_PREFIX . 'front_') || in_array($logical, $declared, true) || isset(self::NOT_CUSTOMER_DATA[$logical])) {
+            if (!str_starts_with((string) $table['name'], GP247_DB_PREFIX . 'front_') || in_array($logical, $declared, true) || isset(\GP247\Core\PersonalData\Application\PersonalDataRegistry::notCustomerTables()[$logical])) {
                 continue;
             }
             $matches = preg_grep(self::PATTERN, array_column($schema->getColumns((string) $table['name']), 'name'));

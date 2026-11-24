@@ -21,6 +21,19 @@ final class FrontPersonalData
 {
     public const OWNER = 'gp247/front';
 
+    /** @var array<string, string> Front tables that look personal by column names but hold no customer data. */
+    public const NOT_CUSTOMER_DATA = [
+        'front_banner' => 'banners of the shop',
+        'front_banner_type' => 'list of banner places',
+        'front_country' => 'list of countries',
+        'front_layout_block' => 'page blocks of the shop',
+        'front_link' => 'menu links of the shop',
+        'front_link_group' => 'list of menu groups',
+        'front_page_description' => 'page texts written by the shop',
+        'front_tracking_revision' => 'changes made by administrators',
+        'front_tracking_snippet' => 'tracking code of the shop',
+    ];
+
     /**
      * @return void
      */
@@ -46,5 +59,11 @@ final class FrontPersonalData
                 ->order(60)
                 ->describe(['en' => 'Newsletter sign-ups', 'vi' => 'Đăng ký nhận tin', 'ja' => 'ニュースレター登録'], self::OWNER)
         );
+        // WHY method_exists: a core without the undeclared-source detection does not have it.
+        if (method_exists(PersonalDataRegistry::class, 'notCustomerData')) {
+            foreach (self::NOT_CUSTOMER_DATA as $table => $reason) {
+                PersonalDataRegistry::notCustomerData($table, $reason);
+            }
+        }
     }
 }
