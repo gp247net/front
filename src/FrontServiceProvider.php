@@ -213,6 +213,10 @@ class FrontServiceProvider extends ServiceProvider
                 exit;
             }
 
+            // Contact messages and newsletter sign-ups in the personal data registry of the core
+            // (US-customer-privacy-declare-shop-data); a no-op on a core without it.
+            \GP247\Front\Privacy\FrontPersonalData::register();
+
             try {
                 $this->registerRouteMiddleware();
             } catch (\Throwable $e) {
