@@ -4,17 +4,19 @@ namespace GP247\Front\Privacy;
 
 use GP247\Core\PersonalData\Application\PersonalDataRegistry;
 use GP247\Core\PersonalData\Domain\PersonalDataSource;
+use GP247\Core\PersonalData\Domain\Retention\RetentionItem;
 use GP247\Core\PersonalData\Domain\SubjectLink;
 
 /**
  * Where gp247/front keeps personal data of customers: messages sent through the contact form
- * and newsletter sign-ups, both found by email and deleted when the customer is erased. Does
+ * and newsletter sign-ups, both found by email and deleted when the customer is erased; messages
+ * are kept 2 years and sign-ups turned off 30 days by default. Does
  * nothing on a core without the personal data registry, so this package keeps running there.
  *
  * Labels are given by locale here, so no language row has to be added for them.
  *
  * @aidlc-unit customer-privacy
- * @aidlc-story US-customer-privacy-declare-shop-data
+ * @aidlc-story US-customer-privacy-declare-shop-data, US-personal-data-retention-policies
  * @aidlc-adr personal-data-registry_source-declaration
  */
 final class FrontPersonalData
@@ -59,6 +61,18 @@ final class FrontPersonalData
                 ->order(60)
                 ->describe(['en' => 'Newsletter sign-ups', 'vi' => 'Đăng ký nhận tin', 'ja' => 'ニュースレター登録'], self::OWNER)
         );
+        // How long front keeps them (US-personal-data-retention-policies); a core without retention items skips it.
+        if (method_exists(PersonalDataRegistry::class, 'retention')) {
+            PersonalDataRegistry::retention(
+                RetentionItem::rows('front.contact', 'front_contact')->days(730, 30, 3650)
+                    ->describe(['en' => 'Contact form messages', 'vi' => 'Tin nhắn form liên hệ', 'ja' => 'お問い合わせ'], self::OWNER, 30)
+            );
+            PersonalDataRegistry::retention(
+                // WHY updated_at: a sign-up is turned off (by the subscriber or the shop) by setting its status, which updates the row.
+                RetentionItem::rows('front.subscriptions', 'front_subscribe')->where(['status' => 0])->olderThan('updated_at')->days(30, 1, 365)
+                    ->describe(['en' => 'Newsletter sign-ups turned off', 'vi' => 'Đăng ký nhận tin đã tắt', 'ja' => '停止されたニュースレター登録'], self::OWNER, 31)
+            );
+        }
         // WHY method_exists: a core without the undeclared-source detection does not have it.
         if (method_exists(PersonalDataRegistry::class, 'notCustomerData')) {
             foreach (self::NOT_CUSTOMER_DATA as $table => $reason) {
