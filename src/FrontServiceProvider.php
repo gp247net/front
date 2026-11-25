@@ -357,12 +357,11 @@ class FrontServiceProvider extends ServiceProvider
      */
     protected function registerAdminShell()
     {
-        // `gp247-front-admin::` exposes the modern admin views (Views/admin,
-        // renamed from admin-shell 2026-07-02 to free the bare 'gp247-front'
-        // namespace for the US-TPL-008 storefront components, which had been
-        // colliding with this one — see aidlc-docs ADR-013); class components
-        // live under GP247\Front\Admin\Livewire (PSR-4). Reuses the core
-        // `<x-gp247::*>` library + base DataTable/Form components.
+        // `gp247-front-admin::` exposes the modern admin views (Views/admin).
+        // WHY a namespace of its own: the bare 'gp247-front' namespace belongs to
+        // the storefront components, and sharing it made the two collide. Class
+        // components live under GP247\Front\Admin\Livewire (PSR-4). Reuses the
+        // core `<x-gp247::*>` library + base DataTable/Form components.
         $this->loadViewsFrom(__DIR__.'/Views/admin', 'gp247-front-admin');
 
         // Cutover (PA-1): all front-admin screens are served at legacy URLs
