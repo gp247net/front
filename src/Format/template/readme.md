@@ -80,7 +80,7 @@ the files of `GP247Front`, so a missing view stops the page with "view not found
 | `common/item_single`, `common/pagination`, `common/pagination_result`, `common/jsonld_product`, `common/jsonld_breadcrumb`, `common/render_form_custom_field` | Included by search and by the shop pages |
 
 The quickest correct start is to copy these files from `vendor/gp247/front/src/Views/templates/GP247Front/` and
-restyle them. The `gp247-template-create` skill (https://github.com/gp247net/gp247-skills) builds them for you.
+restyle them. The `gp247-template-create` skill (https://github.com/gp247-official/gp247-skills) builds them for you.
 
 ## Layout contract: SEO, tracking code and cookie banner
 

@@ -13,11 +13,11 @@ Gói nền tảng frontend & CMS cho GP247
 
 `composer require gp247/front`
 
-[![Tests](https://github.com/gp247net/front/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/gp247net/front/actions/workflows/tests.yml)
+[![Tests](https://github.com/gp247-official/front/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/gp247-official/front/actions/workflows/tests.yml)
 [![Tổng lượt tải](https://poser.pugx.org/gp247/front/d/total.svg)](https://packagist.org/packages/gp247/front)
 [![Phiên bản ổn định mới nhất](https://poser.pugx.org/gp247/front/v/stable.svg)](https://packagist.org/packages/gp247/front)
 [![Giấy phép](https://poser.pugx.org/gp247/front/license.svg)](https://packagist.org/packages/gp247/front)
-[![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/gp247net/front)
+[![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/gp247-official/front)
 
 ## Giới thiệu
 
@@ -34,7 +34,7 @@ Các tính năng chính:
 
 ## Cài đặt
 
-> 📘 **Hướng dẫn cài đặt đầy đủ** — chọn bộ cài (S-Cart, GP247 CMS, chỉ core), hosting không có dòng lệnh, thêm front/shop vào site đang có, xử lý sự cố: [Cài đặt GP247 và S-Cart](https://github.com/gp247net/gp247-docs/blob/main/install-upgrade/install_vi.md).
+> 📘 **Hướng dẫn cài đặt đầy đủ** — chọn bộ cài (S-Cart, GP247 CMS, chỉ core), hosting không có dòng lệnh, thêm front/shop vào site đang có, xử lý sự cố: [Cài đặt GP247 và S-Cart](https://github.com/gp247-official/gp247-docs/blob/main/install-upgrade/install_vi.md).
 
 1. Cài đặt gói
 

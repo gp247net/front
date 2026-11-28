@@ -13,11 +13,11 @@ GP247 のフロントエンド基盤＆CMS パッケージ
 
 `composer require gp247/front`
 
-[![Tests](https://github.com/gp247net/front/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/gp247net/front/actions/workflows/tests.yml)
+[![Tests](https://github.com/gp247-official/front/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/gp247-official/front/actions/workflows/tests.yml)
 [![総ダウンロード数](https://poser.pugx.org/gp247/front/d/total.svg)](https://packagist.org/packages/gp247/front)
 [![最新の安定版](https://poser.pugx.org/gp247/front/v/stable.svg)](https://packagist.org/packages/gp247/front)
 [![ライセンス](https://poser.pugx.org/gp247/front/license.svg)](https://packagist.org/packages/gp247/front)
-[![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/gp247net/front)
+[![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/gp247-official/front)
 
 ## 概要
 
@@ -34,7 +34,7 @@ GP247/Front は、GP247 の**フロントエンド層全体の基盤となるパ
 
 ## インストール
 
-> 📘 **インストールの詳しいガイド** — インストール構成の選び方（S-Cart、GP247 CMS、core のみ）、コマンドラインのないホスティング、既存サイトへの front/shop 追加、トラブルシューティング：[GP247 と S-Cart のインストール](https://github.com/gp247net/gp247-docs/blob/main/install-upgrade/install_ja.md)。
+> 📘 **インストールの詳しいガイド** — インストール構成の選び方（S-Cart、GP247 CMS、core のみ）、コマンドラインのないホスティング、既存サイトへの front/shop 追加、トラブルシューティング：[GP247 と S-Cart のインストール](https://github.com/gp247-official/gp247-docs/blob/main/install-upgrade/install_ja.md)。
 
 1. パッケージをインストールします
 

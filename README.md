@@ -13,11 +13,11 @@ Frontend foundation & CMS package for GP247
 
 `composer require gp247/front`
 
-[![Tests](https://github.com/gp247net/front/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/gp247net/front/actions/workflows/tests.yml)
+[![Tests](https://github.com/gp247-official/front/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/gp247-official/front/actions/workflows/tests.yml)
 [![Total Downloads](https://poser.pugx.org/gp247/front/d/total.svg)](https://packagist.org/packages/gp247/front)
 [![Latest Stable Version](https://poser.pugx.org/gp247/front/v/stable.svg)](https://packagist.org/packages/gp247/front)
 [![License](https://poser.pugx.org/gp247/front/license.svg)](https://packagist.org/packages/gp247/front)
-[![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/gp247net/front)
+[![Ask DeepWiki](https://img.shields.io/badge/Ask-DeepWiki-blue)](https://deepwiki.com/gp247-official/front)
 
 
 ## Introduction
@@ -35,7 +35,7 @@ Key features:
 
 ## Installation
 
-> 📘 **Full installation guide** — choosing a package set (S-Cart, GP247 CMS, core only), hosting without a command line, adding front/shop to an existing site, troubleshooting: [Installing GP247 and S-Cart](https://github.com/gp247net/gp247-docs/blob/main/install-upgrade/install.md).
+> 📘 **Full installation guide** — choosing a package set (S-Cart, GP247 CMS, core only), hosting without a command line, adding front/shop to an existing site, troubleshooting: [Installing GP247 and S-Cart](https://github.com/gp247-official/gp247-docs/blob/main/install-upgrade/install.md).
 
 1. Install package
 

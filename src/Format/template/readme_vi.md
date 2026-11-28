@@ -80,7 +80,7 @@ của `GP247Front`, nên thiếu view nào thì trang đó dừng với lỗi "v
 | `common/item_single`, `common/pagination`, `common/pagination_result`, `common/jsonld_product`, `common/jsonld_breadcrumb`, `common/render_form_custom_field` | Trang tìm kiếm và các trang shop include |
 
 Cách bắt đầu nhanh và đúng: chép các file này từ `vendor/gp247/front/src/Views/templates/GP247Front/` rồi sửa giao diện.
-Skill `gp247-template-create` (https://github.com/gp247net/gp247-skills) dựng sẵn chúng cho bạn.
+Skill `gp247-template-create` (https://github.com/gp247-official/gp247-skills) dựng sẵn chúng cho bạn.
 
 ## Hợp đồng layout: SEO, mã đo lường và banner cookie
 
